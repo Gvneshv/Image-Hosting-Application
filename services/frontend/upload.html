@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Upload</title>
+    <link rel="icon" type="image/x-icon" href="base_images/ico/favicon.ico">
+    <link rel="stylesheet" href="css/upload.css">
+    <script src="js/modal.js" defer></script>
+    <script src="js/upload.js" defer></script>
+    <script src="js/tabs.js" defer></script>
+</head>
+<body>
+<section class="page-container">
+  <header class="header-container">
+    <h1 class="header-title">Upload Photos</h1>
+    <p class="header-subtitle">Upload selfies, memes, or any fun pictures here.</p>
+  </header>
+
+  <nav class="toggle-tabs">
+      <span class="toggle-tab active upload-pictures-button" data-tab="upload">Upload</span>
+      <span class="toggle-tab inactive uploaded-images-button" data-tab="images">Images</span>
+  </nav>
+
+  <!-- Upload section -->
+  <section id="upload-tab" class="upload-section tab-content">
+  <div class="upload-pad" id="uploadArea">
+      <div class="cloud-picture-container">
+          <svg class="cloud-picture" width="47" height="39" viewBox="0 0 47 39" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M31.5 27.5L23.5 19.5L15.5 27.5" stroke="#4676FB" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              <path d="M23.5 19.5V37.5" stroke="#4676FB" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              <path d="M40.2799 32.28C42.2306 31.2165 43.7716 29.5338 44.6597 27.4973C45.5477 25.4607 45.7323 23.1865 45.1843 21.0334C44.6363 18.8803 43.3869 16.971 41.6333 15.6069C39.8796 14.2428 37.7216 13.5015 35.4999 13.5H32.9799C32.3745 11.1585 31.2462 8.98467 29.6798 7.14199C28.1134 5.2993 26.1496 3.8357 23.9361 2.86121C21.7226 1.88673 19.317 1.42672 16.9002 1.51576C14.4833 1.60481 12.1181 2.2406 9.98227 3.37533C7.84649 4.51006 5.99574 6.1142 4.56916 8.06716C3.14259 10.0201 2.1773 12.2711 1.74588 14.6508C1.31446 17.0305 1.42813 19.4771 2.07835 21.8065C2.72856 24.136 3.8984 26.2877 5.49992 28.1" stroke="#4676FB" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              <path d="M31.5 27.5L23.5 19.5L15.5 27.5" stroke="#4676FB" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+      </div>
+      <div class="description-container">
+          <p class="upload-main-text" id="upload-main-text">Select a file or drag and drop here</p>
+          <p class="description-text" id="upload-sub-text">Only support .jpg, .jpeg, .png, and gif.<br>Maximum file size is 5MB</p>
+      </div>
+  </div>
+
+        <label for="fileInput" class="browse-button browse-button-text" id="browse-button">Browse your file</label>
+        <input type="file" id="fileInput" accept=".jpg,.jpeg,.png,.gif"/>
+
+    <section class="url-container">
+        <span class="url-title url-title-text">Current Upload</span>
+        <div class="url-upload">
+            <input class="url" type="text" id="resultLink" name="resultLink" placeholder="https://" readonly/>
+            <button class="url-copy-button url-copy-button-text copyBtn" id="copyBtn">Copy</button>
+        </div>
+    </section>
+</section>
+
+<!-- Images Section -->
+
+    <section class="images-section tab-content hidden" id="images-tab">
+        <div class="hidden-table table">
+            <!-- JS will inject per-page dropdown here -->
+        </div>
+            <!-- JS will inject buttons here -->
+    </section>
+</section>
+<footer class="footer-container"></footer>
+</body>
+</html>

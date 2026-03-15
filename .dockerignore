@@ -1,0 +1,47 @@
+# Version control
+.git
+.gitignore
+.github
+
+# Python bytecode and caches
+**/__pycache__
+**/*.py[cod]
+**/*.pyo
+**/.pytest_cache
+**/.mypy_cache
+**/.ruff_cache
+
+# Virtual environments
+.venv
+venv
+env
+
+# Local environment files (never bake secrets into the image)
+**/.env
+
+# Uploaded images (stored in Docker volumes, not in the image)
+services/backend/backup/
+images/
+
+# Logs
+logs/
+**/*.log
+
+# Editor / IDE artefacts
+.idea
+.vscode
+*.swp
+*.swo
+
+# macOS
+.DS_Store
+
+# Test and coverage reports
+htmlcov/
+.coverage
+coverage.xml
+
+# Build artefacts
+dist/
+build/
+*.egg-info/

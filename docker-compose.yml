@@ -1,0 +1,114 @@
+services:
+  backend:
+    build:
+      context: .
+      dockerfile: ./services/backend/Dockerfile
+    container_name: fastapi-backend
+    env_file:
+      - ./services/backend/.env
+    ports:
+      - "8000:8000"
+    # Use internal Docker volumes instead of host binds (previously used bindings)
+    volumes:
+      - backend_images:/usr/src/app/images
+      - backend_logs:/usr/src/app/logs
+    entrypoint: [ "/usr/src/app/scripts/entrypoint.sh" ]
+    depends_on:
+      db:
+        condition: service_healthy
+      pgbouncer:
+        condition: service_healthy
+    healthcheck:
+      test: [ "CMD-SHELL", "curl -f http://localhost:8000/health || exit 1" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+    networks:
+      - upload-network
+
+  nginx:
+    image: nginx:stable-alpine
+    container_name: nginx
+    ports:
+      - "80:80"
+    # Mount the same Docker volume (read-only)
+    volumes:
+      - backend_images:/usr/src/app/images:ro
+      - backend_logs_nginx:/var/log/nginx
+      - ./services/nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./services/frontend:/usr/share/nginx/html:ro
+    depends_on:
+      backend:
+        condition: service_healthy
+    networks:
+      - upload-network
+
+  db:
+    image: postgres:17.4
+    container_name: postgres-upload-server
+    restart: unless-stopped
+    env_file:
+      - ./services/backend/.env
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB} -h 127.0.0.1 || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
+    networks:
+      - upload-network
+
+  pgbouncer:
+    build:
+      context: ./services/pgbouncer
+      dockerfile: Dockerfile
+    container_name: pgbouncer
+    user: postgres
+    env_file:
+      - ./services/backend/.env
+    ports:
+      - "6432:6432"
+    volumes:
+      - ./logs/pgbouncer:/var/log/pgbouncer
+    depends_on:
+      db:
+        condition: service_healthy
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -h 127.0.0.1 -p 6432 -U $${POSTGRES_USER} -d $${POSTGRES_DB} || exit 1" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+    networks:
+      - upload-network
+
+  backup:
+    build: ./services/backup
+    container_name: backup
+    volumes:
+      - ./services/backend/backup:/backup
+      - ./services/backend/.env:/env/.env:ro
+    depends_on:
+      backend:
+        condition: service_healthy
+    restart: always
+    networks:
+      - upload-network
+
+networks:
+  upload-network:
+
+volumes:
+  postgres_data:
+    driver: local
+  backend_images:
+    driver: local
+  backend_logs:
+    driver: local
+  backend_logs_nginx:
+    driver: local

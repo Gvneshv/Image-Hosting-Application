@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Detailed Image</title>
+    <link rel="icon" type="image/x-icon" href="../base_images/ico/favicon.ico">
+    <link rel="stylesheet" href="../css/viewer.css">
+    <script src="../js/modal.js" defer></script>
+    <script src="../js/viewer.js" defer></script>
+</head>
+<body>
+    <section class="page-container">
+        <button class="back" id="back" title="Back to Gallery">Back to Gallery</button>
+        <header class="header-container">
+            <h1 class="header-title">Upload Photos</h1>
+            <p class="header-subtitle">Upload selfies, memes, or any fun pictures here.</p>
+        </header>
+    </section>
+
+    <main class="main">
+        <section class="image">
+            <!--
+                src is intentionally empty here.
+                viewer.js fetches image metadata from /file_info/:filename and
+                sets imagePreview.src dynamically via info.url.
+                The filename variable passed from the FastAPI route is used by
+                viewer.js (extracted from window.location.pathname) rather than
+                being injected directly into the src attribute.
+            -->
+            <img src="" id="imagePreview" class="imagePreview" alt="{{ filename }}" title="{{ filename }}"/>
+        </section>
+
+        <section class="image-info">
+            <h2 class="page-title">Image Details</h2>
+            <div class="info-card">
+                <div class="info-row">
+                    <span class="info-label">Full Filename:</span>
+                    <span class="info-value" id="infoFilename"></span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Original Name:</span>
+                    <span class="info-value" id="infoOriginalName"></span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Unique Name:</span>
+                    <span class="info-value" id="infoUniqueName"></span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">File Size:</span>
+                    <span class="info-value" id="infoFileSize"></span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">File Type:</span>
+                    <span class="info-value" id="infoFileType"></span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Upload Date:</span>
+                    <span class="info-value" id="infoUploadDate"></span>
+                </div>
+            </div>
+
+            <div class="actions">
+                <button class="action-button" id="copyUrlBtn">
+                    <span>Copy URL</span>
+                </button>
+                <button class="action-button" id="downloadBtn">
+                    <span>Download</span>
+                </button>
+                <button class="action-button" id="deleteBtn">
+                    <span>Delete</span>
+                </button>
+            </div>
+        </section>
+    </main>
+
+    <!-- Lightbox overlay -->
+    <div id="image-viewer" class="hidden">
+        <span class="close-btn" aria-label="Close">&times;</span>
+
+        <!-- Wrapper for main image and neighbor thumbnail previews -->
+        <div class="viewer-content">
+            <img id="viewer-prev" class="viewer-neighbor" alt="Previous Image" />
+            <img id="viewer-image" src="" alt="Preview Image" />
+            <img id="viewer-next" class="viewer-neighbor" alt="Next Image" />
+        </div>
+
+        <!-- Navigation arrows -->
+        <button class="nav-btn prev-btn" aria-label="Previous">&#10094;</button>
+        <button class="nav-btn next-btn" aria-label="Next">&#10095;</button>
+
+        <!-- Fullscreen toggle -->
+        <button class="fullscreen-btn" aria-label="Fullscreen">&#x26F6;</button>
+    </div>
+</body>
+</html>

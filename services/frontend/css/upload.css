@@ -1,0 +1,1014 @@
+body {
+    margin: 0;
+    font-family: Inter, sans-serif;
+    background-color: #F2F5FF;
+}
+
+button {
+    border: none;
+    font-family: Inter, sans-serif;
+    cursor: pointer;
+}
+
+.page-container {
+    width: 100%;
+    height: auto;
+    max-width: 1440px;
+    margin: 0 auto;
+    position: relative;
+}
+
+/* Header Section */
+.header-container {
+    position: absolute;
+    transform: translate(-50%);
+    display: inline-flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+    top: 30px;
+    left: 50%;
+    width: 293px;
+    height: 37px;
+}
+
+.header-title {
+    margin-top: 0;
+    margin-bottom: 0;
+    width: 111px;
+    height: 14px;
+    font-weight: 700;
+    font-size: 16px;
+    line-height: 14px;
+    letter-spacing: -0.02em;
+    color: #0B0B0B;
+}
+
+.header-subtitle {
+    margin: 0;
+    width: 293px;
+    height: 21px;
+    font-weight: 300;
+    font-size: 14px;
+    line-height: 150%;
+    letter-spacing: -0.04em;
+    color: #0B0B0B;
+}
+
+/* Tabs */
+.toggle-tabs {
+    position: absolute;
+    display: inline;
+    transform: translate(-50%);
+    left: 50%;
+    top: 117px;
+    width: 160px;
+    height: 24px;
+    font-weight: 700;
+    font-size: 20px;
+    line-height: 100%;
+}
+
+.toggle-tab {
+    font-size: 20px;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.toggle-tab.active {
+    color: #0060FF;
+}
+
+.toggle-tab.inactive {
+    color: #ADC0F8;
+}
+
+.upload-pictures-button {
+    position: relative;
+    display: inline;
+    vertical-align: middle;
+    color: #0060FF;
+    background-color: #F2F5FF;
+    font-weight: 700;
+    font-size: 20px;
+    line-height: 100%;
+    letter-spacing: 0;
+}
+
+.uploaded-images-button {
+    position: relative;
+    display: inline;
+    vertical-align: middle;
+    left: 14px;
+    color: #ADC0F8;
+    background-color: #F2F5FF;
+    font-weight: 700;
+    font-size: 20px;
+    line-height: 100%;
+    letter-spacing: 0;
+}
+
+/* Upload Section */
+.upload-pad {
+    position: absolute;
+    display: inline;
+    transform: translate(-50%);
+    left: 50%;
+    top: 191px;
+    width: 472px;
+    height: 200px;
+    border-radius: 10px;
+    padding: 16px 32px;
+    border: 2px dashed #0060FF;
+}
+
+.upload-pad.dragover {
+    border-color: #0060FF;
+    background: rgba(0, 96, 255, 0.05);
+    transition: background 0.2s;
+}
+
+.cloud-picture-container {
+    width: 48px;
+    height: 48px;
+    position: absolute;
+    display: inline;
+    transform: translate(-50%);
+    left: 50%;
+    top: 53px;
+}
+
+.cloud-picture {
+    position: absolute;
+    width: 44px;
+    height: 36px;
+    top: 6px;
+    left: 2px;
+    border: 2px;
+}
+
+.description-container {
+    width: 270px;
+    height: 63px;
+    position: absolute;
+    display: inline-block;
+    top: 110px;
+    left: 135px;
+}
+
+.upload-main-text {
+    position: relative;
+    align-content: center;
+    width: 265px;
+    height: 35px;
+    font-weight: 400;
+    font-size: 14px;
+    text-align: center;
+    color: #0B0B0B;
+    overflow-x: clip;
+    overflow-y: clip;
+}
+
+.description-text {
+    position: relative;
+    align-content: center;
+    width: 270px;
+    height: 34px;
+    font-weight: 400;
+    font-size: 14px;
+    text-align: center;
+    color: #ADC0F8;
+    margin-top: -10px;
+}
+
+input[type="file"] {
+    display: none;
+}
+
+.browse-button {
+    position: absolute;
+    display: inline;
+    transform: translate(-50%);
+    left: 50%;
+    width: 509px;
+    height: 20px;
+    background-color: #0060FF;
+    top: 451px;
+    border-radius: 7px;
+    padding: 12px 16px;
+    border: none;
+    cursor: pointer;
+}
+
+.browse-button-text {
+    color: #FFFFFF;
+    font-weight: 600;
+    font-size: 12px;
+    text-align: center;
+    text-transform: uppercase;
+    line-height: 100%;
+    letter-spacing: 0.02em;
+    align-content: center;
+}
+
+.url-container {
+    position: absolute;
+    display: flex;
+    transform: translate(-50%);
+    left: 50%;
+    width: 540px;
+    height: 96px;
+    top: 540px;
+}
+
+.url-title {
+    position: absolute;
+    top: 0;
+    width: 539px;
+    height: 24px;
+}
+
+.url-title-text {
+    font-weight: 700;
+    font-size: 16px;
+    line-height: 24px;
+    color: #0B0B0B;
+    letter-spacing: -0.03em;
+}
+
+.url-upload {
+    position: absolute;
+    display: inline-flex;
+    align-items: center;
+    width: 505px;
+    height: 30px;
+    top: 35px;
+    padding: 16px;
+    border: 2px solid #4676FB;
+    background-color: #FAFAFA;
+    border-radius: 12px;
+}
+
+.url {
+    position: relative;
+    font-weight: 400;
+    font-size: 16px;
+    line-height: 20px;
+    color: rgba(11, 11, 11, 0.5);
+    width: 441px;
+    height: 20px;
+    letter-spacing: 0.02em;
+    border: none;
+    background-color: #FAFAFA;
+    outline: none;
+    caret-color: transparent;
+}
+
+.url-copy-button {
+    position: relative;
+    width: 59px;
+    height: 30px;
+    border: none;
+    left: 8px;
+    border-radius: 8px;
+    background-color: #0060FF;
+}
+
+.url-copy-button-text {
+    color: #FFFFFF;
+    font-weight: 600;
+    font-size: 12px;
+    line-height: 18px;
+    letter-spacing: 0;
+    text-transform: uppercase;
+}
+
+/* Upload error */
+.upload-error {
+    font-weight: 600;
+    font-size: 14px;
+    line-height: 100%;
+    letter-spacing: 0;
+    text-align: center;
+    color: #FF0000;
+    position: relative;
+    align-content: center;
+    width: 270px;
+    height: 29px;
+}
+
+/* Successful upload */
+.url-successful-upload {
+    font-weight: 400;
+    line-height: 20px;
+    color: #0B0B0B;
+    position: relative;
+    font-size: 16px;
+    width: 441px;
+    height: 20px;
+    letter-spacing: 0.02em;
+}
+
+.hidden {
+    display: none !important;
+}
+
+/* Images Section */
+.no-images-msg {
+    position: absolute;
+    padding: 40px;
+    top: 130px;
+    left: 50%;
+    transform: translate(-50%);
+    font-size: 18px;
+    color: #555;
+}
+
+.table {
+    position: relative;
+    display: flex;
+    flex-direction: row;
+    width: 95%;
+    height: auto;
+    top: 171px;
+    left: 30px;
+    padding-bottom: 2%;
+    align-content: center;
+    justify-content: flex-start;
+    align-items: flex-start;
+    flex-wrap: wrap;
+    gap: 2%;
+}
+
+.image-element {
+    position: relative;
+    display: flex;
+    width: 30%;
+    margin-top: 2%;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.image-element:hover {
+    transform: scale(1.05);
+    box-shadow: 0 0 10px darkgoldenrod;
+    border-radius: 20px;
+}
+
+.image {
+    height: 300px;
+    width: 100%;
+    border-radius: 20px 20px 0 0;
+    background-size: cover;
+    cursor: pointer;
+    position: relative;
+    display: flex;
+}
+
+.new-tab {
+    width: 36px;
+    height: 36px;
+    border-radius: 10px;
+    top: 15px;
+    right: 16px;
+    position: absolute;
+    background: url("../base_images/ico/new-tab.png");
+    background-size: cover;
+}
+
+.new-tab:hover {
+    transform: scale(1.15);
+    box-shadow: 0 0 5px black;
+    border-radius: 8px;
+}
+
+.image-beneath {
+    height: 100px;
+    width: 100%;
+    border-radius: 0 0 20px 20px;
+    position: relative;
+    background-color: black;
+}
+
+.image-buttons-container {
+    width: 90%;
+    height: 65%;
+    top: 50%;
+    left: 21px;
+    position: absolute;
+    transform: translate(0, -50%);
+    display: flex;
+}
+
+.copy-button {
+    width: 80%;
+    height: 50%;
+    border-radius: 10px;
+    top: 25%;
+    position: absolute;
+    background-color: darkgoldenrod;
+    color: black;
+    font-size: large;
+    font-weight: lighter;
+    letter-spacing: 0.5em;
+}
+
+.delete-button {
+    height: 36px;
+    width: 38px;
+    min-height: 30px;
+    min-width: 30px;
+    max-height: 50px;
+    max-width: 50px;
+    border-radius: 15px;
+    top: 20%;
+    position: absolute;
+    margin-left: 90%;
+    background-size: cover;
+    background-color: black;
+    font-size: 25px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    /* color: white; */
+}
+
+/* Pagination and Controls */
+.perpage-controls {
+    margin: 10px 0;
+    text-align: left;
+    font-size: 14px;
+    width: 100%;
+}
+
+.perpage-controls label {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 17px;
+    font-weight: bold;
+    margin-left: 5%;
+}
+
+.perpage-controls select {
+    padding: 3px 6px;
+    font-size: 16px;
+    border: none;
+    background-color: #F2F5FF;
+}
+
+.pagination-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+    margin: 15px 0;
+    font-size: 14px;
+    position: relative;
+    top: 175px;
+}
+
+.pagination-container button {
+    padding: 5px 12px;
+    font-size: 17px;
+    font-weight: 300;
+    cursor: pointer;
+    background-color: darkgoldenrod;
+    border-radius: 7px;
+}
+
+.pagination-container button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+#pageInfo {
+    min-width: 80px;
+    text-align: center;
+    font-size: 16px;
+}
+
+/* Footer */
+.footer-container {
+    width: 100%;
+    height: 50px;
+    top: 175px;
+    position: relative;
+}
+
+/* ========================================
+   RESPONSIVE DESIGN - MEDIA QUERIES
+   ======================================== */
+
+/* Large tablets and small desktops (1024px and below) */
+@media (max-width: 1024px) {
+    .header-container {
+        width: 90%;
+        max-width: 400px;
+    }
+
+    .header-subtitle {
+        width: 100%;
+        text-align: center;
+    }
+
+    .upload-pad {
+        width: 85%;
+        max-width: 450px;
+    }
+
+    .browse-button {
+        width: 85%;
+        max-width: 480px;
+    }
+
+    .url-container {
+        width: 85%;
+        max-width: 520px;
+    }
+
+    .url-upload {
+        width: calc(100% - 32px);
+    }
+
+    .url {
+        width: calc(100% - 80px);
+    }
+
+    /* Images grid - 2 columns */
+    .table {
+        width: 90%;
+        left: 5%;
+    }
+
+    .image-element {
+        width: 47%;
+    }
+
+    .delete-button {
+        height: 32px;
+        width: 34px;
+        font-size: 22px;
+    }
+}
+
+/* Tablets and large phones (768px and below) */
+@media (max-width: 768px) {
+    .header-container {
+        top: 20px;
+        width: 90%;
+    }
+
+    .header-title {
+        font-size: 14px;
+    }
+
+    .header-subtitle {
+        font-size: 12px;
+        width: 100%;
+    }
+
+    .toggle-tabs {
+        top: 90px;
+        font-size: 18px;
+    }
+
+    .toggle-tab {
+        font-size: 18px;
+    }
+
+    /* Upload section */
+    .upload-pad {
+        width: 85%;
+        max-width: none;
+        top: 150px;
+        height: 180px;
+    }
+
+    .description-container {
+        left: 50%;
+        transform: translateX(-50%);
+        width: 90%;
+    }
+
+    .upload-main-text,
+    .description-text {
+        width: 100%;
+    }
+
+    .browse-button {
+        width: 90%;
+        max-width: none;
+        top: 380px;
+    }
+
+    .url-container {
+        width: 90%;
+        max-width: none;
+        top: 460px;
+    }
+
+    .url-title {
+        width: 100%;
+    }
+
+    /* Images grid - 2 columns */
+    .table {
+        width: 95%;
+        left: 2.5%;
+        top: 140px;
+    }
+
+    .image-element {
+        width: 47%;
+    }
+
+    .image {
+        height: 200px;
+    }
+
+    .delete-button {
+        height: 28px;
+        width: 30px;
+        font-size: 20px;
+        border-radius: 12px;
+    }
+
+    .copy-button {
+        font-size: medium;
+        letter-spacing: 0.3em;
+    }
+
+    /* Pagination */
+    .pagination-container {
+        top: 145px;
+        flex-wrap: wrap;
+    }
+
+    .pagination-container button {
+        font-size: 15px;
+        padding: 4px 10px;
+    }
+
+    .perpage-controls label {
+        font-size: 15px;
+        margin-left: 2%;
+    }
+
+    .perpage-controls select {
+        font-size: 14px;
+    }
+}
+
+/* Mobile phones (480px and below) */
+@media (max-width: 480px) {
+    .header-container {
+        top: 15px;
+    }
+
+    .header-title {
+        font-size: 12px;
+        width: auto;
+    }
+
+    .header-subtitle {
+        font-size: 11px;
+        line-height: 140%;
+    }
+
+    .toggle-tabs {
+        top: 70px;
+        font-size: 16px;
+        width: 140px;
+    }
+
+    .toggle-tab {
+        font-size: 16px;
+    }
+
+    .uploaded-images-button {
+        left: 10px;
+    }
+
+    /* Upload section - more compact */
+    .upload-pad {
+        width: 88%;
+        top: 120px;
+        height: 160px;
+        padding: 12px 16px;
+    }
+
+    .cloud-picture-container {
+        width: 40px;
+        height: 40px;
+        top: 40px;
+    }
+
+    .cloud-picture {
+        width: 36px;
+        height: 30px;
+    }
+
+    .description-container {
+        top: 90px;
+        width: 95%;
+    }
+
+    .upload-main-text {
+        font-size: 12px;
+        height: auto;
+    }
+
+    .description-text {
+        font-size: 11px;
+        height: auto;
+    }
+
+    .browse-button {
+        width: 90%;
+        top: 320px;
+        padding: 10px 12px;
+        height: auto;
+    }
+
+    .browse-button-text {
+        font-size: 11px;
+    }
+
+    .url-container {
+        width: 95%;
+        top: 390px;
+        height: auto;
+    }
+
+    .url-title-text {
+        font-size: 14px;
+    }
+
+    .url-upload {
+        padding: 12px;
+        flex-direction: column;
+        align-items: stretch;
+        height: auto;
+        gap: 8px;
+    }
+
+    .url {
+        width: 100%;
+        font-size: 14px;
+        text-align: center;
+    }
+
+    .url-copy-button {
+        width: 100%;
+        left: 0;
+        height: 35px;
+    }
+
+    /* Images grid - 1 column for small phones */
+    .table {
+        width: 95%;
+        left: 2.5%;
+        top: 120px;
+    }
+
+    .image-element {
+        width: 100%;
+        margin-top: 4%;
+    }
+
+    .image {
+        height: 250px;
+    }
+
+    .delete-button {
+        height: 32px;
+        width: 34px;
+        font-size: 22px;
+    }
+
+    /* Pagination - stack vertically on very small screens */
+    .pagination-container {
+        top: 125px;
+        gap: 8px;
+    }
+
+    .pagination-container button {
+        font-size: 14px;
+        padding: 4px 8px;
+    }
+
+    #pageInfo {
+        font-size: 14px;
+        min-width: 100%;
+        order: -1;
+    }
+
+    .perpage-controls {
+        margin: 5px 0;
+    }
+
+    .perpage-controls label {
+        font-size: 13px;
+        margin-left: 0;
+        margin-bottom: 5px;
+        flex-wrap: wrap;
+    }
+
+    .perpage-controls select {
+        font-size: 13px;
+    }
+
+    .no-images-msg {
+        font-size: 16px;
+        padding: 20px;
+        top: 110px;
+    }
+}
+
+/* Extra small phones (360px and below) */
+@media (max-width: 360px) {
+    .header-title {
+        font-size: 11px;
+    }
+
+    .header-subtitle {
+        font-size: 10px;
+    }
+
+    .toggle-tab {
+        font-size: 14px;
+    }
+
+    .upload-main-text,
+    .description-text {
+        font-size: 10px;
+    }
+
+    .browse-button-text {
+        font-size: 10px;
+    }
+
+    .image {
+        height: 200px;
+    }
+}
+
+/* ========================================
+   CUSTOM MODAL SYSTEM
+   ======================================== */
+
+/* Modal overlay - covers entire screen */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.7);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 10000;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+}
+
+.modal-overlay.show {
+    opacity: 1;
+    pointer-events: all;
+}
+
+/* Modal container */
+.modal-container {
+    background: white;
+    border-radius: 15px;
+    padding: 30px;
+    max-width: 450px;
+    width: 90%;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+    transform: scale(0.9);
+    transition: transform 0.3s ease;
+}
+
+.modal-overlay.show .modal-container {
+    transform: scale(1);
+}
+
+/* Modal header */
+.modal-header {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    margin-bottom: 20px;
+}
+
+.modal-icon {
+    font-size: 40px;
+    line-height: 1;
+}
+
+.modal-icon.warning { color: #ff9800; }
+.modal-icon.success { color: #4caf50; }
+.modal-icon.error { color: #f44336; }
+.modal-icon.info { color: #2196f3; }
+
+.modal-title {
+    font-size: 24px;
+    font-weight: 700;
+    color: #0B0B0B;
+    margin: 0;
+}
+
+/* Modal content */
+.modal-content {
+    font-size: 16px;
+    line-height: 1.5;
+    color: #555;
+    margin-bottom: 25px;
+}
+
+/* Modal buttons */
+.modal-buttons {
+    display: flex;
+    gap: 10px;
+    justify-content: flex-end;
+}
+
+.modal-button {
+    padding: 12px 24px;
+    border: none;
+    border-radius: 8px;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: transform 0.2s, box-shadow 0.2s;
+    font-family: Inter, sans-serif;
+}
+
+.modal-button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.modal-button:active {
+    transform: translateY(0);
+}
+
+.modal-button.primary {
+    background-color: #0060FF;
+    color: white;
+}
+
+.modal-button.primary:hover {
+    background-color: #0052e0;
+}
+
+.modal-button.danger {
+    background-color: #f44336;
+    color: white;
+}
+
+.modal-button.danger:hover {
+    background-color: #d32f2f;
+}
+
+.modal-button.secondary {
+    background-color: #e0e0e0;
+    color: #333;
+}
+
+.modal-button.secondary:hover {
+    background-color: #d0d0d0;
+}
+
+/* Responsive */
+@media (max-width: 480px) {
+    .modal-container {
+        padding: 20px;
+        max-width: 95%;
+    }
+
+    .modal-title {
+        font-size: 20px;
+    }
+
+    .modal-content {
+        font-size: 14px;
+    }
+
+    .modal-icon {
+        font-size: 32px;
+    }
+
+    .modal-buttons {
+        flex-direction: column-reverse;
+    }
+
+    .modal-button {
+        width: 100%;
+        padding: 14px;
+    }
+}
