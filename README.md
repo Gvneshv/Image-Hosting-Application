@@ -28,6 +28,7 @@ This application provides a complete self-hosted image hosting solution. Images 
 ## Features
 
 ### Upload
+
 - Upload images via browser file picker, drag-and-drop, or REST API
 - Per-IP rate limiting to prevent abuse (10 uploads per minute)
 - File size and extension validation on both client and server
@@ -35,6 +36,7 @@ This application provides a complete self-hosted image hosting solution. Images 
 - Instant URL copy on the upload page after a successful upload
 
 ### Image Library
+
 - Toggle between the upload form and image library without a page reload
 - Library updates in real time without reloading when images are added or deleted
 - Sort images by upload time, file size, or filename in ascending or descending order
@@ -44,6 +46,7 @@ This application provides a complete self-hosted image hosting solution. Images 
 - Open any image in the same tab or a new tab directly from the library
 
 ### Image Viewer
+
 - Individual image pages display full metadata: filename, original name, unique name, size, type, and upload date
 - Individual image pages are server-rendered with Jinja2 Templates
 - Buttons to download the image, copy its URL, or delete it
@@ -53,6 +56,7 @@ This application provides a complete self-hosted image hosting solution. Images 
 - Close the overlay by clicking the darkened area outside the image
 
 ### Infrastructure & Reliability
+
 - Fully containerized with Docker (backend, database, backup, PgBouncer, Nginx)
 - Database schema managed and migrated automatically on startup with Alembic
 - Scheduled database backups via cron (daily at 02:00, retains last 7 backups)
@@ -70,22 +74,22 @@ This application provides a complete self-hosted image hosting solution. Images 
 
 ## Tech Stack
 
-| Layer | Technology |
-|---|---|
-| **Backend** | Python 3.12, FastAPI, SQLAlchemy, Alembic, Pydantic v2 |
-| **Frontend** | Vanilla JavaScript (ES6+), HTML5, CSS3 |
-| **Database** | PostgreSQL 17 |
-| **Connection Pooling** | PgBouncer 1.24 |
-| **Reverse Proxy** | Nginx (stable-alpine) |
-| **Containerization** | Docker, Docker Compose |
-| **Package Management** | Poetry |
-| **Templating** | Jinja2 |
-| **Image Validation** | Pillow |
-| **Rate Limiting** | SlowAPI |
-| **Scheduling** | APScheduler |
-| **Logging** | Python `logging` (structured, leveled) |
-| **Migrations** | Alembic |
-| **Backups** | Bash + cron |
+| Layer                  | Technology                                             |
+| ---------------------- | ------------------------------------------------------ |
+| **Backend**            | Python 3.12, FastAPI, SQLAlchemy, Alembic, Pydantic v2 |
+| **Frontend**           | Vanilla JavaScript (ES6+), HTML5, CSS3                 |
+| **Database**           | PostgreSQL 17                                          |
+| **Connection Pooling** | PgBouncer 1.24                                         |
+| **Reverse Proxy**      | Nginx (stable-alpine)                                  |
+| **Containerization**   | Docker, Docker Compose                                 |
+| **Package Management** | Poetry                                                 |
+| **Templating**         | Jinja2                                                 |
+| **Image Validation**   | Pillow                                                 |
+| **Rate Limiting**      | SlowAPI                                                |
+| **Scheduling**         | APScheduler                                            |
+| **Logging**            | Python `logging` (structured, leveled)                 |
+| **Migrations**         | Alembic                                                |
+| **Backups**            | Bash + cron                                            |
 
 ---
 
@@ -202,7 +206,7 @@ See [Environment Variables](#environment-variables) for all available settings. 
 mkdir -p logs/pgbouncer
 ```
 
-**4. Build and start all containers**
+**4. Build and start all containers (requires Make build tool to be installed)**
 
 ```bash
 make up
@@ -218,9 +222,9 @@ The database schema is created and migrated automatically on first startup via A
 
 **5. Access the application**
 
-| Service | URL |
-|---|---|
-| Application | `http://localhost` |
+| Service            | URL                     |
+| ------------------ | ----------------------- |
+| Application        | `http://localhost`      |
 | API Docs (Swagger) | `http://localhost/docs` |
 
 > **Note:** If you need to wipe the database and start fresh (e.g. after a failed first startup), run `docker compose down -v` before starting again. The `-v` flag removes named volumes and forces PostgreSQL to reinitialise.
@@ -266,16 +270,16 @@ Interactive Swagger documentation is available at **`http://localhost/docs`** wh
 
 ### Endpoints
 
-| Method | Endpoint | Description |
-|---|---|---|
-| `GET` | `/` | Welcome / liveness ping |
-| `GET` | `/upload` | Paginated image list with sorting |
-| `POST` | `/upload/` | Upload an image (rate-limited: 10/min per IP) |
-| `DELETE` | `/upload/{filename}` | Delete an image by unique name |
-| `GET` | `/file_info/{filename}` | Metadata for a single image |
-| `GET` | `/all_images` | Full image list for the viewer slideshow |
-| `GET` | `/view/{filename}` | Render the Jinja2 image viewer page |
-| `GET` | `/health` | Health check (database + filesystem) |
+| Method   | Endpoint                | Description                                   |
+| -------- | ----------------------- | --------------------------------------------- |
+| `GET`    | `/`                     | Welcome / liveness ping                       |
+| `GET`    | `/upload`               | Paginated image list with sorting             |
+| `POST`   | `/upload/`              | Upload an image (rate-limited: 10/min per IP) |
+| `DELETE` | `/upload/{filename}`    | Delete an image by unique name                |
+| `GET`    | `/file_info/{filename}` | Metadata for a single image                   |
+| `GET`    | `/all_images`           | Full image list for the viewer slideshow      |
+| `GET`    | `/view/{filename}`      | Render the Jinja2 image viewer page           |
+| `GET`    | `/health`               | Health check (database + filesystem)          |
 
 ### Upload Constraints
 
@@ -305,16 +309,16 @@ All configuration lives in `services/backend/.env`. This file is never committed
 
 > **Important:** `pydantic-settings` does not interpolate `${VAR}` syntax in `.env` files. `DATABASE_URL` must be written as a fully resolved literal string — do not use variable references inside it.
 
-| Variable | Description | Example |
-|---|---|---|
-| `POSTGRES_DB` | PostgreSQL database name | `appdb` |
-| `POSTGRES_USER` | PostgreSQL username | `appuser` |
-| `POSTGRES_PASSWORD` | PostgreSQL password | `changeme` |
-| `POSTGRES_HOST` | PostgreSQL hostname (Docker service name) | `db` |
-| `POSTGRES_PORT` | PostgreSQL port | `5432` |
-| `DATABASE_URL` | Full SQLAlchemy connection URL — write literally | `postgresql+psycopg2://appuser:changeme@pgbouncer:6432/appdb` |
-| `BACKEND_WORKERS` | Number of Uvicorn worker processes | `1` |
-| `WEB_SERVER_START_PORT` | Uvicorn listening port | `8000` |
+| Variable                | Description                                      | Example                                                       |
+| ----------------------- | ------------------------------------------------ | ------------------------------------------------------------- |
+| `POSTGRES_DB`           | PostgreSQL database name                         | `appdb`                                                       |
+| `POSTGRES_USER`         | PostgreSQL username                              | `appuser`                                                     |
+| `POSTGRES_PASSWORD`     | PostgreSQL password                              | `changeme`                                                    |
+| `POSTGRES_HOST`         | PostgreSQL hostname (Docker service name)        | `db`                                                          |
+| `POSTGRES_PORT`         | PostgreSQL port                                  | `5432`                                                        |
+| `DATABASE_URL`          | Full SQLAlchemy connection URL — write literally | `postgresql+psycopg2://appuser:changeme@pgbouncer:6432/appdb` |
+| `BACKEND_WORKERS`       | Number of Uvicorn worker processes               | `1`                                                           |
+| `WEB_SERVER_START_PORT` | Uvicorn listening port                           | `8000`                                                        |
 
 ### A note on `BACKEND_WORKERS`
 
@@ -326,16 +330,16 @@ All configuration lives in `services/backend/.env`. This file is never committed
 
 All commands are run from the project root.
 
-| Command | Description |
-|---|---|
-| `make up` | Build images and start all containers in detached mode |
-| `make down` | Stop and remove containers (volumes are preserved) |
-| `make restart` | Restart all containers without rebuilding |
-| `make logs` | Tail backend logs (Ctrl-C to exit) |
-| `make shell` | Open an interactive shell inside the backend container |
-| `make revision m="message"` | Generate a new Alembic migration |
-| `make upgrade` | Apply all pending Alembic migrations |
-| `make downgrade` | Roll back the most recent Alembic migration |
+| Command                     | Description                                            |
+| --------------------------- | ------------------------------------------------------ |
+| `make up`                   | Build images and start all containers in detached mode |
+| `make down`                 | Stop and remove containers (volumes are preserved)     |
+| `make restart`              | Restart all containers without rebuilding              |
+| `make logs`                 | Tail backend logs (Ctrl-C to exit)                     |
+| `make shell`                | Open an interactive shell inside the backend container |
+| `make revision m="message"` | Generate a new Alembic migration                       |
+| `make upgrade`              | Apply all pending Alembic migrations                   |
+| `make downgrade`            | Roll back the most recent Alembic migration            |
 
 ---
 
@@ -344,6 +348,7 @@ All commands are run from the project root.
 Contributions are welcome. Please follow these steps:
 
 1. **Fork** the repository and create a feature branch:
+
    ```bash
    git checkout -b feature/your-feature-name
    ```
@@ -351,6 +356,7 @@ Contributions are welcome. Please follow these steps:
 2. **Make your changes.** Follow the existing code style — type hints on all functions, docstrings on public methods, and structured log messages throughout.
 
 3. **Commit** with a clear, descriptive message:
+
    ```bash
    git commit -m "feat: add support for AVIF image format"
    ```
