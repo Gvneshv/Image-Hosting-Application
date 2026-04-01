@@ -55,6 +55,12 @@ COPY services/backend/src/alembic.ini /usr/src/app/alembic.ini
 COPY services/backend/src/migrations/ /usr/src/app/migrations/
 
 # ---------------------------
+# Ensure appuser owns the directory from the start to avoid permission issues later
+# ---------------------------
+COPY services/backend/src/migrations/ /usr/src/app/migrations/
+RUN chown -R appuser:appuser /usr/src/app/migrations
+
+# ---------------------------
 # Copy scripts and make them executable
 # ---------------------------
 COPY services/backend/src/scripts /usr/src/app/scripts
