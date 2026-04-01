@@ -55,12 +55,6 @@ COPY services/backend/src/alembic.ini /usr/src/app/alembic.ini
 COPY services/backend/src/migrations/ /usr/src/app/migrations/
 
 # ---------------------------
-# Ensure appuser owns the directory from the start to avoid permission issues later
-# ---------------------------
-COPY services/backend/src/migrations/ /usr/src/app/migrations/
-RUN chown -R appuser:appuser /usr/src/app/migrations
-
-# ---------------------------
 # Copy scripts and make them executable
 # ---------------------------
 COPY services/backend/src/scripts /usr/src/app/scripts
@@ -79,7 +73,7 @@ RUN useradd -m -u 1000 appuser
 # ---------------------------
 # Give appuser ownership of the directories it needs to write to
 # ---------------------------
-RUN chown -R appuser:appuser /usr/src/app/images /usr/src/app/logs
+RUN chown -R appuser:appuser /usr/src/app/images /usr/src/app/logs /usr/src/app/migrations
 
 # ---------------------------
 # Now switch to the non-root user

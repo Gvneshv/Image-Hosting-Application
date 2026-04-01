@@ -136,6 +136,23 @@ ENV/
 env.bak/
 venv.bak/
 
+# Ignore the entire folder by default
+.vscode/*
+
+# BUT keep files that help the team (shared config)
+# !.vscode/settings.json (The DB connection credentials can be here)
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+!.vscode/*.code-snippets
+
+# Ignore user-specific workspace files
+*.code-workspace
+
+# Ignore built extensions
+*.vsix
+
+
 # Spyder project settings
 .spyderproject
 .spyproject
