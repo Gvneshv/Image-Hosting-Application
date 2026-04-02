@@ -115,7 +115,7 @@
                 const fullUrl = info.url.startsWith('http')
                     ? info.url
                     : `${location.origin}${info.url}`;
-                await navigator.clipboard.writeText(fullUrl);
+                await copyToClipboard(fullUrl);
                 copyBtn.textContent = 'COPIED';
                 setTimeout(() => (copyBtn.textContent = 'COPY URL'), 1500);
             } catch (err) {
@@ -332,6 +332,10 @@
             toggleFullscreen();
         });
 
+        if (!document.fullscreenEnabled) {
+            fullscreenBtn.style.display = 'none';
+        }
+
         function toggleFullscreen() {
             if (!document.fullscreenElement) {
                 viewer.requestFullscreen().catch(err => {
@@ -339,6 +343,24 @@
                 });
             } else {
                 document.exitFullscreen();
+            }
+        }
+
+        async function copyToClipboard(text) {
+            try {
+                await navigator.clipboard.writeText(text);
+                return true;
+            } catch {
+                // Fallback for HTTP / older browsers
+                const ta = document.createElement('textarea');
+                ta.value = text;
+                ta.style.cssText = 'position:fixed;opacity:0';
+                document.body.appendChild(ta);
+                ta.focus();
+                ta.select();
+                const ok = document.execCommand('copy');
+                ta.remove();
+                return ok;
             }
         }
 

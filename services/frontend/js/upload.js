@@ -81,7 +81,7 @@
          */
         const uploadFile = async (file) => {
             // Client-side validation
-            if (!allowedTypes.includes(file.type)) {
+            if (file.type && !allowedTypes.includes(file.type)) {
                 showStatus(uploadText, 'Upload failed: Only JPG, PNG, and GIF files are allowed.', true);
                 return;
             }
@@ -144,8 +144,6 @@
             }
         };
 
-        uploadBtn.addEventListener('click', () => fileInput.click());
-
         fileInput.addEventListener('change', () => {
             const file = fileInput.files[0];
             if (file) uploadFile(file);
@@ -155,7 +153,7 @@
         copyBtn.addEventListener('click', async () => {
             if (!resultInput.value) return;
             try {
-                await navigator.clipboard.writeText(resultInput.value);
+                await copyToClipboard(resultInput.value);
                 copyBtn.textContent = 'Copied!';
                 setTimeout(() => (copyBtn.textContent = 'COPY'), 1500);
             } catch (err) {
@@ -390,7 +388,7 @@
                         event.stopPropagation();
                         const url = `${location.origin}/images/${encodeURIComponent(unique_name)}`;
                         try {
-                            await navigator.clipboard.writeText(url);
+                            await copyToClipboard(url);
                             copyBtn.textContent = 'COPIED';
                             setTimeout(() => (copyBtn.textContent = 'COPY'), 1500);
                         } catch (err) {
@@ -456,6 +454,24 @@
         // Load immediately if this tab is already active
         if (imgTabBtn.classList.contains('active')) {
             loadImages();
+        }
+    }
+
+    async function copyToClipboard(text) {
+        try {
+            await navigator.clipboard.writeText(text);
+            return true;
+        } catch {
+            // Fallback for HTTP / older browsers
+            const ta = document.createElement('textarea');
+            ta.value = text;
+            ta.style.cssText = 'position:fixed;opacity:0';
+            document.body.appendChild(ta);
+            ta.focus();
+            ta.select();
+            const ok = document.execCommand('copy');
+            ta.remove();
+            return ok;
         }
     }
 
