@@ -30,8 +30,8 @@ This application provides a complete self-hosted image hosting solution. Images 
 
 ### Upload
 
-![Upload demo](https://github.com/gxneshx/Image_Hosting_Project_2.0/releases/download/v1.0.0/image_upload.gif)
-![Drag and drop demo](https://github.com/gxneshx/Image_Hosting_Project_2.0/releases/download/v1.0.0/dragging.gif)
+![Upload demo](https://github.com/Gvneshv/Image-Hosting-Application/releases/download/v1.0.2/image_upload.gif)
+![Drag and drop demo](https://github.com/Gvneshv/Image-Hosting-Application/releases/download/v1.0.2/dragging.gif)
 
 - Upload images via browser file picker, drag-and-drop, or REST API
 - Per-IP rate limiting to prevent abuse (10 uploads per minute)
@@ -41,9 +41,9 @@ This application provides a complete self-hosted image hosting solution. Images 
 
 ### Image Library
 
-![Sorting demo](https://github.com/gxneshx/Image_Hosting_Project_2.0/releases/download/v1.0.0/sort.gif)
-![Pagination demo](https://github.com/gxneshx/Image_Hosting_Project_2.0/releases/download/v1.0.0/pagination_copy.gif)
-![Delete from gallery demo](https://github.com/gxneshx/Image_Hosting_Project_2.0/releases/download/v1.0.0/gallery_copy_delete.gif)
+![Sorting demo](https://github.com/Gvneshv/Image-Hosting-Application/releases/download/v1.0.2/sort.gif)
+![Pagination demo](https://github.com/Gvneshv/Image-Hosting-Application/releases/download/v1.0.2/pagination_copy.gif)
+![Delete from gallery demo](https://github.com/Gvneshv/Image-Hosting-Application/releases/download/v1.0.2/gallery_copy_delete.gif)
 
 - Toggle between the upload form and image library without a page reload
 - Library updates in real time without reloading when images are added or deleted
@@ -55,8 +55,8 @@ This application provides a complete self-hosted image hosting solution. Images 
 
 ### Image Viewer
 
-![Lightbox and fullscreen demo](https://github.com/gxneshx/Image_Hosting_Project_2.0/releases/download/v1.0.0/viewer_lightbox_fs_mode.gif)
-![Viewer actions demo](https://github.com/gxneshx/Image_Hosting_Project_2.0/releases/download/v1.0.0/viewer_copy_download_delete.gif)
+![Lightbox and fullscreen demo](https://github.com/Gvneshv/Image-Hosting-Application/releases/download/v1.0.2/viewer_lightbox_fs_mode.gif)
+![Viewer actions demo](https://github.com/Gvneshv/Image-Hosting-Application/releases/download/v1.0.2/viewer_copy_download_delete.gif)
 
 - Individual image pages display full metadata: filename, original name, unique name, size, type, and upload date
 - Individual image pages are server-rendered with Jinja2 Templates
