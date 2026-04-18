@@ -35,3 +35,11 @@ engine = create_engine(
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
 Base = declarative_base()
+
+def get_db():
+    """Yield a database session and ensure it is closed after the request."""
+    db = SessionLocal()
+    try:
+        yield db
+    finally:
+        db.close()
