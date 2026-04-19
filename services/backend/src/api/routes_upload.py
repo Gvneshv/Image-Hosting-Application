@@ -1,16 +1,28 @@
 """
 API routes for image upload, retrieval, and management.
-
+ 
+All routes except ``GET /``, ``GET /health``, and ``GET /view/{filename}``
+require a valid JWT in the Authorization header:
+    Authorization: Bearer <token>
+ 
+Access control
+--------------
+- Regular users can only see, upload, and delete **their own** images.
+- Admin users can see and delete **any** image regardless of ownership.
+  The admin check is done inline in each route: if the caller is an admin,
+  ``user_id=None`` is passed to CRUD functions, which removes the ownership
+  filter and exposes all rows.
+ 
 Endpoints
 ---------
-GET  /              — welcome / basic health ping
-GET  /upload        — paginated image list with sorting
-POST /upload/       — upload a new image (rate-limited)
-DELETE /upload/{filename} — delete an image by unique name
-GET  /file_info/{filename} — metadata for a single image
-GET  /all_images    — full image list for the viewer slideshow
-GET  /view/{filename} — render the Jinja2 image-viewer page
-GET  /health        — extended health check (DB + filesystem)
+GET    /                        — welcome / basic liveness ping (public)
+GET    /upload                  — paginated image list (auth required)
+POST   /upload/                 — upload a new image (auth required, rate-limited)
+DELETE /upload/{filename}       — delete an image (auth required, ownership enforced)
+GET    /file_info/{filename}    — metadata for a single image (auth required)
+GET    /all_images              — full image list for the viewer slideshow (auth required)
+GET    /view/{filename}         — render the Jinja2 image-viewer page (auth required)
+GET    /health                  — extended health check: DB + filesystem (public)
 """
 
 import math
@@ -27,10 +39,12 @@ from sqlalchemy.orm import Session
 from starlette.responses import HTMLResponse
 
 from db import crud
-from db.database import SessionLocal
+from db.database import get_db
+from db.models import User
 from handlers.upload import save_uploaded_image
 from schemas.upload import ImageUploadResponse, ImageInfo
 from settings.config import config
+from utils.auth_utils import get_current_user
 from utils.rate_limiter import limiter
 
 logger = logging.getLogger(__name__)
@@ -40,25 +54,44 @@ templates = Jinja2Templates(directory=config.FRONTEND_TEMPLATES_DIR)
 
 
 # ---------------------------------------------------------------------------
-# Dependency
-# ---------------------------------------------------------------------------
-
-def get_db():
-    """Yield a database session and ensure it is closed after the request."""
-    db = SessionLocal()
-    try:
-        yield db
-    finally:
-        db.close()
-
-
-# ---------------------------------------------------------------------------
 # Type aliases
 # ---------------------------------------------------------------------------
+ 
+# DbSession injects a database session automatically into any route that
+# declares it as a parameter. FastAPI calls get_db(), yields the session,
+# passes it to the route, and closes it when the response is done.
 
 DbSession = Annotated[Session, Depends(get_db)]
+
+# CurrentUser injects the authenticated User ORM object into protected routes.
+# FastAPI extracts the Bearer token from the Authorization header, verifies it,
+# and loads the matching user from the database — all before the route runs.
+# If the token is missing, expired, or invalid a 401 is raised automatically.
+CurrentUser = Annotated[User, Depends(get_current_user)]
+
 PageNumber = Annotated[int, Query(ge=1)]
 PerPageNumber = Annotated[int, Query(ge=1, le=100)]
+
+
+# ---------------------------------------------------------------------------
+# Helper
+# ---------------------------------------------------------------------------
+
+def _scoped_user_id(user: User) -> int | None:
+    """
+    Return ``None`` for admins (no ownership filter) or the user's ID for regular users.
+ 
+    Admins can access all images; regular users are scoped to their own.
+    Centralising this logic here keeps every route one clean line instead of
+    repeating the same ``if user.is_admin`` check everywhere.
+ 
+    Args:
+        user: The currently authenticated User ORM instance.
+ 
+    Returns:
+        int | None: ``None`` if the user is an admin, otherwise their ``id``.
+    """
+    return None if user.is_admin else user.id
 
 
 # ---------------------------------------------------------------------------
@@ -67,7 +100,11 @@ PerPageNumber = Annotated[int, Query(ge=1, le=100)]
 
 @router.get("/")
 def root():
-    """Welcome endpoint — also serves as a basic liveness ping."""
+    """
+    Welcome endpoint — also serves as a basic liveness ping.
+ 
+    Public — no authentication required.
+    """
     logger.info("Root endpoint hit.")
     return {"message": "Welcome to the Image Hosting Server v2.0"}
 
@@ -75,25 +112,32 @@ def root():
 @router.get("/upload", response_model=dict)
 def get_images(
     db: DbSession,
+    current_user = CurrentUser,
     page: PageNumber = 1,
     per_page: PerPageNumber = 6,
     sort_by: Annotated[str, Query()] = "upload_time",
     sort_order: Annotated[str, Query()] = "desc",
 ):
-    """Return a paginated, sorted list of uploaded images.
-
+    """
+    Return a paginated, sorted list of images visible to the caller.
+ 
+    Regular users see only their own images.
+    Admin users see all images across all accounts.
+ 
     Args:
+        db: Database session.
+        current_user: Authenticated user injected by the JWT dependency.
         page: Page number (1-based).
         per_page: Number of images per page (1–100).
         sort_by: Column to sort on — ``filename``, ``upload_time``, or ``size``.
         sort_order: Sort direction — ``asc`` or ``desc``.
-
+ 
     Returns:
         dict: Images for the requested page plus pagination metadata.
-
+ 
     Raises:
         HTTPException 400: Invalid ``sort_by`` or ``sort_order`` value.
-        HTTPException 404: No images found at all.
+        HTTPException 404: No images found for this user.
     """
     # Manual validation — avoids 422 errors that can occur with regex in Query()
     if sort_by not in {"filename", "upload_time", "size"}:
@@ -101,9 +145,11 @@ def get_images(
     if sort_order not in {"desc", "asc"}:
         raise HTTPException(status_code=400, detail="Invalid sort_order value.")
 
+    uid = _scoped_user_id(current_user)
     skip = (page - 1) * per_page
-    images = crud.get_images_paginated(db, skip=skip, limit=per_page, sort_by=sort_by, sort_order=sort_order)
-    total = crud.count_images(db)
+
+    images = crud.get_images_paginated(db, skip=skip, limit=per_page, sort_by=sort_by, sort_order=sort_order, user_id=uid)
+    total = crud.count_images(db, user_id=uid)
 
     if not images:
         raise HTTPException(status_code=404, detail="No images found.")
@@ -124,24 +170,29 @@ def get_images(
 async def upload_file(
     request: Request,
     db: DbSession,
+    current_user: CurrentUser,
     file: Annotated[UploadFile, "image file"] = File(...),
 ):
-    """Upload and store an image file.
-
+    """
+    Upload and store an image file, linked to the authenticated user.
+ 
     Validates the Content-Length header before reading the body, then
     delegates full validation (extension, MIME type, Pillow verification)
     and storage to ``handlers.upload.save_uploaded_image``.
-
+ 
+    The new image is automatically associated with the calling user's account.
+ 
     Rate-limited to 10 uploads per minute per IP address.
-
+ 
     Args:
         request: Incoming HTTP request (used for request ID logging and rate limiting).
         db: Database session.
+        current_user: Authenticated user injected by the JWT dependency.
         file: Uploaded file.
-
+ 
     Returns:
         ImageUploadResponse: Metadata and URL of the saved image.
-
+ 
     Raises:
         HTTPException 413: Content-Length exceeds the configured maximum.
         HTTPException 400: File fails validation (type, size, or content check).
@@ -157,6 +208,7 @@ async def upload_file(
     try:
         result = save_uploaded_image(file)
 
+        # user_id ties this image to the uploading user's account.
         crud.create_image(
             db,
             filename=file.filename,
@@ -166,8 +218,14 @@ async def upload_file(
             filepath=result["filepath"],
             mimetype=file.content_type,
             upload_time=datetime.now(timezone.utc),
+            user_id=current_user.id,
         )
-        logger.info(f"[{request.state.request_id}] File '{result['filename']}' uploaded successfully.")
+        logger.info(
+            "[%s] User id=%s uploaded '%s' successfully.",
+            request.state.request_id,
+            current_user.id,
+            result["filename"],
+        )
         return ImageUploadResponse(**result)
 
     except HTTPException as e:
@@ -179,19 +237,26 @@ async def upload_file(
 
 
 @router.delete("/upload/{filename}")
-def delete_file(filename: str, db: DbSession):
-    """Delete an image from disk and the database.
-
+def delete_file(filename: str, db: DbSession, current_user: CurrentUser):
+    """
+    Delete an image from disk and the database.
+ 
+    Regular users can only delete their own images. Admins can delete any image.
+    If a regular user attempts to delete an image that isn't theirs, the CRUD
+    layer returns ``False`` (ownership filter finds nothing) and a 404 is raised
+    — indistinguishable from a genuinely missing file, to avoid leaking info.
+ 
     Args:
         filename: The unique filename of the image to delete.
         db: Database session.
-
+        current_user: Authenticated user injected by the JWT dependency.
+ 
     Returns:
         dict: Confirmation message.
-
+ 
     Raises:
         HTTPException 400: File extension is not supported.
-        HTTPException 404: File does not exist on disk.
+        HTTPException 404: File does not exist on disk or user does not own it.
         HTTPException 500: Permission error or unexpected failure.
     """
     ext = os.path.splitext(filename)[1].lower()
@@ -207,9 +272,9 @@ def delete_file(filename: str, db: DbSession):
     try:
         os.remove(full_path)
 
-        deleted = crud.delete_image(db, unique_name=filename)
+        deleted = crud.delete_image(db, unique_name=filename, user_id=_scoped_user_id(current_user))
         if not deleted:
-            logger.warning(f"DB record for '{filename}' not found during delete.")
+            logger.warning(f"DB record for '{filename}' not found during delete (user id = {current_user.id}).")
 
     except PermissionError:
         logger.error(f"Permission denied when deleting: {filename}")
@@ -218,27 +283,30 @@ def delete_file(filename: str, db: DbSession):
         logger.error(f"Unexpected error during delete of '{filename}': {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
-    logger.info(f"Deleted file and DB record: {filename}")
+    logger.info(f"User id = {current_user.id} deleted file: {filename}")
     return {"message": f"File '{filename}' has been deleted from disk and DB."}
 
 
 @router.get("/file_info/{filename}")
-async def get_file_info(filename: str, db: DbSession):
-    """Return metadata for a single image.
-
-    Used by the viewer page to populate the info panel.
-
+async def get_file_info(filename: str, db: DbSession, current_user: CurrentUser):
+    """
+    Return metadata for a single image.
+ 
+    Regular users can only retrieve info for their own images.
+    Admins can retrieve info for any image.
+ 
     Args:
         filename: Unique filename of the image.
         db: Database session.
-
+        current_user: Authenticated user injected by the JWT dependency.
+ 
     Returns:
         dict: Metadata fields (filename, size, type, upload date, URL, etc.).
-
+ 
     Raises:
-        JSONResponse 404: Image not found in DB or on disk.
+        JSONResponse 404: Image not found in DB, not on disk, or not owned by caller.
     """
-    image = crud.get_image(db, unique_name=filename)
+    image = crud.get_image(db, unique_name=filename, user_id=_scoped_user_id(current_user))
     if not image:
         return JSONResponse({"error": "File was not found in the database."}, status_code=404)
 
@@ -259,29 +327,38 @@ async def get_file_info(filename: str, db: DbSession):
 
 
 @router.get("/all_images")
-def get_all_images(db: DbSession):
-    """Return all images ordered by upload time, used by the viewer slideshow.
-
-    Limited to 1000 images. Increase the limit if the library grows beyond that.
-
+def get_all_images(db: DbSession, current_user: CurrentUser):
+    """
+    Return all images visible to the caller, ordered by upload time.
+ 
+    Used by the viewer slideshow. Regular users see only their own images;
+    admins see everything. Limited to 1000 images.
+ 
     Args:
         db: Database session.
-
+        current_user: Authenticated user injected by the JWT dependency.
+ 
     Returns:
         dict: ``{"images": [...]}`` — full list of image dicts.
     """
-    images = crud.get_images_paginated(db, skip=0, limit=1000, sort_by="upload_time", sort_order="asc")
+    images = crud.get_images_paginated(db, skip=0, limit=1000, sort_by="upload_time", sort_order="asc", user_id=_scoped_user_id(current_user))
     return {"images": [img.to_dict() for img in images]}
 
 
 @router.get("/view/{filename}", response_class=HTMLResponse)
-async def view_file(request: Request, filename: str):
-    """Render the server-side image viewer page via Jinja2.
-
+async def view_file(request: Request, filename: str, current_user: CurrentUser):
+    """
+    Render the server-side image viewer page via Jinja2.
+ 
+    Requires authentication — unauthenticated requests receive a 401 before
+    the template is rendered. The frontend JS in ``viewer.js`` detects the 401
+    and redirects to the login page.
+ 
     Args:
         request: Incoming HTTP request (required by Jinja2Templates).
         filename: Unique filename extracted from the URL path.
-
+        current_user: Authenticated user injected by the JWT dependency.
+ 
     Returns:
         HTMLResponse: Rendered ``viewer.html`` template.
     """
@@ -293,10 +370,12 @@ async def view_file(request: Request, filename: str):
 
 @router.get("/health")
 def health(db: DbSession):
-    """Extended health check: verifies the database connection and images directory.
-
-    Used by Docker Compose ``healthcheck`` to determine container readiness.
-
+    """
+    Extended health check: verifies the database connection and images directory.
+ 
+    Public — no authentication required. Docker Compose calls this endpoint
+    during startup to decide when the backend container is ready.
+ 
     Returns:
         dict: Overall status (``"ok"`` or ``"degraded"``), plus individual
               component statuses for the database and images directory.
