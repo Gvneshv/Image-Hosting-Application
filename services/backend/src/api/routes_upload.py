@@ -346,7 +346,7 @@ def get_all_images(db: DbSession, current_user: CurrentUser):
 
 
 @router.get("/view/{filename}", response_class=HTMLResponse)
-async def view_file(request: Request, filename: str, current_user: CurrentUser):
+async def view_file(request: Request, filename: str, _: CurrentUser):
     """
     Render the server-side image viewer page via Jinja2.
  
