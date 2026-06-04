@@ -4,10 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>Image Hosting - Sign In</title>
+    <title>Image Hosting - Create Account</title>
     <link rel="icon" type="image/x-icon" href="base_images/ico/favicon.ico">
     <link rel="stylesheet" href="css/auth.css">
-    <script src="js/index.js" defer></script>
+    <script src="js/register.js" defer></script>
 </head>
 <body>
 
@@ -15,24 +15,18 @@
 
     <!-- ==================== HEADER ==================== -->
     <header class="header-container">
-        <!--
-            Clicking the title always goes to the gallery.
-            index.js will redirect already-logged-in users to upload.html
-            before this page even renders, so this link is only ever
-            reached by unauthenticated visitors (it just reloads the page).
-        -->
-        <a href="upload.html" class="header-link">
+        <a href="index.html" class="header-link">
             <h1 class="header-title">Image Hosting</h1>
         </a>
         <p class="header-subtitle">Your personal image gallery.</p>
     </header>
 
-    <!-- ==================== LOGIN FORM ==================== -->
+    <!-- ==================== REGISTRATION FORM ==================== -->
     <main class="auth-container">
         <div class="auth-card">
-            <h2 class="auth-heading">Sign In</h2>
+            <h2 class="auth-heading">Create Account</h2>
 
-            <form class="auth-form" id="login-form" novalidate>
+            <form class="auth-form" id="register-form" novalidate>
 
                 <div class="form-group">
                     <label for="email">Email</label>
@@ -44,7 +38,6 @@
                         autocomplete="email"
                         required
                     >
-                    <!-- Inline validation message shown by JS if the field is empty/malformed -->
                     <span class="field-error" id="email-error"></span>
                 </div>
 
@@ -54,22 +47,36 @@
                         type="password"
                         id="password"
                         name="password"
-                        placeholder="Your password"
-                        autocomplete="current-password"
+                        placeholder="At least 8 characters"
+                        autocomplete="new-password"
                         required
+                        minlength="8"
                     >
                     <span class="field-error" id="password-error"></span>
                 </div>
 
-                <button type="submit" class="btn btn-primary" id="login-btn">
-                    Sign In
+                <div class="form-group">
+                    <label for="confirm-password">Confirm Password</label>
+                    <input
+                        type="password"
+                        id="confirm-password"
+                        name="confirm-password"
+                        placeholder="Repeat your password"
+                        autocomplete="new-password"
+                        required
+                    >
+                    <span class="field-error" id="confirm-password-error"></span>
+                </div>
+
+                <button type="submit" class="btn btn-primary" id="register-btn">
+                    Create Account
                 </button>
 
             </form>
 
             <p class="auth-switch">
-                Don't have an account?
-                <a href="register.html" class="auth-link">Create one</a>
+                Already have an account?
+                <a href="index.html" class="auth-link">Sign in</a>
             </p>
         </div>
     </main>
@@ -80,23 +87,39 @@
 <!-- ==================== MODALS ==================== -->
 
 <!--
-    Wrong credentials modal.
-    Shown by index.js when POST /auth/login returns 401.
-    Closed by clicking the OK button or anywhere on the overlay.
+    Email already registered modal.
+    Shown by register.js when POST /auth/register returns 400.
 -->
-<div class="modal-overlay" id="wrong-credentials-overlay" role="dialog" aria-modal="true" aria-labelledby="wc-title" hidden>
+<div class="modal-overlay" id="email-taken-overlay" role="dialog" aria-modal="true" aria-labelledby="et-title" hidden>
     <div class="modal">
-        <h3 class="modal-title" id="wc-title">Sign In Failed</h3>
-        <p class="modal-body">Incorrect email or password. Please try again.</p>
+        <h3 class="modal-title" id="et-title">Email Already in Use</h3>
+        <p class="modal-body">
+            An account with this email address already exists.
+            <a href="index.html" class="auth-link">Sign in instead?</a>
+        </p>
         <div class="modal-actions">
-            <button class="btn btn-primary" id="wrong-credentials-ok">OK</button>
+            <button class="btn btn-primary" id="email-taken-ok">OK</button>
         </div>
     </div>
 </div>
 
 <!--
+    Registration success modal.
+    Shown briefly after a successful registration before redirecting to login.
+-->
+<div class="modal-overlay" id="register-success-overlay" role="dialog" aria-modal="true" aria-labelledby="rs-title" hidden>
+    <div class="modal">
+        <h3 class="modal-title" id="rs-title">Account Created!</h3>
+        <p class="modal-body">
+            Your account has been created successfully.
+            You will be redirected to the sign-in page now.
+        </p>
+        <!-- No button needed - JS auto-redirects after a short delay -->
+    </div>
+</div>
+
+<!--
     Generic server error modal.
-    Shown when the backend returns an unexpected 5xx response.
 -->
 <div class="modal-overlay" id="server-error-overlay" role="dialog" aria-modal="true" aria-labelledby="se-title" hidden>
     <div class="modal">
