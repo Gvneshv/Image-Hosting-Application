@@ -5,7 +5,12 @@
     <meta name="viewport"
           content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>Upload</title>
+    <!--
+        Page title reflects the dual purpose of this page (upload + gallery).
+        upload.js redirects unauthenticated visitors to index.html before
+        anything here renders.
+    -->
+    <title>My Gallery</title>
     <link rel="icon" type="image/x-icon" href="base_images/ico/favicon.ico">
     <link rel="stylesheet" href="css/upload.css">
     <script src="js/modal.js" defer></script>
@@ -14,9 +19,37 @@
 </head>
 <body>
 <section class="page-container">
+
   <header class="header-container">
-    <h1 class="header-title">Upload Photos</h1>
+    <!--
+        Clicking the title switches to the Images tab so the user lands
+        directly on their gallery. The data-tab attribute is read by tabs.js,
+        which already handles all tab switching via that same mechanism.
+    -->
+    <a class="header-link header-title-link" data-tab="images" id="header-gallery-link">
+      <h1 class="header-title">My Gallery</h1>
+    </a>
     <p class="header-subtitle">Upload selfies, memes, or any fun pictures here.</p>
+
+    <!--
+        Account icon — top-right corner of the header.
+        Navigates to account.html. upload.js fills in the user's initials
+        or a default icon once the token is decoded.
+        The aria-label provides accessible text for screen readers.
+    -->
+    <a href="account.html" class="account-icon-link" id="account-icon-link" aria-label="My Account">
+      <div class="account-icon" id="account-icon">
+        <!--
+            Default: a generic person SVG.
+            upload.js replaces the inner content with the user's initials
+            (e.g. "JD" for john@doe.com) once the page loads.
+        -->
+        <svg class="account-icon-svg" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+          <circle cx="12" cy="8" r="4" stroke="currentColor" stroke-width="2"/>
+          <path d="M4 20c0-4 3.6-7 8-7s8 3 8 7" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+      </div>
+    </a>
   </header>
 
   <nav class="toggle-tabs">
@@ -54,13 +87,13 @@
 </section>
 
 <!-- Images Section -->
-
     <section class="images-section tab-content hidden" id="images-tab">
         <div class="hidden-table table">
             <!-- JS will inject per-page dropdown here -->
         </div>
             <!-- JS will inject buttons here -->
     </section>
+
 </section>
 <footer class="footer-container"></footer>
 </body>
