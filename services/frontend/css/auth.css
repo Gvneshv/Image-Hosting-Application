@@ -1,0 +1,426 @@
+/* =============================================================================
+   Shared styles for authentication pages
+   Used by: index.html (login), register.html, account.html
+
+   Design tokens mirror the existing upload.css system:
+     Background  #F2F5FF
+     Text        #0B0B0B
+     Hint/muted  #ADC0F8
+     Blue        #0060FF  (hover: #0052e0)
+     Accent      #4676FB
+     Surface     #FAFAFA / white
+     Danger      #f44336  (hover: #d32f2f)
+     Font        Inter, sans-serif
+   ============================================================================= */
+
+/* ---------------------------------------------------------------------------
+   Reset & base
+   --------------------------------------------------------------------------- */
+
+body {
+    margin: 0;
+    font-family: Inter, sans-serif;
+    background-color: #F2F5FF;
+}
+
+button {
+    border: none;
+    font-family: Inter, sans-serif;
+    cursor: pointer;
+}
+
+/* ---------------------------------------------------------------------------
+   Page shell - same centred max-width wrapper used across all pages
+   --------------------------------------------------------------------------- */
+
+.page-container {
+    width: 100%;
+    min-height: 100vh;
+    max-width: 1440px;
+    margin: 0 auto;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+/* ---------------------------------------------------------------------------
+   Header - visually identical to upload.css header
+   The <a> wrapper removes the underline while keeping the element a link.
+   --------------------------------------------------------------------------- */
+
+.header-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+    padding-top: 30px;
+    width: 293px;
+}
+
+.header-link {
+    text-decoration: none;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+}
+
+.header-title {
+    margin: 0;
+    font-weight: 700;
+    font-size: 16px;
+    line-height: 14px;
+    letter-spacing: -0.02em;
+    color: #0B0B0B;
+}
+
+.header-subtitle {
+    margin: 0;
+    width: 293px;
+    font-weight: 300;
+    font-size: 14px;
+    line-height: 150%;
+    letter-spacing: -0.04em;
+    color: #0B0B0B;
+    text-align: center;
+}
+
+/* ---------------------------------------------------------------------------
+   Auth container - centres the card vertically in the remaining space
+   --------------------------------------------------------------------------- */
+
+.auth-container {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 40px 16px 60px;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+/* ---------------------------------------------------------------------------
+   Auth card - the white box holding the form
+   --------------------------------------------------------------------------- */
+
+.auth-card {
+    background: white;
+    border-radius: 15px;
+    padding: 40px 36px;
+    width: 100%;
+    max-width: 460px;
+    box-shadow: 0 4px 24px rgba(70, 118, 251, 0.10);
+    box-sizing: border-box;
+}
+
+.auth-heading {
+    margin: 0 0 28px;
+    font-weight: 700;
+    font-size: 22px;
+    line-height: 1.2;
+    letter-spacing: -0.02em;
+    color: #0B0B0B;
+}
+
+/* ---------------------------------------------------------------------------
+   Form layout
+   --------------------------------------------------------------------------- */
+
+.auth-form {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.form-group label {
+    font-weight: 600;
+    font-size: 13px;
+    line-height: 1;
+    letter-spacing: -0.01em;
+    color: #0B0B0B;
+}
+
+.form-group input {
+    font-family: Inter, sans-serif;
+    font-size: 14px;
+    font-weight: 400;
+    line-height: 1.4;
+    color: #0B0B0B;
+    background-color: #FAFAFA;
+    border: 2px solid #ADC0F8;
+    border-radius: 8px;
+    padding: 10px 14px;
+    outline: none;
+    transition: border-color 0.15s ease;
+    box-sizing: border-box;
+    width: 100%;
+}
+
+.form-group input::placeholder {
+    color: #ADC0F8;
+    font-weight: 300;
+}
+
+.form-group input:focus {
+    border-color: #4676FB;
+    background-color: white;
+}
+
+/*
+ * Visual indicator for invalid fields - applied by JS after a failed
+ * submit attempt, not on every keystroke (avoids nagging the user).
+ */
+.form-group input.input-error {
+    border-color: #f44336;
+}
+
+/* Inline validation message beneath the input */
+.field-error {
+    font-size: 12px;
+    font-weight: 500;
+    color: #f44336;
+    min-height: 16px; /* keeps layout stable when empty */
+    line-height: 1.3;
+}
+
+/* ---------------------------------------------------------------------------
+   Buttons - three semantic variants used across auth pages
+   --------------------------------------------------------------------------- */
+
+.btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-family: Inter, sans-serif;
+    font-weight: 600;
+    font-size: 12px;
+    letter-spacing: 0.02em;
+    text-transform: uppercase;
+    border: none;
+    border-radius: 7px;
+    padding: 12px 16px;
+    cursor: pointer;
+    transition: background-color 0.15s ease, transform 0.1s ease, box-shadow 0.15s ease;
+}
+
+.btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+}
+
+.btn:active {
+    transform: translateY(0);
+    box-shadow: none;
+}
+
+/* Primary - blue, used for the main submit action */
+.btn-primary {
+    background-color: #0060FF;
+    color: #FFFFFF;
+    width: 100%;
+}
+
+.btn-primary:hover {
+    background-color: #0052e0;
+}
+
+/* Secondary - muted, used for cancel / back actions */
+.btn-secondary {
+    background-color: #e0e0e0;
+    color: #333333;
+}
+
+.btn-secondary:hover {
+    background-color: #d0d0d0;
+}
+
+/* Danger - red, used for destructive actions like Delete Account */
+.btn-danger {
+    background-color: #f44336;
+    color: #FFFFFF;
+}
+
+.btn-danger:hover {
+    background-color: #d32f2f;
+}
+
+/* ---------------------------------------------------------------------------
+   "Already have an account? Sign in" - the link beneath the form
+   --------------------------------------------------------------------------- */
+
+.auth-switch {
+    margin: 20px 0 0;
+    font-size: 13px;
+    font-weight: 400;
+    color: #0B0B0B;
+    text-align: center;
+}
+
+.auth-link {
+    color: #0060FF;
+    font-weight: 600;
+    text-decoration: none;
+}
+
+.auth-link:hover {
+    text-decoration: underline;
+}
+
+/* ---------------------------------------------------------------------------
+   Modals - used on index.html, register.html, and account.html.
+   These pages use the `hidden` attribute toggle pattern (no JS class-based
+   transitions), so the overlay uses `display: none` via [hidden] and
+   flex centering when shown.
+   --------------------------------------------------------------------------- */
+
+/*
+ * The overlay itself is full-screen and semi-transparent.
+ * When the `hidden` attribute is removed by JS, the flex layout
+ * centres the modal card.
+ */
+.modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.55);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10000;
+    padding: 16px;
+    box-sizing: border-box;
+}
+
+/* [hidden] overrides the flex display set above */
+.modal-overlay[hidden] {
+    display: none;
+}
+
+/* The white card inside the overlay */
+.modal {
+    background: white;
+    border-radius: 15px;
+    padding: 30px;
+    max-width: 450px;
+    width: 100%;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.25);
+    box-sizing: border-box;
+}
+
+.modal-title {
+    margin: 0 0 12px;
+    font-size: 20px;
+    font-weight: 700;
+    color: #0B0B0B;
+    letter-spacing: -0.02em;
+}
+
+/* Danger variant - red title for destructive-action modals */
+.modal-title--danger {
+    color: #f44336;
+}
+
+.modal-body {
+    margin: 0 0 24px;
+    font-size: 14px;
+    line-height: 1.6;
+    color: #555555;
+}
+
+.modal-body strong {
+    color: #0B0B0B;
+}
+
+/* Row of action buttons, right-aligned */
+.modal-actions {
+    display: flex;
+    gap: 10px;
+    justify-content: flex-end;
+}
+
+/* Modal action buttons inherit .btn but are narrower (no width: 100%) */
+.modal-actions .btn {
+    width: auto;
+    min-width: 80px;
+}
+
+/* ---------------------------------------------------------------------------
+   Utility
+   --------------------------------------------------------------------------- */
+
+.hidden {
+    display: none !important;
+}
+
+/* ---------------------------------------------------------------------------
+   Responsive - tablet (768px and below)
+   --------------------------------------------------------------------------- */
+
+@media (max-width: 768px) {
+    .auth-card {
+        padding: 28px 20px;
+    }
+
+    .auth-heading {
+        font-size: 20px;
+        margin-bottom: 22px;
+    }
+}
+
+/* ---------------------------------------------------------------------------
+   Responsive - mobile (480px and below)
+   --------------------------------------------------------------------------- */
+
+@media (max-width: 480px) {
+    .header-container {
+        width: 90%;
+        padding-top: 20px;
+    }
+
+    .header-subtitle {
+        width: 100%;
+        font-size: 12px;
+    }
+
+    .auth-container {
+        padding: 24px 12px 40px;
+        align-items: flex-start;
+    }
+
+    .auth-card {
+        padding: 24px 16px;
+        border-radius: 12px;
+    }
+
+    .auth-heading {
+        font-size: 18px;
+    }
+
+    .modal {
+        padding: 20px;
+    }
+
+    .modal-title {
+        font-size: 18px;
+    }
+
+    .modal-body {
+        font-size: 13px;
+    }
+
+    .modal-actions {
+        flex-direction: column-reverse;
+        gap: 8px;
+    }
+
+    .modal-actions .btn {
+        width: 100%;
+        padding: 14px;
+    }
+}
