@@ -2,8 +2,7 @@
  * Login page logic
  *
  * Responsibilities:
- *  1. Auth guard - redirect already-authenticated users to upload.html
- *     so they never see the login page while holding a valid token.
+ *  1. Auth guard - redirect already-authenticated users to upload.html so they never see the login page while holding a valid token.
  *  2. Client-side form validation before hitting the network.
  *  3. POST /auth/login - exchange credentials for a JWT.
  *  4. Persist the token in localStorage and redirect on success.
@@ -26,13 +25,12 @@
 
   /* -------------------------------------------------------------------------
    *  Auth guard - runs synchronously before any DOM interaction.
-   *  If a token already exists we skip rendering entirely and bounce the
-   *  user to the gallery.  This prevents a flash of the login form.
+   *  If a token already exists we skip rendering entirely and bounce the user to the gallery.
+   *  This prevents a flash of the login form.
    * ---------------------------------------------------------------------- */
   if (localStorage.getItem("access_token")) {
     location.replace("upload.html");
-    // `replace` removes this page from browser history so the back button
-    // after login does not return the user to an empty login screen.
+    // `replace` removes this page from browser history so the back button after login does not return the user to an empty login screen.
   }
 
   /* -------------------------------------------------------------------------
@@ -56,9 +54,8 @@
   /* -------------------------------------------------------------------------
    *  Modal helpers
    *
-   *  The auth pages use the `hidden` attribute pattern (HTML-native), not the
-   *  `.show` class used by modal.js on the upload page.  Showing a modal is
-   *  just `overlay.removeAttribute('hidden')`; hiding is `overlay.hidden = true`.
+   *  The auth pages use the `hidden` attribute pattern (HTML-native), not the `.show` class used by modal.js on the upload page.
+   *  Showing a modal is just `overlay.removeAttribute('hidden')`; hiding is `overlay.hidden = true`.
    * ---------------------------------------------------------------------- */
 
   /** Show a modal overlay (removes the `hidden` attribute). */
@@ -130,9 +127,8 @@
     try {
       /*
        * FastAPI's OAuth2PasswordRequestForm expects the body as
-       * application/x-www-form-urlencoded with `username` and `password`
-       * fields.  Our users log in with an email, but the field name on
-       * the wire must remain `username` to match the form schema.
+       * application/x-www-form-urlencoded with `username` and `password` fields.
+       * Our users log in with an email, but the field name on the wire must remain `username` to match the form schema.
        */
       const body = new URLSearchParams();
       body.append("username", emailInput.value.trim());
@@ -174,8 +170,7 @@
   });
 
   /* -------------------------------------------------------------------------
-   *  Clear the error state on a field as soon as the user starts typing -
-   *  avoids leaving stale red borders after a failed attempt.
+   *  Clear the error state on a field as soon as the user starts typing - avoids leaving stale red borders after a failed attempt.
    * ---------------------------------------------------------------------- */
   emailInput.addEventListener("input", () => {
     emailError.textContent = "";
