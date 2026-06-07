@@ -161,6 +161,12 @@ button {
     transition: border-color 0.15s ease;
     box-sizing: border-box;
     width: 100%;
+    /*
+     * Explicit height prevents the field from growing when a browser password-manager badge is injected into a password input,
+     * which can cause the field to expand into an infinite row on paste/focus.
+     */
+    height: 42px;
+    overflow: hidden;
 }
 
 .form-group input::placeholder {

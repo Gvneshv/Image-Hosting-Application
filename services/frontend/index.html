@@ -16,12 +16,11 @@
     <!-- ==================== HEADER ==================== -->
     <header class="header-container">
         <!--
-            Clicking the title always goes to the gallery.
-            index.js will redirect already-logged-in users to upload.html
-            before this page even renders, so this link is only ever
-            reached by unauthenticated visitors (it just reloads the page).
+            Clicking the title reloads the login page.
+            index.js redirects already-logged-in users to upload.html before this page renders, so this link is only ever reached by
+            unauthenticated visitors — for them, "home" is here.
         -->
-        <a href="upload.html" class="header-link">
+        <a href="index.html" class="header-link">
             <h1 class="header-title">Image Hosting</h1>
         </a>
         <p class="header-subtitle">Your personal image gallery.</p>
