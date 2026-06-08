@@ -195,3 +195,6 @@ cython_debug/
 images/*.jpg
 images/*.png
 images/*.gif
+
+# A scratch file the VSCode extensions like SQLTools write when you run queries. It has no effect on the app and shouldn't be committed.
+*.session.sql
