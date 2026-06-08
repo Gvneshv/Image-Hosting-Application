@@ -10,7 +10,6 @@ Image schemas
 Authentication schemas
 ----------------------
 ``UserRegister``  - request body for ``POST /auth/register``.
-``UserLogin``     - request body for ``POST /auth/login``.
 ``Token``         - response body returned after a successful login.
 ``TokenData``     - internal schema used when decoding a JWT (not sent to clients).
 ``UserOut``       - safe user info returned in responses (no password hash ever).
@@ -72,22 +71,6 @@ class UserRegister(BaseModel):
     Attributes:
         email (EmailStr): The email address the user wants to register with.
         password (str): Plain-text password chosen by the user. It is hashed immediately upon receipt and never stored or logged as plain text anywhere in the system.
-    """
-
-    email: EmailStr
-    password: str
-
-
-class UserLogin(BaseModel):
-    """
-    Request body for ``POST /auth/login``.
- 
-    Identical fields to ``UserRegister`` - kept as a separate class
-    so the two endpoints can evolve independently in the future (e.g. adding a CAPTCHA field to registration without touching login).
- 
-    Attributes:
-        email (EmailStr): The user's registered email address.
-        password (str): The plain-text password to verify against the stored hash.
     """
 
     email: EmailStr

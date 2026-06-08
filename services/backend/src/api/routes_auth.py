@@ -19,13 +19,14 @@ import logging
 import os
 
 from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.orm import Session
 from typing import Annotated
 
 from db.crud import create_user, delete_user, get_user_by_email, update_user_password
 from db.database import get_db
 from db.models import User
-from schemas.upload import ChangePasswordRequest, Token, UserLogin, UserOut, UserRegister
+from schemas.upload import ChangePasswordRequest, Token, UserOut, UserRegister
 from settings.config import config
 from utils.auth_utils import create_access_token, get_current_user, hash_password, verify_password
 
@@ -87,7 +88,7 @@ def register(user_data: UserRegister, db: Session = Depends(get_db)) -> UserOut:
         status_code=status.HTTP_200_OK,
         summary="Log in and receive a JWT access token",
 )
-def login(credentials: UserLogin, db: Session = Depends(get_db)) -> Token:
+def login(credentials: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)) -> Token:
     """
     Verify user credentials and return a signed JWT.
  
@@ -114,7 +115,7 @@ def login(credentials: UserLogin, db: Session = Depends(get_db)) -> Token:
         headers={"WWW-Authenticate": "Bearer"},
     )
 
-    user = get_user_by_email(db, email=credentials.email)
+    user = get_user_by_email(db, email=credentials.username)
     if user is None:
         logger.warning(f"Login attempt with non-existent email: {credentials.email}")
         raise auth_error
