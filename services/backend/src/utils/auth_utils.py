@@ -3,7 +3,7 @@ Authentication utilities.
  
 This module is the single source of truth for everything auth-related:
  
-- Password hashing and verification (bcrypt via ``passlib``)
+- Password hashing and verification (Argon2id via ``pwdlib``)
 - JWT token creation and decoding (via ``python-jose``)
 - The ``get_current_user`` FastAPI dependency, which every protected route
   uses to identify the caller
@@ -30,7 +30,7 @@ from datetime import datetime, timedelta, timezone
 from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
 from jose import JWTError, jwt
-from passlib.context import CryptContext
+from pwdlib import PasswordHash
 from sqlalchemy.orm import Session
 
 from db.crud import get_user_by_id
@@ -43,16 +43,14 @@ from settings.config import config
 # Password hashing
 # ---------------------------------------------------------------------------
  
-# CryptContext wraps passlib and lets us swap algorithms later without
-# changing call sites. "bcrypt" is the industry standard for passwords:
-# it is intentionally slow, making brute-force attacks expensive.
-# ``deprecated="auto"`` means old hashes (if we ever change algorithm) are
-# automatically recognised and flagged for re-hashing on next login.
-_pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+# PasswordHash.recommended() selects Argon2id - the winner of the Password Hashing Competition and the current OWASP/IETF recommendation.
+# It is memory-hard (unlike bcrypt), making GPU-accelerated brute-force attacks significantly more expensive.
+# The call sites (hash_password / verify_password) are identical to the previous passlib-based implementation.
+_pwd_context = PasswordHash.recommended()
 
 def hash_password(plain_password: str) -> str:
     """
-    Hash a plain-text password with bcrypt.
+    Hash a plain-text password with Argon2id.
  
     This function should be called exactly once per password: at registration
     (or password change). The resulting hash is what gets stored in the DB.
@@ -62,23 +60,22 @@ def hash_password(plain_password: str) -> str:
         plain_password: The raw password string provided by the user.
  
     Returns:
-        str: A bcrypt hash string (e.g. ``$2b$12$...``).
-             Safe to store in the database.
+        str: An Argon2id hash string (e.g. ``$argon2id$...``). Safe to store in the database.
     """
     return _pwd_context.hash(plain_password)
 
 
 def verify_password(plain_password: str, hashed_password: str) -> bool:
     """
-    Check a plain-text password against a stored bcrypt hash.
+    Check a plain-text password against a stored Argon2id hash.
  
-    Used during login. bcrypt re-hashes the plain password with the same
-    salt that is embedded in the stored hash, then compares results.
+    Used during login. 
+    Argon2id re-derives the hash from the plain password with the same salt that is embedded in the stored hash, then compares results.
     The comparison is timing-safe (constant-time) to prevent timing attacks.
  
     Args:
         plain_password: The raw password string typed by the user at login.
-        hashed_password: The bcrypt hash stored in the ``Users`` table.
+        hashed_password: The Argon2id hash stored in the ``Users`` table.
  
     Returns:
         bool: ``True`` if the password matches the hash, ``False`` otherwise.
@@ -121,7 +118,7 @@ def create_access_token(user_id: int) -> str:
 
     # The payload (also called "claims") is a plain dict that gets encoded
     # into the token. ``sub`` is the standard claim for "who this token is
-    # about". We store the user_id as a string — JWT sub is always a string.
+    # about". We store the user_id as a string - JWT sub is always a string.
     payload = {
         "sub": str(user_id), 
         "exp": expire
@@ -173,7 +170,7 @@ def decode_access_token(token: str) -> TokenData:
     
     except JWTError:
         # JWTError covers: invalid signature, expired token, malformed token.
-        # We intentionally surface the same generic error for all of these —
+        # We intentionally surface the same generic error for all of these -
         # telling an attacker *why* their token was rejected is unnecessary.
         raise credentials_exception
 
