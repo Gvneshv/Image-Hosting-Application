@@ -2,7 +2,7 @@
 CRUD helpers for the ``User`` and ``Image`` models.
  
 All functions accept an active ``Session`` as their first argument and do
-**not** manage transactions themselves — callers are responsible for
+**not** manage transactions themselves - callers are responsible for
 committing or rolling back as needed (except where a commit is the
 natural conclusion of the operation, e.g. ``create_image``).
  
@@ -69,7 +69,7 @@ def create_user(db: Session, email: str, password_hash: str) -> User:
  
     New accounts are always created with ``is_admin=False``.
     Admin privileges are granted manually (directly in the DB or via a
-    one-time setup script) — never through the public registration endpoint.
+    one-time setup script) - never through the public registration endpoint.
  
     Args:
         db: Active database session.
@@ -138,7 +138,7 @@ def delete_image(db: Session, unique_name: str, user_id: int | None = None) -> b
     """Delete an image record by its unique name.
 
     When ``user_id`` is provided, the delete is scoped to that user's images
-    only — a user cannot delete an image they don't own.
+    only - a user cannot delete an image they don't own.
     When ``user_id`` is ``None`` (admin callers), ownership is not checked
     and any image can be deleted.
 
@@ -207,7 +207,7 @@ def get_images_paginated(
         db: Active database session.
         skip: Number of rows to skip (offset), used for pagination.
         limit: Maximum number of rows to return.
-        sort_by: Column name to sort on — ``"filename"``, ``"upload_time"``, or ``"size"``.
+        sort_by: Column name to sort on - ``"filename"``, ``"upload_time"``, or ``"size"``.
         sort_order: ``"asc"`` for ascending or ``"desc"`` for descending.
         user_id: If provided, only return images owned by this user.
                  Pass ``None`` to skip the ownership filter (admin use).
@@ -255,3 +255,61 @@ def count_images(db: Session, user_id: int | None = None) -> int:
         query = query.filter(Image.user_id == user_id)
 
     return query.count()
+
+
+def update_user_password(db: Session, user_id: int, new_password_hash: str) -> bool:
+    """
+    Update the stored password hash for a user.
+
+    The new password must be hashed **before** calling this function.
+    Plain-text passwords must never reach the database layer.
+
+    Args:
+        db: Active database session.
+        user_id: Primary key of the user whose password is being changed.
+        new_password_hash: Bcrypt hash of the user's new password.
+
+    Returns:
+        bool: ``True`` if the user was found and updated,
+            ``False``if the user_id does not exist (should not happen in normal flow since the caller is authenticated, but handled defensively).
+    """
+    user = db.query(User).filter(User.id == user_id).first()
+    if not user:
+        return False
+    user.hashed_password = new_password_hash
+    db.commit()
+    return True
+
+
+def delete_user(db: Session, user_id: int) -> list[str]:
+    """
+    Delete a user account and all of their image records from the database.
+
+    Does NOT delete files from disk - that is the caller's responsibility (route layer), following the same pattern as ``DELETE /upload/{filename}``.
+    The list of unique filenames is returned so the route can remove the physical files after the DB transaction succeeds.
+
+    Images are deleted first to avoid a foreign-key constraint violation when the User row is removed.
+
+    Args:
+        db: Active database session.
+        user_id: Primary key of the user to delete.
+
+    Returns:
+        list[str]: The ``unique_name`` of every image that belonged to this user, so the caller can delete the corresponding files from disk.
+            Empty list if the user had no images or was not found.
+    """
+    # Collect filenames before deletion so the route can clean up disk files.
+    images = db.query(Image).filter(Image.user_id == user_id).all()
+    filenames = [img.unique_name for img in images]
+
+    # Delete image rows first (FK constraint: images reference users).
+    for img in images:
+        db.delete(img)
+
+    # Delete the user row.
+    user = db.query(User).filter(User.id == user_id).first()
+    if user:
+        db.delete(user)
+
+    db.commit()
+    return filenames
