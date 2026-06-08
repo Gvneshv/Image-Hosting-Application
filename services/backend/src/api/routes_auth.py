@@ -117,7 +117,11 @@ def login(credentials: OAuth2PasswordRequestForm = Depends(), db: Session = Depe
 
     user = get_user_by_email(db, email=credentials.username)
     if user is None:
-        logger.warning(f"Login attempt with non-existent email: {credentials.email}")
+        logger.warning("Login attempt with non-existent email: %s", credentials.username)
+        raise auth_error
+    
+    if not verify_password(credentials.password, user.hashed_password):
+        logger.warning("Failed login attempt for email: %s", credentials.username)
         raise auth_error
     
     # Credentials are valid - issue a token containing the user's ID.

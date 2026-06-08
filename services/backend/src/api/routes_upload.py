@@ -15,14 +15,14 @@ Access control
  
 Endpoints
 ---------
-GET    /                        — welcome / basic liveness ping (public)
-GET    /upload                  — paginated image list (auth required)
-POST   /upload/                 — upload a new image (auth required, rate-limited)
-DELETE /upload/{filename}       — delete an image (auth required, ownership enforced)
-GET    /file_info/{filename}    — metadata for a single image (auth required)
-GET    /all_images              — full image list for the viewer slideshow (auth required)
-GET    /view/{filename}         — render the Jinja2 image-viewer page (auth required)
-GET    /health                  — extended health check: DB + filesystem (public)
+GET    /                        - welcome / basic liveness ping (public)
+GET    /upload                  - paginated image list (auth required)
+POST   /upload/                 - upload a new image (auth required, rate-limited)
+DELETE /upload/{filename}       - delete an image (auth required, ownership enforced)
+GET    /file_info/{filename}    - metadata for a single image (auth required)
+GET    /all_images              - full image list for the viewer slideshow (auth required)
+GET    /view/{filename}         - render the Jinja2 image-viewer page (auth required)
+GET    /health                  - extended health check: DB + filesystem (public)
 """
 
 import math
@@ -65,7 +65,7 @@ DbSession = Annotated[Session, Depends(get_db)]
 
 # CurrentUser injects the authenticated User ORM object into protected routes.
 # FastAPI extracts the Bearer token from the Authorization header, verifies it,
-# and loads the matching user from the database — all before the route runs.
+# and loads the matching user from the database - all before the route runs.
 # If the token is missing, expired, or invalid a 401 is raised automatically.
 CurrentUser = Annotated[User, Depends(get_current_user)]
 
@@ -101,9 +101,9 @@ def _scoped_user_id(user: User) -> int | None:
 @router.get("/")
 def root():
     """
-    Welcome endpoint — also serves as a basic liveness ping.
+    Welcome endpoint - also serves as a basic liveness ping.
  
-    Public — no authentication required.
+    Public - no authentication required.
     """
     logger.info("Root endpoint hit.")
     return {"message": "Welcome to the Image Hosting Server v2.0"}
@@ -129,8 +129,8 @@ def get_images(
         current_user: Authenticated user injected by the JWT dependency.
         page: Page number (1-based).
         per_page: Number of images per page (1–100).
-        sort_by: Column to sort on — ``filename``, ``upload_time``, or ``size``.
-        sort_order: Sort direction — ``asc`` or ``desc``.
+        sort_by: Column to sort on - ``filename``, ``upload_time``, or ``size``.
+        sort_order: Sort direction - ``asc`` or ``desc``.
  
     Returns:
         dict: Images for the requested page plus pagination metadata.
@@ -139,7 +139,7 @@ def get_images(
         HTTPException 400: Invalid ``sort_by`` or ``sort_order`` value.
         HTTPException 404: No images found for this user.
     """
-    # Manual validation — avoids 422 errors that can occur with regex in Query()
+    # Manual validation - avoids 422 errors that can occur with regex in Query()
     if sort_by not in {"filename", "upload_time", "size"}:
         raise HTTPException(status_code=400, detail="Invalid sort_by value.")
     if sort_order not in {"desc", "asc"}:
@@ -244,7 +244,7 @@ def delete_file(filename: str, db: DbSession, current_user: CurrentUser):
     Regular users can only delete their own images. Admins can delete any image.
     If a regular user attempts to delete an image that isn't theirs, the CRUD
     layer returns ``False`` (ownership filter finds nothing) and a 404 is raised
-    — indistinguishable from a genuinely missing file, to avoid leaking info.
+    - indistinguishable from a genuinely missing file, to avoid leaking info.
  
     Args:
         filename: The unique filename of the image to delete.
@@ -339,26 +339,24 @@ def get_all_images(db: DbSession, current_user: CurrentUser):
         current_user: Authenticated user injected by the JWT dependency.
  
     Returns:
-        dict: ``{"images": [...]}`` — full list of image dicts.
+        dict: ``{"images": [...]}`` - full list of image dicts.
     """
     images = crud.get_images_paginated(db, skip=0, limit=1000, sort_by="upload_time", sort_order="asc", user_id=_scoped_user_id(current_user))
     return {"images": [img.to_dict() for img in images]}
 
 
 @router.get("/view/{filename}", response_class=HTMLResponse)
-async def view_file(request: Request, filename: str, _: CurrentUser):
+async def view_file(request: Request, filename: str):
     """
     Render the server-side image viewer page via Jinja2.
- 
-    Requires authentication — unauthenticated requests receive a 401 before
-    the template is rendered. The frontend JS in ``viewer.js`` detects the 401
-    and redirects to the login page.
- 
+
+    Public endpoint - authentication is enforced client-side by ``viewer.js`` (checks localStorage for a token and redirects to login if absent).
+    The API calls that ``viewer.js`` makes afterwards (``/file_info``, ``/all_images``) are still protected and require a valid Bearer token.
+
     Args:
         request: Incoming HTTP request (required by Jinja2Templates).
         filename: Unique filename extracted from the URL path.
-        current_user: Authenticated user injected by the JWT dependency.
- 
+
     Returns:
         HTMLResponse: Rendered ``viewer.html`` template.
     """
@@ -373,7 +371,7 @@ def health(db: DbSession):
     """
     Extended health check: verifies the database connection and images directory.
  
-    Public — no authentication required. Docker Compose calls this endpoint
+    Public - no authentication required. Docker Compose calls this endpoint
     during startup to decide when the backend container is ready.
  
     Returns:
