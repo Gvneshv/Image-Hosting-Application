@@ -36,7 +36,7 @@ button {
 .header-title-group {
   display: flex;
   flex-direction: column;
-  align-items: flex-start; /* left child of space-between row - align to left edge */
+  align-items: center;
   gap: 2px;
   flex: 1;
   min-width: 0;
@@ -52,7 +52,7 @@ button {
   line-height: 14px;
   letter-spacing: -0.02em;
   color: #0b0b0b;
-  text-align: left;
+  text-align: right;
 }
 
 .header-subtitle {
@@ -64,7 +64,9 @@ button {
   line-height: 150%;
   letter-spacing: -0.04em;
   color: #0b0b0b;
-  text-align: left;
+  text-align: right;
+  right: -1%;
+  position: relative;
 }
 
 /* Account icon - top-right corner, links to account.html */

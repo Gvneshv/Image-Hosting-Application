@@ -57,6 +57,9 @@
     return response;
   };
 
+  // Cache DOM references
+  const back = document.getElementById("back-to-the-gallery-link");
+
   /* -------------------------------------------------------------------------
    *  DOM references - My Info section
    * ---------------------------------------------------------------------- */
@@ -112,6 +115,14 @@
 
   const serverErrOverlay = document.getElementById("server-error-overlay");
   const serverErrOk = document.getElementById("server-error-ok");
+
+  // -----------------------------------------------------------------------
+  // Action buttons
+  // -----------------------------------------------------------------------
+
+  back.addEventListener("click", () => {
+    window.location.href = "/upload.html#images";
+  });
 
   /* -------------------------------------------------------------------------
    *  Modal helpers - `hidden` attribute pattern
