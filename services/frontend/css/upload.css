@@ -36,7 +36,7 @@ button {
 .header-title-group {
   display: flex;
   flex-direction: column;
-  align-items: center;
+  align-items: flex-start; /* left child of space-between row - align to left edge */
   gap: 2px;
   flex: 1;
   min-width: 0;
@@ -52,7 +52,7 @@ button {
   line-height: 14px;
   letter-spacing: -0.02em;
   color: #0b0b0b;
-  text-align: right;
+  text-align: left;
 }
 
 .header-subtitle {
@@ -64,9 +64,7 @@ button {
   line-height: 150%;
   letter-spacing: -0.04em;
   color: #0b0b0b;
-  text-align: right;
-  left: 20px;
-  position: relative;
+  text-align: left;
 }
 
 /* Account icon - top-right corner, links to account.html */
@@ -553,8 +551,7 @@ input[type="file"] {
 /* Large tablets and small desktops (1024px and below) */
 @media (max-width: 1024px) {
   .header-container {
-    width: 90%;
-    max-width: 400px;
+    /* left/right/padding from base rule span full width - no override needed */
   }
 
   .header-subtitle {
@@ -606,7 +603,7 @@ input[type="file"] {
 @media (max-width: 768px) {
   .header-container {
     top: 20px;
-    width: 90%;
+    /* full-width span inherited from base rule */
   }
 
   .header-title {

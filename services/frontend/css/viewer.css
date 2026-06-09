@@ -38,7 +38,7 @@ body {
 .header-title-group {
   display: flex;
   flex-direction: column;
-  align-items: center;
+  align-items: flex-start; /* title/subtitle align to the left edge of the group */
   gap: 2px;
   flex: 1;
   min-width: 0;
@@ -54,7 +54,7 @@ body {
   line-height: 14px;
   letter-spacing: -0.02em;
   color: #0b0b0b;
-  text-align: right;
+  text-align: left;
 }
 
 .header-subtitle {
@@ -66,9 +66,7 @@ body {
   line-height: 150%;
   letter-spacing: -0.04em;
   color: #0b0b0b;
-  text-align: right;
-  left: 20px;
-  position: relative;
+  text-align: left;
 }
 
 /* Account icon - top-right corner, links to account.html */
@@ -374,9 +372,8 @@ main {
   }
 
   .header-container {
-    width: 90%;
-    max-width: 50%;
     top: 25px;
+    /* left/right/padding from base rule span the full width - no override needed */
   }
 
   .back {
@@ -438,8 +435,7 @@ main {
 
   .header-container {
     top: 29px;
-    width: 50%; /* Narrower to avoid sides */
-    max-width: 200px;
+    /* full-width span inherited from base rule */
   }
 
   .header-title {
@@ -547,8 +543,7 @@ main {
 
   .header-container {
     top: 29px;
-    width: 50%;
-    max-width: 180px;
+    /* full-width span inherited from base rule */
   }
 
   .header-title {
@@ -659,7 +654,7 @@ main {
 
   .header-container {
     top: 29px;
-    max-width: 150px;
+    /* full-width span inherited from base rule */
   }
 
   .header-title {
@@ -724,7 +719,7 @@ main {
 
   .header-container {
     top: 29px;
-    max-width: 250px;
+    /* full-width span inherited from base rule */
   }
 
   .header-title {
