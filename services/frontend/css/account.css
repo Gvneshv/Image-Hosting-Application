@@ -45,8 +45,7 @@
 
 /*
  * Sidebar nav buttons look like text labels, not pill buttons.
- * The active state mirrors the blue #0060FF used for active tabs
- * in upload.css (.toggle-tab.active).
+ * The active state mirrors the blue #0060FF used for active tabs in upload.css (.toggle-tab.active).
  */
 .sidebar-btn {
   display: block;
@@ -127,9 +126,8 @@
 
 /*
  * Hidden sections - toggled by account.js when a sidebar button is clicked.
- * Using a modifier class rather than the `hidden` attribute so that
- * account.js can find sections via querySelectorAll and toggle the class
- * without fighting the [hidden] attribute.
+ * Using a modifier class rather than the `hidden` attribute so that account.js can find sections via querySelectorAll
+ * and toggle the class without fighting the [hidden] attribute.
  */
 .account-section--hidden {
   display: none;
@@ -188,28 +186,34 @@
 }
 
 /* ---------------------------------------------------------------------------
-   Responsive - tablet (768px and below): sidebar goes above content
+   Responsive - tablet (768px and below)
+
+   Layout shift: two-column desktop → stacked mobile.
+   The sidebar becomes a top bar above the content card.
+   Inside the sidebar:
+     - .sidebar-nav buttons sit in a row (equal-width tabs)
+     - .sidebar-danger-zone sits in a separate row below, also horizontal
+   The two groups are kept in distinct rows by keeping the sidebar as a column container and making each child group a row internally.
+   This prevents nav buttons and danger buttons from colliding on wrap.
    --------------------------------------------------------------------------- */
 
 @media (max-width: 768px) {
   .account-main {
-    flex-direction: column;
+    flex-direction: column; /* sidebar on top, content card below */
     gap: 16px;
     padding: 24px 16px 48px;
   }
 
   .account-sidebar {
     width: 100%;
-    flex-direction: row;
-    flex-wrap: wrap;
-    gap: 12px;
+    flex-direction: column; /* keep two distinct rows: nav + danger */
+    gap: 8px;
   }
 
-  /* Nav buttons sit side by side on tablet */
+  /* Nav tabs - equal-width buttons in a single row */
   .sidebar-nav {
     flex-direction: row;
-    flex: 1;
-    min-width: 0;
+    gap: 6px;
   }
 
   .sidebar-btn {
@@ -217,20 +221,21 @@
     text-align: center;
   }
 
-  /* Danger zone also goes horizontal */
+  /* Danger zone - full-width buttons side-by-side below nav */
   .sidebar-danger-zone {
     flex-direction: row;
-    align-items: center;
+    align-items: stretch;
     gap: 8px;
   }
 
   .danger-label {
-    display: none; /* not enough room; the button labels speak for themselves */
+    display: none; /* not enough room; button labels are self-explanatory */
   }
 
   .sidebar-danger-zone .btn {
-    width: auto;
     flex: 1;
+    width: auto;
+    justify-content: center;
   }
 
   .account-section {
@@ -249,12 +254,22 @@
   }
 
   .sidebar-nav {
-    gap: 6px;
+    gap: 4px;
   }
 
   .sidebar-btn {
     font-size: 13px;
     padding: 8px 10px;
+  }
+
+  /* Stack danger buttons vertically on very small screens so they don't get too narrow to read (e.g. "Delete Account" truncates below ~160px). */
+  .sidebar-danger-zone {
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .sidebar-danger-zone .btn {
+    width: 100%;
   }
 
   .account-section {

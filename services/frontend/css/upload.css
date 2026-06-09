@@ -39,6 +39,7 @@ button {
   align-items: center;
   gap: 2px;
   flex: 1;
+  min-width: 0;
 }
 
 .header-title {
@@ -51,6 +52,7 @@ button {
   line-height: 14px;
   letter-spacing: -0.02em;
   color: #0b0b0b;
+  text-align: right;
 }
 
 .header-subtitle {
@@ -62,6 +64,9 @@ button {
   line-height: 150%;
   letter-spacing: -0.04em;
   color: #0b0b0b;
+  text-align: right;
+  left: 20px;
+  position: relative;
 }
 
 /* Account icon - top-right corner, links to account.html */
