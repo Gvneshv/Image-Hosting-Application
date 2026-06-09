@@ -1,12 +1,12 @@
 /**
  * Image-host frontend logic
  * - Auth guard: redirects unauthenticated visitors to index.html
- * - Account icon: populates initials from the stored JWT email
+ * - Account icon: fetches initials from GET /auth/me and populates the account icon
  * - Upload via button or drag-&-drop
  * - List uploaded images
  * - Delete images
  */
-(() => {
+(async() => {
   /* --------------------------------------------------------------------
    *  AUTH GUARD
    *  Runs before any DOM work.  If no token is present the user has no business being here - send them to the login page immediately.
@@ -141,7 +141,7 @@
   /**
    * Initialize upload functionality.
    */
-  function initUploader() {
+  function initUploader(loadImages) {
     const uploadBtn = $(SEL.uploadBtn);
     const fileInput = $(SEL.fileInput);
     const resultInput = $(SEL.resultInput);
@@ -239,6 +239,8 @@
         // Success - parse JSON response
         const result = await response.json();
         showStatus(uploadText, `File uploaded: ${result.filename}`);
+
+        loadImages();
 
         // Build full URL for the result
         const imageUrl = result.url.startsWith("http")
@@ -568,6 +570,8 @@
     if (imgTabBtn.classList.contains("active")) {
       loadImages();
     }
+
+    return { loadImages };
   }
 
   async function copyToClipboard(text) {
@@ -589,6 +593,6 @@
   }
 
   // Initialize modules
-  initUploader();
-  initImagesTab();
+  const { loadImages } = initImagesTab();
+  initUploader(loadImages);
 })();
