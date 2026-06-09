@@ -146,7 +146,7 @@
     // -----------------------------------------------------------------------
 
     back.addEventListener("click", () => {
-      window.location.href = "/upload.html";
+      window.location.href = "/upload.html#images";
     });
 
     copyBtn.addEventListener("click", async () => {
@@ -197,7 +197,7 @@
           icon: "✓",
           iconClass: "success",
         });
-        window.location.href = "/upload.html";
+        window.location.href = "/upload.html#images";
       } catch (err) {
         await customAlert(`Delete failed: ${err.message}`, "Error", {
           icon: "✕",

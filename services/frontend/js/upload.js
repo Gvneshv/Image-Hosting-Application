@@ -571,6 +571,11 @@
       loadImages();
     }
 
+    // Activate images tab automatically if the URL hash requests it
+    if (window.location.hash === "#images") {
+      imgTabBtn.click();
+    }
+
     return { loadImages };
   }
 
