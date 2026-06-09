@@ -112,7 +112,7 @@ def root():
 @router.get("/upload", response_model=dict)
 def get_images(
     db: DbSession,
-    current_user = CurrentUser,
+    current_user: CurrentUser,
     page: PageNumber = 1,
     per_page: PerPageNumber = 6,
     sort_by: Annotated[str, Query()] = "upload_time",
