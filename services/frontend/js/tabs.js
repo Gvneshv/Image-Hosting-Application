@@ -13,25 +13,35 @@
  *   <section id="images-tab"  class="tab-content hidden">...</section>
  */
 
-const tabs = document.querySelectorAll('.toggle-tab');
-const tabContents = document.querySelectorAll('.tab-content');
+const tabs = document.querySelectorAll(".toggle-tab");
+const tabContents = document.querySelectorAll(".tab-content");
 
-tabs.forEach(tab => {
-    tab.addEventListener('click', (e) => {
-        e.preventDefault();
+tabs.forEach((tab) => {
+  tab.addEventListener("click", (e) => {
+    e.preventDefault();
 
-        const target = tab.dataset.tab;
+    const target = tab.dataset.tab;
 
-        // Update active/inactive state on all tab labels
-        tabs.forEach(t => {
-            t.classList.remove('active');
-            t.classList.add('inactive');
-        });
-        tab.classList.add('active');
-        tab.classList.remove('inactive');
-
-        // Show only the matching content section
-        tabContents.forEach(tc => tc.classList.add('hidden'));
-        document.getElementById(`${target}-tab`).classList.remove('hidden');
+    // Update active/inactive state on all tab labels
+    tabs.forEach((t) => {
+      t.classList.remove("active");
+      t.classList.add("inactive");
     });
+    tab.classList.add("active");
+    tab.classList.remove("inactive");
+
+    // Show only the matching content section
+    tabContents.forEach((tc) => tc.classList.add("hidden"));
+    document.getElementById(`${target}-tab`).classList.remove("hidden");
+  });
 });
+
+// Activate a tab on load if the URL hash matches a tab name (e.g. #images).
+// Used by viewer.js to redirect back to the images tab after delete/back.
+const hashTarget = window.location.hash.slice(1); // strip leading '#'
+if (hashTarget) {
+  const matchingTab = document.querySelector(
+    `.toggle-tab[data-tab="${hashTarget}"]`,
+  );
+  if (matchingTab) matchingTab.click();
+}

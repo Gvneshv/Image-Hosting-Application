@@ -1,137 +1,152 @@
 <!doctype html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
     <title>Image Hosting - Create Account</title>
-    <link rel="icon" type="image/x-icon" href="base_images/ico/favicon.ico">
-    <link rel="stylesheet" href="css/auth.css">
+    <link rel="icon" type="image/x-icon" href="base_images/ico/favicon.ico" />
+    <link rel="stylesheet" href="css/auth.css" />
     <script src="js/register.js" defer></script>
-</head>
-<body>
-
-<div class="page-container">
-
-    <!-- ==================== HEADER ==================== -->
-    <header class="header-container">
+  </head>
+  <body>
+    <div class="page-container">
+      <!-- ==================== HEADER ==================== -->
+      <header class="header-container">
         <a href="index.html" class="header-link">
-            <h1 class="header-title">Image Hosting</h1>
+          <h1 class="header-title">Image Hosting</h1>
         </a>
         <p class="header-subtitle">Your personal image gallery.</p>
-    </header>
+      </header>
 
-    <!-- ==================== REGISTRATION FORM ==================== -->
-    <main class="auth-container">
+      <!-- ==================== REGISTRATION FORM ==================== -->
+      <main class="auth-container">
         <div class="auth-card">
-            <h2 class="auth-heading">Create Account</h2>
+          <h2 class="auth-heading">Create Account</h2>
 
-            <form class="auth-form" id="register-form" novalidate>
+          <form class="auth-form" id="register-form" novalidate>
+            <div class="form-group">
+              <label for="email">Email</label>
+              <input
+                type="email"
+                id="email"
+                name="email"
+                placeholder="you@example.com"
+                autocomplete="email"
+                required
+              />
+              <span class="field-error" id="email-error"></span>
+            </div>
 
-                <div class="form-group">
-                    <label for="email">Email</label>
-                    <input
-                        type="email"
-                        id="email"
-                        name="email"
-                        placeholder="you@example.com"
-                        autocomplete="email"
-                        required
-                    >
-                    <span class="field-error" id="email-error"></span>
-                </div>
+            <div class="form-group">
+              <label for="password">Password</label>
+              <input
+                type="password"
+                id="password"
+                name="password"
+                placeholder="At least 8 characters"
+                autocomplete="new-password"
+                required
+                minlength="8"
+              />
+              <span class="field-error" id="password-error"></span>
+            </div>
 
-                <div class="form-group">
-                    <label for="password">Password</label>
-                    <input
-                        type="password"
-                        id="password"
-                        name="password"
-                        placeholder="At least 8 characters"
-                        autocomplete="new-password"
-                        required
-                        minlength="8"
-                    >
-                    <span class="field-error" id="password-error"></span>
-                </div>
+            <div class="form-group">
+              <label for="confirm-password">Confirm Password</label>
+              <input
+                type="password"
+                id="confirm-password"
+                name="confirm-password"
+                placeholder="Repeat your password"
+                autocomplete="new-password"
+                required
+              />
+              <span class="field-error" id="confirm-password-error"></span>
+            </div>
 
-                <div class="form-group">
-                    <label for="confirm-password">Confirm Password</label>
-                    <input
-                        type="password"
-                        id="confirm-password"
-                        name="confirm-password"
-                        placeholder="Repeat your password"
-                        autocomplete="new-password"
-                        required
-                    >
-                    <span class="field-error" id="confirm-password-error"></span>
-                </div>
+            <button type="submit" class="btn btn-primary" id="register-btn">
+              Create Account
+            </button>
+          </form>
 
-                <button type="submit" class="btn btn-primary" id="register-btn">
-                    Create Account
-                </button>
-
-            </form>
-
-            <p class="auth-switch">
-                Already have an account?
-                <a href="index.html" class="auth-link">Sign in</a>
-            </p>
+          <p class="auth-switch">
+            Already have an account?
+            <a href="index.html" class="auth-link">Sign in</a>
+          </p>
         </div>
-    </main>
+      </main>
+    </div>
+    <!-- /.page-container -->
 
-</div><!-- /.page-container -->
+    <!-- ==================== MODALS ==================== -->
 
-
-<!-- ==================== MODALS ==================== -->
-
-<!--
+    <!--
     Email already registered modal.
     Shown by register.js when POST /auth/register returns 400.
 -->
-<div class="modal-overlay" id="email-taken-overlay" role="dialog" aria-modal="true" aria-labelledby="et-title" hidden>
-    <div class="modal">
+    <div
+      class="modal-overlay"
+      id="email-taken-overlay"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="et-title"
+      hidden
+    >
+      <div class="modal">
         <h3 class="modal-title" id="et-title">Email Already in Use</h3>
         <p class="modal-body">
-            An account with this email address already exists.
-            <a href="index.html" class="auth-link">Sign in instead?</a>
+          An account with this email address already exists.
+          <a href="index.html" class="auth-link">Sign in instead?</a>
         </p>
         <div class="modal-actions">
-            <button class="btn btn-primary" id="email-taken-ok">OK</button>
+          <button class="btn btn-primary" id="email-taken-ok">OK</button>
         </div>
+      </div>
     </div>
-</div>
 
-<!--
+    <!--
     Registration success modal.
     Shown briefly after a successful registration before redirecting to login.
 -->
-<div class="modal-overlay" id="register-success-overlay" role="dialog" aria-modal="true" aria-labelledby="rs-title" hidden>
-    <div class="modal">
+    <div
+      class="modal-overlay"
+      id="register-success-overlay"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="rs-title"
+      hidden
+    >
+      <div class="modal">
         <h3 class="modal-title" id="rs-title">Account Created!</h3>
         <p class="modal-body">
-            Your account has been created successfully.
-            You will be redirected to the sign-in page now.
+          Your account has been created successfully. You will be redirected to
+          the sign-in page now.
         </p>
         <!-- No button needed - JS auto-redirects after a short delay -->
+      </div>
     </div>
-</div>
 
-<!--
+    <!--
     Generic server error modal.
 -->
-<div class="modal-overlay" id="server-error-overlay" role="dialog" aria-modal="true" aria-labelledby="se-title" hidden>
-    <div class="modal">
+    <div
+      class="modal-overlay"
+      id="server-error-overlay"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="se-title"
+      hidden
+    >
+      <div class="modal">
         <h3 class="modal-title" id="se-title">Something Went Wrong</h3>
         <p class="modal-body">
-            The server returned an unexpected error. Please try again in a moment.
+          The server returned an unexpected error. Please try again in a moment.
         </p>
         <div class="modal-actions">
-            <button class="btn btn-primary" id="server-error-ok">OK</button>
+          <button class="btn btn-primary" id="server-error-ok">OK</button>
         </div>
+      </div>
     </div>
-</div>
-
-</body>
+  </body>
 </html>

@@ -4,27 +4,27 @@
  */
 
 class CustomModal {
-    constructor() {
-        this.overlay = null;
-        this.createOverlay();
-    }
+  constructor() {
+    this.overlay = null;
+    this.createOverlay();
+  }
 
-    createOverlay() {
-        this.overlay = document.createElement('div');
-        this.overlay.className = 'modal-overlay';
-        document.body.appendChild(this.overlay);
-    }
+  createOverlay() {
+    this.overlay = document.createElement("div");
+    this.overlay.className = "modal-overlay";
+    document.body.appendChild(this.overlay);
+  }
 
-    confirm(message, title = "Confirm", options = {}) {
-        return new Promise((resolve) => {
-            const {
-                confirmText = "Confirm",
-                cancelText = "Cancel",
-                icon = "⚠️",
-                iconClass = "warning"
-            } = options;
+  confirm(message, title = "Confirm", options = {}) {
+    return new Promise((resolve) => {
+      const {
+        confirmText = "Confirm",
+        cancelText = "Cancel",
+        icon = "⚠️",
+        iconClass = "warning",
+      } = options;
 
-            this.overlay.innerHTML = `
+      this.overlay.innerHTML = `
                 <div class="modal-container">
                     <div class="modal-header">
                         <span class="modal-icon ${iconClass}">${icon}</span>
@@ -38,56 +38,52 @@ class CustomModal {
                 </div>
             `;
 
-            requestAnimationFrame(() => {
-                this.overlay.classList.add('show');
-            });
+      requestAnimationFrame(() => {
+        this.overlay.classList.add("show");
+      });
 
-            const handleClick = (e) => {
-                const action = e.target.dataset.action;
-                if (action) {
-                    this.hide();
-                    resolve(action === 'confirm');
-                    cleanup();
-                }
-            };
+      const handleClick = (e) => {
+        const action = e.target.dataset.action;
+        if (action) {
+          this.hide();
+          resolve(action === "confirm");
+          cleanup();
+        }
+      };
 
-            const handleEscape = (e) => {
-                if (e.key === 'Escape') {
-                    this.hide();
-                    resolve(false);
-                    cleanup();
-                }
-            };
+      const handleEscape = (e) => {
+        if (e.key === "Escape") {
+          this.hide();
+          resolve(false);
+          cleanup();
+        }
+      };
 
-            const handleOutsideClick = (e) => {
-                if (e.target === this.overlay) {
-                    this.hide();
-                    resolve(false);
-                    cleanup();
-                }
-            };
+      const handleOutsideClick = (e) => {
+        if (e.target === this.overlay) {
+          this.hide();
+          resolve(false);
+          cleanup();
+        }
+      };
 
-            const cleanup = () => {
-                this.overlay.removeEventListener('click', handleClick);
-                this.overlay.removeEventListener('click', handleOutsideClick);
-                document.removeEventListener('keydown', handleEscape);
-            };
+      const cleanup = () => {
+        this.overlay.removeEventListener("click", handleClick);
+        this.overlay.removeEventListener("click", handleOutsideClick);
+        document.removeEventListener("keydown", handleEscape);
+      };
 
-            this.overlay.addEventListener('click', handleClick);
-            this.overlay.addEventListener('click', handleOutsideClick);
-            document.addEventListener('keydown', handleEscape);
-        });
-    }
+      this.overlay.addEventListener("click", handleClick);
+      this.overlay.addEventListener("click", handleOutsideClick);
+      document.addEventListener("keydown", handleEscape);
+    });
+  }
 
-    alert(message, title = "Alert", options = {}) {
-        return new Promise((resolve) => {
-            const {
-                okText = "OK",
-                icon = "ℹ️",
-                iconClass = "info"
-            } = options;
+  alert(message, title = "Alert", options = {}) {
+    return new Promise((resolve) => {
+      const { okText = "OK", icon = "ℹ️", iconClass = "info" } = options;
 
-            this.overlay.innerHTML = `
+      this.overlay.innerHTML = `
                 <div class="modal-container">
                     <div class="modal-header">
                         <span class="modal-icon ${iconClass}">${icon}</span>
@@ -100,54 +96,56 @@ class CustomModal {
                 </div>
             `;
 
-            requestAnimationFrame(() => {
-                this.overlay.classList.add('show');
-            });
+      requestAnimationFrame(() => {
+        this.overlay.classList.add("show");
+      });
 
-            const handleClick = (e) => {
-                if (e.target.dataset.action === 'ok') {
-                    this.hide();
-                    resolve();
-                    cleanup();
-                }
-            };
+      const handleClick = (e) => {
+        if (e.target.dataset.action === "ok") {
+          this.hide();
+          resolve();
+          cleanup();
+        }
+      };
 
-            const handleEscape = (e) => {
-                if (e.key === 'Escape') {
-                    this.hide();
-                    resolve();
-                    cleanup();
-                }
-            };
+      const handleEscape = (e) => {
+        if (e.key === "Escape") {
+          this.hide();
+          resolve();
+          cleanup();
+        }
+      };
 
-            const handleOutsideClick = (e) => {
-                if (e.target === this.overlay) {
-                    this.hide();
-                    resolve();
-                    cleanup();
-                }
-            };
+      const handleOutsideClick = (e) => {
+        if (e.target === this.overlay) {
+          this.hide();
+          resolve();
+          cleanup();
+        }
+      };
 
-            const cleanup = () => {
-                this.overlay.removeEventListener('click', handleClick);
-                this.overlay.removeEventListener('click', handleOutsideClick);
-                document.removeEventListener('keydown', handleEscape);
-            };
+      const cleanup = () => {
+        this.overlay.removeEventListener("click", handleClick);
+        this.overlay.removeEventListener("click", handleOutsideClick);
+        document.removeEventListener("keydown", handleEscape);
+      };
 
-            this.overlay.addEventListener('click', handleClick);
-            this.overlay.addEventListener('click', handleOutsideClick);
-            document.addEventListener('keydown', handleEscape);
-        });
-    }
+      this.overlay.addEventListener("click", handleClick);
+      this.overlay.addEventListener("click", handleOutsideClick);
+      document.addEventListener("keydown", handleEscape);
+    });
+  }
 
-    hide() {
-        this.overlay.classList.remove('show');
-    }
+  hide() {
+    this.overlay.classList.remove("show");
+  }
 }
 
 // Create global instance
 const modal = new CustomModal();
 
 // Global helper functions
-window.customConfirm = (message, title, options) => modal.confirm(message, title, options);
-window.customAlert = (message, title, options) => modal.alert(message, title, options);
+window.customConfirm = (message, title, options) =>
+  modal.confirm(message, title, options);
+window.customAlert = (message, title, options) =>
+  modal.alert(message, title, options);

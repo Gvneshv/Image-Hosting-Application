@@ -6,7 +6,7 @@
  * - List uploaded images
  * - Delete images
  */
-(async() => {
+(async () => {
   /* --------------------------------------------------------------------
    *  AUTH GUARD
    *  Runs before any DOM work.  If no token is present the user has no business being here - send them to the login page immediately.
@@ -569,11 +569,6 @@
     // Load immediately if this tab is already active
     if (imgTabBtn.classList.contains("active")) {
       loadImages();
-    }
-
-    // Activate images tab automatically if the URL hash requests it
-    if (window.location.hash === "#images") {
-      imgTabBtn.click();
     }
 
     return { loadImages };

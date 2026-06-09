@@ -21,15 +21,24 @@ button {
 /* Header Section */
 .header-container {
   position: absolute;
-  transform: translate(-50%);
-  display: inline-flex;
+  top: 20px;
+  left: 0;
+  right: 0;
+  padding: 0 24px;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  width: auto;
+  height: auto;
+}
+
+.header-title-group {
+  display: flex;
   flex-direction: column;
   align-items: center;
   gap: 2px;
-  top: 30px;
-  left: 50%;
-  width: 293px;
-  height: 37px;
+  flex: 1;
 }
 
 .header-title {
@@ -57,38 +66,37 @@ button {
 
 /* Account icon - top-right corner, links to account.html */
 .account-icon-link {
-    position: absolute;
-    top: 20px;
-    right: 24px;
-    text-decoration: none;
-    z-index: 10;
+  text-decoration: none;
+  flex-shrink: 0; /* don't compress the icon */
 }
 
 .account-icon {
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
-    background-color: #0060FF;
-    color: #FFFFFF;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 15px;
-    font-weight: 700;
-    letter-spacing: 0.03em;
-    user-select: none;
-    transition: background-color 0.2s, transform 0.2s;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background-color: #0060ff;
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  user-select: none;
+  transition:
+    background-color 0.2s,
+    transform 0.2s;
 }
 
 .account-icon:hover {
-    background-color: #0052e0;
-    transform: scale(1.08);
+  background-color: #0052e0;
+  transform: scale(1.08);
 }
 
 .account-icon-svg {
-    width: 22px;
-    height: 22px;
-    color: #FFFFFF;
+  width: 22px;
+  height: 22px;
+  color: #ffffff;
 }
 
 /* Tabs */

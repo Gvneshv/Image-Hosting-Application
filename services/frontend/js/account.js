@@ -70,7 +70,9 @@
   const currentPasswordInput = document.getElementById("current-password");
   const newPasswordInput = document.getElementById("new-password");
   const confirmNewInput = document.getElementById("confirm-new-password");
-  const currentPasswordError = document.getElementById("current-password-error");
+  const currentPasswordError = document.getElementById(
+    "current-password-error",
+  );
   const newPasswordError = document.getElementById("new-password-error");
   const confirmNewError = document.getElementById("confirm-new-password-error");
   const changePasswordBtn = document.getElementById("change-password-btn");
@@ -90,14 +92,22 @@
   const logoutCancel = document.getElementById("logout-cancel");
   const logoutConfirm = document.getElementById("logout-confirm");
 
-  const deleteAccountOverlay = document.getElementById("delete-account-overlay");
+  const deleteAccountOverlay = document.getElementById(
+    "delete-account-overlay",
+  );
   const deleteAccountCancel = document.getElementById("delete-account-cancel");
-  const deleteAccountConfirm = document.getElementById("delete-account-confirm");
+  const deleteAccountConfirm = document.getElementById(
+    "delete-account-confirm",
+  );
 
-  const passwordSuccessOverlay = document.getElementById("password-success-overlay");
+  const passwordSuccessOverlay = document.getElementById(
+    "password-success-overlay",
+  );
   const passwordSuccessOk = document.getElementById("password-success-ok");
 
-  const wrongPasswordOverlay = document.getElementById("wrong-password-overlay");
+  const wrongPasswordOverlay = document.getElementById(
+    "wrong-password-overlay",
+  );
   const wrongPasswordOk = document.getElementById("wrong-password-ok");
 
   const serverErrOverlay = document.getElementById("server-error-overlay");
@@ -170,7 +180,9 @@
 
       // Show only the targeted section
       sections.forEach((s) => s.classList.add("account-section--hidden"));
-      document.getElementById(targetId)?.classList.remove("account-section--hidden");
+      document
+        .getElementById(targetId)
+        ?.classList.remove("account-section--hidden");
 
       // Clear password form state when leaving that section so stale errors don't show if the user navigates away and comes back.
       if (targetId !== "section-password") {

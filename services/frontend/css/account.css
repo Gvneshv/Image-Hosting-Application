@@ -14,14 +14,14 @@
    --------------------------------------------------------------------------- */
 
 .account-main {
-    display: flex;
-    flex-direction: row;
-    align-items: flex-start;
-    gap: 24px;
-    width: 100%;
-    max-width: 860px;
-    padding: 40px 16px 60px;
-    box-sizing: border-box;
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  gap: 24px;
+  width: 100%;
+  max-width: 860px;
+  padding: 40px 16px 60px;
+  box-sizing: border-box;
 }
 
 /* ---------------------------------------------------------------------------
@@ -29,18 +29,18 @@
    --------------------------------------------------------------------------- */
 
 .account-sidebar {
-    display: flex;
-    flex-direction: column;
-    gap: 32px;
-    flex-shrink: 0;
-    width: 180px;
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+  flex-shrink: 0;
+  width: 180px;
 }
 
 /* Navigation group - My Info / Change Password */
 .sidebar-nav {
-    display: flex;
-    flex-direction: column;
-    gap: 6px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
 }
 
 /*
@@ -49,31 +49,33 @@
  * in upload.css (.toggle-tab.active).
  */
 .sidebar-btn {
-    display: block;
-    width: 100%;
-    padding: 10px 14px;
-    background: transparent;
-    border: none;
-    border-radius: 8px;
-    text-align: left;
-    font-family: Inter, sans-serif;
-    font-size: 14px;
-    font-weight: 500;
-    color: #ADC0F8;
-    cursor: pointer;
-    transition: background-color 0.12s ease, color 0.12s ease;
+  display: block;
+  width: 100%;
+  padding: 10px 14px;
+  background: transparent;
+  border: none;
+  border-radius: 8px;
+  text-align: left;
+  font-family: Inter, sans-serif;
+  font-size: 14px;
+  font-weight: 500;
+  color: #adc0f8;
+  cursor: pointer;
+  transition:
+    background-color 0.12s ease,
+    color 0.12s ease;
 }
 
 .sidebar-btn:hover {
-    background-color: rgba(70, 118, 251, 0.08);
-    color: #0060FF;
+  background-color: rgba(70, 118, 251, 0.08);
+  color: #0060ff;
 }
 
 /* Active state - selected section */
 .sidebar-btn--active {
-    background-color: rgba(0, 96, 255, 0.08);
-    color: #0060FF;
-    font-weight: 700;
+  background-color: rgba(0, 96, 255, 0.08);
+  color: #0060ff;
+  font-weight: 700;
 }
 
 /* ---------------------------------------------------------------------------
@@ -81,9 +83,9 @@
    --------------------------------------------------------------------------- */
 
 .sidebar-danger-zone {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
 }
 
 /*
@@ -91,18 +93,18 @@
  * Communicates that these actions have consequences.
  */
 .danger-label {
-    font-size: 11px;
-    font-weight: 600;
-    letter-spacing: 0.06em;
-    text-transform: uppercase;
-    color: #ADC0F8;
-    padding: 0 2px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: #adc0f8;
+  padding: 0 2px;
 }
 
 /* Danger-zone buttons span the full sidebar width */
 .sidebar-danger-zone .btn {
-    width: 100%;
-    justify-content: center;
+  width: 100%;
+  justify-content: center;
 }
 
 /* ---------------------------------------------------------------------------
@@ -110,17 +112,17 @@
    --------------------------------------------------------------------------- */
 
 .account-content {
-    flex: 1;
-    min-width: 0; /* prevent flex child overflow */
+  flex: 1;
+  min-width: 0; /* prevent flex child overflow */
 }
 
 /* White card wrapping each content section - same shadow as .auth-card */
 .account-section {
-    background: white;
-    border-radius: 15px;
-    padding: 32px 28px;
-    box-shadow: 0 4px 24px rgba(70, 118, 251, 0.10);
-    box-sizing: border-box;
+  background: white;
+  border-radius: 15px;
+  padding: 32px 28px;
+  box-shadow: 0 4px 24px rgba(70, 118, 251, 0.1);
+  box-sizing: border-box;
 }
 
 /*
@@ -130,16 +132,16 @@
  * without fighting the [hidden] attribute.
  */
 .account-section--hidden {
-    display: none;
+  display: none;
 }
 
 .section-title {
-    margin: 0 0 24px;
-    font-weight: 700;
-    font-size: 18px;
-    line-height: 1.2;
-    letter-spacing: -0.02em;
-    color: #0B0B0B;
+  margin: 0 0 24px;
+  font-weight: 700;
+  font-size: 18px;
+  line-height: 1.2;
+  letter-spacing: -0.02em;
+  color: #0b0b0b;
 }
 
 /* ---------------------------------------------------------------------------
@@ -151,27 +153,27 @@
  * Each term (dt) is a muted label; the definition (dd) is the actual value.
  */
 .info-list {
-    margin: 0;
-    display: flex;
-    flex-direction: column;
-    gap: 16px;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
 }
 
 .info-list dt {
-    font-size: 12px;
-    font-weight: 600;
-    letter-spacing: 0.04em;
-    text-transform: uppercase;
-    color: #ADC0F8;
-    margin: 0 0 2px;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: #adc0f8;
+  margin: 0 0 2px;
 }
 
 .info-list dd {
-    margin: 0;
-    font-size: 15px;
-    font-weight: 400;
-    color: #0B0B0B;
-    word-break: break-all; /* long emails won't overflow the card */
+  margin: 0;
+  font-size: 15px;
+  font-weight: 400;
+  color: #0b0b0b;
+  word-break: break-all; /* long emails won't overflow the card */
 }
 
 /* ---------------------------------------------------------------------------
@@ -180,9 +182,9 @@
    --------------------------------------------------------------------------- */
 
 #change-password-form .btn-primary {
-    width: auto;
-    align-self: flex-start;
-    min-width: 180px;
+  width: auto;
+  align-self: flex-start;
+  min-width: 180px;
 }
 
 /* ---------------------------------------------------------------------------
@@ -190,50 +192,50 @@
    --------------------------------------------------------------------------- */
 
 @media (max-width: 768px) {
-    .account-main {
-        flex-direction: column;
-        gap: 16px;
-        padding: 24px 16px 48px;
-    }
+  .account-main {
+    flex-direction: column;
+    gap: 16px;
+    padding: 24px 16px 48px;
+  }
 
-    .account-sidebar {
-        width: 100%;
-        flex-direction: row;
-        flex-wrap: wrap;
-        gap: 12px;
-    }
+  .account-sidebar {
+    width: 100%;
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
 
-    /* Nav buttons sit side by side on tablet */
-    .sidebar-nav {
-        flex-direction: row;
-        flex: 1;
-        min-width: 0;
-    }
+  /* Nav buttons sit side by side on tablet */
+  .sidebar-nav {
+    flex-direction: row;
+    flex: 1;
+    min-width: 0;
+  }
 
-    .sidebar-btn {
-        flex: 1;
-        text-align: center;
-    }
+  .sidebar-btn {
+    flex: 1;
+    text-align: center;
+  }
 
-    /* Danger zone also goes horizontal */
-    .sidebar-danger-zone {
-        flex-direction: row;
-        align-items: center;
-        gap: 8px;
-    }
+  /* Danger zone also goes horizontal */
+  .sidebar-danger-zone {
+    flex-direction: row;
+    align-items: center;
+    gap: 8px;
+  }
 
-    .danger-label {
-        display: none; /* not enough room; the button labels speak for themselves */
-    }
+  .danger-label {
+    display: none; /* not enough room; the button labels speak for themselves */
+  }
 
-    .sidebar-danger-zone .btn {
-        width: auto;
-        flex: 1;
-    }
+  .sidebar-danger-zone .btn {
+    width: auto;
+    flex: 1;
+  }
 
-    .account-section {
-        padding: 24px 20px;
-    }
+  .account-section {
+    padding: 24px 20px;
+  }
 }
 
 /* ---------------------------------------------------------------------------
@@ -241,35 +243,35 @@
    --------------------------------------------------------------------------- */
 
 @media (max-width: 480px) {
-    .account-main {
-        padding: 16px 12px 40px;
-        gap: 12px;
-    }
+  .account-main {
+    padding: 16px 12px 40px;
+    gap: 12px;
+  }
 
-    .sidebar-nav {
-        gap: 6px;
-    }
+  .sidebar-nav {
+    gap: 6px;
+  }
 
-    .sidebar-btn {
-        font-size: 13px;
-        padding: 8px 10px;
-    }
+  .sidebar-btn {
+    font-size: 13px;
+    padding: 8px 10px;
+  }
 
-    .account-section {
-        padding: 20px 16px;
-        border-radius: 12px;
-    }
+  .account-section {
+    padding: 20px 16px;
+    border-radius: 12px;
+  }
 
-    .section-title {
-        font-size: 16px;
-        margin-bottom: 18px;
-    }
+  .section-title {
+    font-size: 16px;
+    margin-bottom: 18px;
+  }
 
-    .info-list dd {
-        font-size: 14px;
-    }
+  .info-list dd {
+    font-size: 14px;
+  }
 
-    #change-password-form .btn-primary {
-        width: 100%;
-    }
+  #change-password-form .btn-primary {
+    width: 100%;
+  }
 }
