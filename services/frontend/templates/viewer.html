@@ -1,24 +1,31 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport"
-          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0"
+    />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
     <title>Detailed Image</title>
-    <link rel="icon" type="image/x-icon" href="../base_images/ico/favicon.ico">
-    <link rel="stylesheet" href="../css/viewer.css">
+    <link
+      rel="icon"
+      type="image/x-icon"
+      href="../base_images/ico/favicon.ico"
+    />
+    <link rel="stylesheet" href="../css/viewer.css" />
     <script src="../js/modal.js" defer></script>
     <script src="../js/viewer.js" defer></script>
-</head>
-<body>
+  </head>
+  <body>
     <section class="page-container">
-        <button class="back" id="back" title="Back to Gallery">Back to Gallery</button>
-        <header class="header-container">
+      <button class="back" id="back" title="Back to Gallery">
+        Back to Gallery
+      </button>
+      <header class="header-container">
         <!--
-        Clicking the title switches to the Images tab so the user lands
-        directly on their gallery. The data-tab attribute is read by tabs.js,
-        which already handles all tab switching via that same mechanism.
+        Clicking the title switches to the Images tab so the user lands directly on their gallery.
+        The data-tab attribute is read by tabs.js, which already handles all tab switching via that same mechanism.
     -->
         <div class="header-title-group">
           <a
@@ -34,121 +41,169 @@
         </div>
 
         <!--
-        Account icon - top-right corner of the header.
-        Navigates to account.html. upload.js fills in the user's initials or a default icon once the token is decoded.
+        Header-right group - account icon, plus an admin shield icon that upload.js reveals only when GET /auth/me reports is_admin: true.
+        Kept as a sibling flex item (not absolutely positioned) so it participates in the same space-between layout as the title group.
+    -->
+        <div class="header-actions-group">
+          <!--
+            Admin icon - hidden by default via the `hidden` attribute.
+            upload.js removes `hidden` only after confirming is_admin
+            from the server response (never trust the JWT payload alone
+            for this, since the JWT does not carry is_admin).
+        -->
+          <a
+            href="admin.html"
+            class="admin-icon-link"
+            id="admin-icon-link"
+            aria-label="Admin Panel"
+            title="Admin Panel"
+            hidden
+          >
+            <div class="admin-icon">
+              <svg
+                class="admin-icon-svg"
+                viewBox="0 0 24 24"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+                aria-hidden="true"
+              >
+                <path
+                  d="M12 2L4 5v6c0 5 3.4 9.4 8 11 4.6-1.6 8-6 8-11V5l-8-3z"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linejoin="round"
+                />
+                <path
+                  d="M9 12l2 2 4-4"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                />
+              </svg>
+            </div>
+          </a>
+
+          <!--
+        Account icon - links to account.html.
+        upload.js fills in the user's initials or a default icon once the token is decoded.
         The aria-label provides accessible text for screen readers.
     -->
-        <a
-          href="account.html"
-          class="account-icon-link"
-          id="account-icon-link"
-          aria-label="My Account"
-        >
-          <div class="account-icon" id="account-icon">
-            <!--
+          <a
+            href="account.html"
+            class="account-icon-link"
+            id="account-icon-link"
+            aria-label="My Account"
+          >
+            <div class="account-icon" id="account-icon">
+              <!--
             Default: a generic person SVG.
-            upload.js replaces the inner content with the user's initials
-            (e.g. "JD" for john@doe.com) once the page loads.
+            upload.js replaces the inner content with the user's initials (e.g. "JD" for john@doe.com) once the page loads.
         -->
-            <svg
-              class="account-icon-svg"
-              viewBox="0 0 24 24"
-              fill="none"
-              xmlns="http://www.w3.org/2000/svg"
-              aria-hidden="true"
-            >
-              <circle
-                cx="12"
-                cy="8"
-                r="4"
-                stroke="currentColor"
-                stroke-width="2"
-              />
-              <path
-                d="M4 20c0-4 3.6-7 8-7s8 3 8 7"
-                stroke="currentColor"
-                stroke-width="2"
-                stroke-linecap="round"
-              />
-            </svg>
-          </div>
-        </a>
+              <svg
+                class="account-icon-svg"
+                viewBox="0 0 24 24"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+                aria-hidden="true"
+              >
+                <circle
+                  cx="12"
+                  cy="8"
+                  r="4"
+                  stroke="currentColor"
+                  stroke-width="2"
+                />
+                <path
+                  d="M4 20c0-4 3.6-7 8-7s8 3 8 7"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                />
+              </svg>
+            </div>
+          </a>
+        </div>
       </header>
     </section>
 
     <main class="main">
-        <section class="image">
-            <!--
+      <section class="image">
+        <!--
                 src is intentionally empty here.
-                viewer.js fetches image metadata from /file_info/:filename and
-                sets imagePreview.src dynamically via info.url.
-                The filename variable passed from the FastAPI route is used by
-                viewer.js (extracted from window.location.pathname) rather than
-                being injected directly into the src attribute.
+                viewer.js fetches image metadata from /file_info/:filename and sets imagePreview.src dynamically via info.url.
+                The filename variable passed from the FastAPI route is used by viewer.js (extracted from window.location.pathname)
+                rather than being injected directly into the src attribute.
             -->
-            <img src="" id="imagePreview" class="imagePreview" alt="{{ filename }}" title="{{ filename }}"/>
-        </section>
+        <img
+          src=""
+          id="imagePreview"
+          class="imagePreview"
+          alt="{{ filename }}"
+          title="{{ filename }}"
+        />
+      </section>
 
-        <section class="image-info">
-            <h2 class="page-title">Image Details</h2>
-            <div class="info-card">
-                <div class="info-row">
-                    <span class="info-label">Full Filename:</span>
-                    <span class="info-value" id="infoFilename"></span>
-                </div>
-                <div class="info-row">
-                    <span class="info-label">Original Name:</span>
-                    <span class="info-value" id="infoOriginalName"></span>
-                </div>
-                <div class="info-row">
-                    <span class="info-label">Unique Name:</span>
-                    <span class="info-value" id="infoUniqueName"></span>
-                </div>
-                <div class="info-row">
-                    <span class="info-label">File Size:</span>
-                    <span class="info-value" id="infoFileSize"></span>
-                </div>
-                <div class="info-row">
-                    <span class="info-label">File Type:</span>
-                    <span class="info-value" id="infoFileType"></span>
-                </div>
-                <div class="info-row">
-                    <span class="info-label">Upload Date:</span>
-                    <span class="info-value" id="infoUploadDate"></span>
-                </div>
-            </div>
+      <section class="image-info">
+        <h2 class="page-title">Image Details</h2>
+        <div class="info-card">
+          <div class="info-row">
+            <span class="info-label">Full Filename:</span>
+            <span class="info-value" id="infoFilename"></span>
+          </div>
+          <div class="info-row">
+            <span class="info-label">Original Name:</span>
+            <span class="info-value" id="infoOriginalName"></span>
+          </div>
+          <div class="info-row">
+            <span class="info-label">Unique Name:</span>
+            <span class="info-value" id="infoUniqueName"></span>
+          </div>
+          <div class="info-row">
+            <span class="info-label">File Size:</span>
+            <span class="info-value" id="infoFileSize"></span>
+          </div>
+          <div class="info-row">
+            <span class="info-label">File Type:</span>
+            <span class="info-value" id="infoFileType"></span>
+          </div>
+          <div class="info-row">
+            <span class="info-label">Upload Date:</span>
+            <span class="info-value" id="infoUploadDate"></span>
+          </div>
+        </div>
 
-            <div class="actions">
-                <button class="action-button" id="copyUrlBtn">
-                    <span>Copy URL</span>
-                </button>
-                <button class="action-button" id="downloadBtn">
-                    <span>Download</span>
-                </button>
-                <button class="action-button" id="deleteBtn">
-                    <span>Delete</span>
-                </button>
-            </div>
-        </section>
+        <div class="actions">
+          <button class="action-button" id="copyUrlBtn">
+            <span>Copy URL</span>
+          </button>
+          <button class="action-button" id="downloadBtn">
+            <span>Download</span>
+          </button>
+          <button class="action-button" id="deleteBtn">
+            <span>Delete</span>
+          </button>
+        </div>
+      </section>
     </main>
 
     <!-- Lightbox overlay -->
     <div id="image-viewer" class="hidden">
-        <span class="close-btn" aria-label="Close">&times;</span>
+      <span class="close-btn" aria-label="Close">&times;</span>
 
-        <!-- Wrapper for main image and neighbor thumbnail previews -->
-        <div class="viewer-content">
-            <img id="viewer-prev" class="viewer-neighbor" alt="" />
-            <img id="viewer-image" src="" alt="Preview Image" />
-            <img id="viewer-next" class="viewer-neighbor" alt="" />
-        </div>
+      <!-- Wrapper for main image and neighbor thumbnail previews -->
+      <div class="viewer-content">
+        <img id="viewer-prev" class="viewer-neighbor" alt="" />
+        <img id="viewer-image" src="" alt="Preview Image" />
+        <img id="viewer-next" class="viewer-neighbor" alt="" />
+      </div>
 
-        <!-- Navigation arrows -->
-        <button class="nav-btn prev-btn" aria-label="Previous">&#10094;</button>
-        <button class="nav-btn next-btn" aria-label="Next">&#10095;</button>
+      <!-- Navigation arrows -->
+      <button class="nav-btn prev-btn" aria-label="Previous">&#10094;</button>
+      <button class="nav-btn next-btn" aria-label="Next">&#10095;</button>
 
-        <!-- Fullscreen toggle -->
-        <button class="fullscreen-btn" aria-label="Fullscreen">&#x26F6;</button>
+      <!-- Fullscreen toggle -->
+      <button class="fullscreen-btn" aria-label="Fullscreen">&#x26F6;</button>
     </div>
-</body>
+  </body>
 </html>

@@ -741,7 +741,7 @@
     if (!userDetailOverlay.hidden) hideModal(userDetailOverlay);
     if (!addUserOverlay.hidden) hideModal(addUserOverlay);
     if (!infoOverlay.hidden) hideModal(infoOverlay);
-    // confirmOverlay intentionally excluded — destructive actions need an explicit choice.
+    // confirmOverlay intentionally excluded - destructive actions need an explicit choice.
   });
 
   /* -------------------------------------------------------------------------

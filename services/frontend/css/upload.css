@@ -104,6 +104,50 @@ button {
   color: #ffffff;
 }
 
+.header-actions-group {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 10px;
+  flex-shrink: 0;
+}
+ 
+/* Admin icon - hidden by default via the `hidden` attribute in HTML.
+   upload.js removes `hidden` only after GET /auth/me confirms is_admin. */
+.admin-icon-link {
+  text-decoration: none;
+  flex-shrink: 0;
+}
+ 
+.admin-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background-color: #fafafa;
+  color: #0060ff;
+  border: 2px solid #0060ff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  user-select: none;
+  transition:
+    background-color 0.2s,
+    transform 0.2s;
+  box-sizing: border-box;
+}
+ 
+.admin-icon:hover {
+  background-color: #0060ff;
+  color: #ffffff;
+  transform: scale(1.08);
+}
+ 
+.admin-icon-svg {
+  width: 20px;
+  height: 20px;
+  color: inherit;
+}
+
 /* Tabs */
 .toggle-tabs {
   position: absolute;
@@ -552,10 +596,6 @@ input[type="file"] {
 
 /* Large tablets and small desktops (1024px and below) */
 @media (max-width: 1024px) {
-  .header-container {
-    /* left/right/padding from base rule span full width - no override needed */
-  }
-
   .header-subtitle {
     width: 100%;
     text-align: center;
@@ -737,6 +777,21 @@ input[type="file"] {
 
   .uploaded-images-button {
     left: 10px;
+  }
+
+  .header-actions-group {
+    gap: 6px;
+  }
+ 
+  .admin-icon,
+  .account-icon {
+    width: 34px;
+    height: 34px;
+  }
+ 
+  .admin-icon-svg {
+    width: 17px;
+    height: 17px;
   }
 
   /* Upload section - more compact */

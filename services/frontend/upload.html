@@ -9,8 +9,7 @@
     <meta http-equiv="X-UA-Compatible" content="ie=edge" />
     <!--
         Page title reflects the dual purpose of this page (upload + gallery).
-        upload.js redirects unauthenticated visitors to index.html before
-        anything here renders.
+        upload.js redirects unauthenticated visitors to index.html before anything here renders.
     -->
     <title>My Gallery</title>
     <link rel="icon" type="image/x-icon" href="base_images/ico/favicon.ico" />
@@ -23,9 +22,8 @@
     <section class="page-container">
       <header class="header-container">
         <!--
-        Clicking the title switches to the Images tab so the user lands
-        directly on their gallery. The data-tab attribute is read by tabs.js,
-        which already handles all tab switching via that same mechanism.
+        Clicking the title switches to the Images tab so the user lands directly on their gallery.
+        The data-tab attribute is read by tabs.js, which already handles all tab switching via that same mechanism.
     -->
         <div class="header-title-group">
           <a
@@ -41,45 +39,88 @@
         </div>
 
         <!--
-        Account icon - top-right corner of the header.
-        Navigates to account.html. upload.js fills in the user's initials or a default icon once the token is decoded.
+        Header-right group - account icon, plus an admin shield icon that upload.js reveals only when GET /auth/me reports is_admin: true.
+        Kept as a sibling flex item (not absolutely positioned) so it participates in the same space-between layout as the title group.
+    -->
+        <div class="header-actions-group">
+          <!--
+            Admin icon - hidden by default via the `hidden` attribute.
+            upload.js removes `hidden` only after confirming is_admin
+            from the server response (never trust the JWT payload alone for this, since the JWT does not carry is_admin).
+        -->
+          <a
+            href="admin.html"
+            class="admin-icon-link"
+            id="admin-icon-link"
+            aria-label="Admin Panel"
+            title="Admin Panel"
+            hidden
+          >
+            <div class="admin-icon">
+              <svg
+                class="admin-icon-svg"
+                viewBox="0 0 24 24"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+                aria-hidden="true"
+              >
+                <path
+                  d="M12 2L4 5v6c0 5 3.4 9.4 8 11 4.6-1.6 8-6 8-11V5l-8-3z"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linejoin="round"
+                />
+                <path
+                  d="M9 12l2 2 4-4"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                />
+              </svg>
+            </div>
+          </a>
+
+          <!--
+        Account icon - links to account.html.
+        upload.js fills in the user's initials or a default icon once the token is decoded.
         The aria-label provides accessible text for screen readers.
     -->
-        <a
-          href="account.html"
-          class="account-icon-link"
-          id="account-icon-link"
-          aria-label="My Account"
-        >
-          <div class="account-icon" id="account-icon">
-            <!--
+          <a
+            href="account.html"
+            class="account-icon-link"
+            id="account-icon-link"
+            aria-label="My Account"
+          >
+            <div class="account-icon" id="account-icon">
+              <!--
             Default: a generic person SVG.
-            upload.js replaces the inner content with the user's initials
-            (e.g. "JD" for john@doe.com) once the page loads.
+            upload.js replaces the inner content with the user's initials (e.g. "JD" for john@doe.com) once the page loads.
         -->
-            <svg
-              class="account-icon-svg"
-              viewBox="0 0 24 24"
-              fill="none"
-              xmlns="http://www.w3.org/2000/svg"
-              aria-hidden="true"
-            >
-              <circle
-                cx="12"
-                cy="8"
-                r="4"
-                stroke="currentColor"
-                stroke-width="2"
-              />
-              <path
-                d="M4 20c0-4 3.6-7 8-7s8 3 8 7"
-                stroke="currentColor"
-                stroke-width="2"
-                stroke-linecap="round"
-              />
-            </svg>
-          </div>
-        </a>
+              <svg
+                class="account-icon-svg"
+                viewBox="0 0 24 24"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+                aria-hidden="true"
+              >
+                <circle
+                  cx="12"
+                  cy="8"
+                  r="4"
+                  stroke="currentColor"
+                  stroke-width="2"
+                />
+                <path
+                  d="M4 20c0-4 3.6-7 8-7s8 3 8 7"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                />
+              </svg>
+            </div>
+          </a>
+        </div>
       </header>
 
       <nav class="toggle-tabs">

@@ -57,6 +57,30 @@
   })();
 
   /* --------------------------------------------------------------------
+   *  ADMIN ICON - reveal the link to admin.html for admin users only.
+   *
+   *  is_admin is NOT present in the JWT payload (the token only carries the user_id in `sub`),
+   *  so it cannot be read client-side from the token the way the initials are above.
+   *  This must come from the server, which is the only authoritative source.
+   *  The icon stays `hidden` (set in upload.html) until this confirms is_admin: true.
+   *
+   *  Runs after authFetch is defined below, so it is invoked at the bottom of this IIFE rather than inline here
+   *  - see the call to revealAdminIconIfAdmin() near the end of the file.
+   * ------------------------------------------------------------------ */
+  const revealAdminIconIfAdmin = async () => {
+    try {
+      const res = await authFetch(`${location.origin}/auth/me`);
+      if (!res.ok) return; // 401 already redirected via authFetch; anything else, just skip silently
+      const me = await res.json();
+      if (me.is_admin) {
+        document.getElementById("admin-icon-link")?.removeAttribute("hidden");
+      }
+    } catch {
+      // Network failure - admin icon simply stays hidden, no user-facing impact.
+    }
+  };
+
+  /* --------------------------------------------------------------------
    *  AUTH FETCH HELPER
    *
    *  Wraps every API call with the Bearer token header.
@@ -595,4 +619,5 @@
   // Initialize modules
   const { loadImages } = initImagesTab();
   initUploader(loadImages);
+  revealAdminIconIfAdmin();
 })();
