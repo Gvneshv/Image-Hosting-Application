@@ -370,6 +370,15 @@
    Wide modal variant - user detail
    --------------------------------------------------------------------------- */
 
+/*
+ * auth.css defines .modal-overlay with display: flex (so it can center its content), but does not know about admin.html's modal IDs specifically
+ * - this [hidden] override must be re-declared here because admin.css loads after auth.css
+ * and otherwise the [hidden] attribute on these overlays has no effect, leaving every modal permanently visible and blocking all clicks on the page underneath it.
+ */
+.modal-overlay[hidden] {
+  display: none;
+}
+
 .modal--wide {
   max-width: 720px;
 }
