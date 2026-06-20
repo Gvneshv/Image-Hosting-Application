@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <title>404 - Image Not Found</title>
+    <link rel="icon" type="image/x-icon" href="base_images/ico/favicon.ico" />
+    <link rel="stylesheet" href="css/404.css" />
+  </head>
+  <body>
+    <div class="error-page">
+      <!--
+        Broken-image SVG - the classic "broken picture" icon (mountain + torn corner), drawn larger and given a wobble animation
+        so it reads as a deliberate joke rather than an actual rendering failure.
+      -->
+      <svg
+        class="broken-image-icon"
+        width="180"
+        height="180"
+        viewBox="0 0 180 180"
+        fill="none"
+        xmlns="http://www.w3.org/2000/svg"
+        aria-hidden="true"
+      >
+        <rect
+          x="20"
+          y="20"
+          width="140"
+          height="140"
+          rx="12"
+          stroke="#ADC0F8"
+          stroke-width="4"
+          stroke-dasharray="10 8"
+        />
+        <path
+          d="M40 120L75 80L100 105L120 80L140 105"
+          stroke="#4676FB"
+          stroke-width="4"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        />
+        <circle cx="65" cy="55" r="10" stroke="#4676FB" stroke-width="4" />
+        <!-- Torn corner -->
+        <path
+          d="M160 20L130 20L160 50Z"
+          fill="#F2F5FF"
+          stroke="#ADC0F8"
+          stroke-width="3"
+        />
+        <!-- The "crack" through the image -->
+        <path
+          d="M70 20L90 60L65 75L110 160"
+          stroke="#F44336"
+          stroke-width="3"
+          stroke-linecap="round"
+          opacity="0.6"
+        />
+      </svg>
+
+      <h1 class="error-code">404</h1>
+      <p class="error-title">This image has left the gallery.</p>
+      <p class="error-subtitle">
+        Either it was deleted, the link is wrong, or it's just not feeling
+        photogenic today. We checked behind the couch - still nothing.
+      </p>
+
+      <div class="error-actions">
+        <a href="/upload.html" class="btn btn-primary">Back to My Gallery</a>
+        <a href="/index.html" class="btn btn-secondary">Go to Login</a>
+      </div>
+    </div>
+  </body>
+</html>
