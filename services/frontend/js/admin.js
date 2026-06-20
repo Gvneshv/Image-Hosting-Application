@@ -11,6 +11,7 @@
  *  7. Actions: add user, block/unblock, grant/revoke admin, clear lockout, delete user, delete individual images.
  *  8. Generic confirm/info modals reused across all destructive actions.
  */
+
 (() => {
   /* -------------------------------------------------------------------------
    *  API endpoints
@@ -32,6 +33,7 @@
   const token = localStorage.getItem("access_token");
   if (!token) {
     location.replace("index.html");
+    return;
   }
 
   /**
@@ -72,7 +74,7 @@
   const statAdminUsers = $("#stat-admin-users");
   const statBlockedUsers = $("#stat-blocked-users");
 
-  // Users Table
+  // Users table
   const userSearchInput = $("#user-search");
   const usersTableBody = $("#users-table-body");
   const usersPagination = $("#users-pagination");
@@ -107,7 +109,7 @@
   const addUserSubmit = $("#add-user-submit");
 
   // Generic confirm modal
-  const confirmOverlay = $("#confirm-overlay");
+  const confirmOverlay = $("#confirm-action-overlay");
   const confirmTitle = $("#ca-title");
   const confirmBody = $("#ca-body");
   const confirmBtn = $("#ca-confirm");
@@ -117,13 +119,15 @@
   const infoOverlay = $("#info-overlay");
   const infoTitle = $("#info-title");
   const infoBody = $("#info-body");
-  const infoButton = $("#info-button");
+  const infoOk = $("#info-ok");
 
   /* -------------------------------------------------------------------------
    *  Modal helpers - `hidden` attribute pattern (matches account.js)
    * ---------------------------------------------------------------------- */
   const showModal = (overlay) => overlay.removeAttribute("hidden");
-  const hideModal = (overlay) => (overlay.hidden = true);
+  const hideModal = (overlay) => {
+    overlay.hidden = true;
+  };
 
   /**
    * Show the generic info modal.
@@ -210,7 +214,7 @@
       navButtons.forEach((b) => b.classList.remove("sidebar-btn--active"));
       btn.classList.add("sidebar-btn--active");
 
-      section.forEach((s) => s.classList.add("admin-section--hidden"));
+      sections.forEach((s) => s.classList.add("admin-section--hidden"));
       document
         .getElementById(targetId)
         ?.classList.remove("admin-section--hidden");
@@ -247,9 +251,9 @@
    * ---------------------------------------------------------------------- */
   const loadStats = async () => {
     try {
-      const res = await authFetch("API_STATS");
+      const res = await authFetch(API_STATS);
       if (!res.ok) {
-        showInfo("Failed to load statistics", "Error");
+        showInfo("Failed to load statistics.", "Error");
         return;
       }
       const stats = await res.json();
@@ -260,7 +264,7 @@
       statAdminUsers.textContent = stats.admin_users;
       statBlockedUsers.textContent = stats.blocked_users;
     } catch {
-      showInfo("Network error while loading statistics", "Error");
+      showInfo("Network error while loading statistics.", "Error");
     }
   };
 
@@ -366,7 +370,7 @@
         <td>${user.image_count}</td>
         <td>${formatDate(user.last_login)}</td>
         <td>${formatDate(user.created_at)}</td>
-        <td class=users-table-actions>
+        <td class="users-table-actions">
           <button class="table-action-btn" title="View details" data-action="view">👁️</button>
         </td>
       `;
@@ -400,7 +404,7 @@
    *  User detail modal
    * ---------------------------------------------------------------------- */
   let currentDetailUser = null; // cached user dict for the open modal
-  let currentImagePage = 1;
+  let currentImagesPage = 1;
   const IMAGES_PER_PAGE = 12;
 
   /**
@@ -420,7 +424,7 @@
       const res = await authFetch(userUrl(userId));
       if (!res.ok) {
         hideModal(userDetailOverlay);
-        showInfo("Failed to load user details", "Error");
+        showInfo("Failed to load user details.", "Error");
         return;
       }
       const user = await res.json();
@@ -431,7 +435,7 @@
       await loadUserImages(userId, 1);
     } catch {
       hideModal(userDetailOverlay);
-      showInfo("Network error while loading user details", "Error");
+      showInfo("Network error while loading user details.", "Error");
     }
   };
 
@@ -444,17 +448,15 @@
     udRole.innerHTML = user.is_admin
       ? `<span class="badge badge--admin">Admin</span>`
       : `<span class="badge badge--user">User</span>`;
-
     udStatus.innerHTML = user.is_blocked
       ? `<span class="badge badge--blocked">Blocked</span>`
       : `<span class="badge badge--active">Active</span>`;
-
     udCreated.textContent = formatDate(user.created_at);
     udLastLogin.textContent = formatDate(user.last_login);
     udIp.textContent = user.registered_ip || "-";
     udImageCount.textContent = user.image_count;
 
-    udToggleAdmin.textContent = user.is_admin ? "Revoke admin" : "Grant admin";
+    udToggleAdmin.textContent = user.is_admin ? "Revoke Admin" : "Grant Admin";
     udToggleBlock.textContent = user.is_blocked ? "Unblock User" : "Block User";
   };
 
@@ -530,10 +532,9 @@
               method: "DELETE",
             });
             if (!res.ok) {
-              showInfo("Failed to delete image", "Error");
+              showInfo("Failed to delete image.", "Error");
               return;
             }
-
             // Refresh both the image grid and the user's image count.
             if (currentDetailUser) {
               currentDetailUser.image_count -= 1;
@@ -541,7 +542,7 @@
             }
             await loadUserImages(currentDetailUser.id, currentImagesPage);
           } catch {
-            showInfo("Network error while deleting image", "Error");
+            showInfo("Network error while deleting image.", "Error");
           }
         });
 
@@ -571,7 +572,7 @@
       });
       const data = await res.json();
       if (!res.ok) {
-        showInfo(data.details || "Failed to update admin status.", "Error");
+        showInfo(data.detail || "Failed to update admin status.", "Error");
         return;
       }
       currentDetailUser = { ...currentDetailUser, ...data };
@@ -602,7 +603,7 @@
       });
       const data = await res.json();
       if (!res.ok) {
-        showInfo(data.details || "Failed to update block status.", "Error");
+        showInfo(data.detail || "Failed to update block status.", "Error");
         return;
       }
       currentDetailUser = { ...currentDetailUser, ...data };
@@ -641,7 +642,7 @@
     if (!ok) return;
 
     try {
-      const res = await authFetch(userDeleteUrl(currentDetailUser.id), {
+      const res = await authFetch(userUrl(currentDetailUser.id), {
         method: "DELETE",
       });
       const data = await res.json();
@@ -663,7 +664,7 @@
    * ---------------------------------------------------------------------- */
   openAddUserBtn.addEventListener("click", () => {
     addUserForm.reset();
-    [auEmail, auPassword].forEach((el) => el.classList.remove("imput-error"));
+    [auEmail, auPassword].forEach((el) => el.classList.remove("input-error"));
     auEmailError.textContent = "";
     auPasswordError.textContent = "";
     showModal(addUserOverlay);
@@ -688,7 +689,7 @@
       auEmail.classList.add("input-error");
       valid = false;
     }
-    if (!auPassword.value.length < 8) {
+    if (auPassword.value.length < 8) {
       auPasswordError.textContent = "Password must be at least 8 characters.";
       auPassword.classList.add("input-error");
       valid = false;

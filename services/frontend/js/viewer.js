@@ -59,7 +59,7 @@
     copyBtn: "#copyUrlBtn",
     downloadBtn: "#downloadBtn",
     deleteBtn: "#deleteBtn",
-    back: "#back",
+    back: ".back-to-gallery",
     viewer: "#image-viewer",
     viewerImg: "#viewer-image",
     viewerContent: ".viewer-content", // wrapper around main image + neighbors

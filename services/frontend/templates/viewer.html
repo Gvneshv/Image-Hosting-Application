@@ -16,10 +16,11 @@
     <link rel="stylesheet" href="../css/viewer.css" />
     <script src="../js/modal.js" defer></script>
     <script src="../js/viewer.js" defer></script>
+    <script src="../js/tabs.js" defer></script>
   </head>
   <body>
     <section class="page-container">
-      <button class="back" id="back" title="Back to Gallery">
+      <button class="back back-to-gallery" title="Back to Gallery">
         Back to Gallery
       </button>
       <header class="header-container">
@@ -33,7 +34,7 @@
             data-tab="images"
             id="header-gallery-link"
           >
-            <h1 class="header-title">My Gallery</h1>
+            <h1 class="header-title back-to-gallery">My Gallery</h1>
           </a>
           <p class="header-subtitle">
             Upload selfies, memes, or any fun pictures here.
@@ -52,7 +53,7 @@
             for this, since the JWT does not carry is_admin).
         -->
           <a
-            href="admin.html"
+            href="../admin.html"
             class="admin-icon-link"
             id="admin-icon-link"
             aria-label="Admin Panel"
@@ -90,7 +91,7 @@
         The aria-label provides accessible text for screen readers.
     -->
           <a
-            href="account.html"
+            href="../account.html"
             class="account-icon-link"
             id="account-icon-link"
             aria-label="My Account"

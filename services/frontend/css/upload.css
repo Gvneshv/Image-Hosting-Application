@@ -507,6 +507,11 @@ input[type="file"] {
   letter-spacing: 0.5em;
 }
 
+.copy-button:hover {
+  box-shadow: 0 0 22px darkgoldenrod,
+    0 0 3px darkgoldenrod
+}
+
 .delete-button {
   height: 36px;
   width: 38px;
