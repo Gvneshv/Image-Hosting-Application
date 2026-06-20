@@ -49,6 +49,9 @@ class User(Base):
     # False by default - admin status is granted manually in the DB or via a one-time setup script, never through the registration endpoint.
     is_admin = Column(Boolean, default=False, nullable=False)
 
+    # Admin-controlled manual block. Set/cleared only by an admin via /admin routes.
+    is_blocked = Column(Boolean, default=False, nullable=False)
+
     created_at = Column(DateTime, server_default=func.now(), nullable=False)
 
     # Updated on every successful login by routes_auth.login()
