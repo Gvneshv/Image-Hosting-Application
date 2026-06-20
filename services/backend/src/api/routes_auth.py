@@ -309,7 +309,7 @@ def change_password(
         )
 
     new_hash = hash_password(data.new_password)
-    update_user_password(db, user_id=current_user.id, new_password_hash=new_hash)
+    update_user_password(db, user_id=current_user.id, new_hashed_password=new_hash)
 
     logger.info("Password changed successfully for user id=%s.", current_user.id)
     return {"message": "Password updated successfully."}

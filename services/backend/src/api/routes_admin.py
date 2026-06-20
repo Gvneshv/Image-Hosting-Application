@@ -116,7 +116,7 @@ def get_stats(db: DbSession, _admin: AdminUser) -> AdminStatsOut:
 # User list & creation
 # ---------------------------------------------------------------------------
 
-@router.post(
+@router.get(
     "/admin/users",
     summary="Paginated user list with image counts",
 )
@@ -222,7 +222,7 @@ def create_user(
     "/admin/users/{user_id}",
     summary="Single user detail + image count",
 )
-def get_user(user_id: int, db: DbSession, _admin = AdminUser) -> dict:
+def get_user(user_id: int, db: DbSession, _admin: AdminUser) -> dict:
     """
     Return full details for a single user, including their image count.
  
