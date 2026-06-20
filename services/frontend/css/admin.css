@@ -1,0 +1,614 @@
+/* =============================================================================
+   Layout styles for admin.html
+   Depends on: auth.css (body, buttons, modals, form elements, .page-container, .header-container, .info-list)
+
+   This file contains everything unique to admin.html:
+     - Two-column sidebar + content layout (mirrors account.css)
+     - Stats grid (dashboard cards)
+     - Users table + pagination
+     - Wide modal variant for user detail (info + image browser)
+     - Add user form extras (checkbox)
+   ============================================================================= */
+
+/* ---------------------------------------------------------------------------
+   Header - admin.html has no account icon, so the title can center normally
+   --------------------------------------------------------------------------- */
+
+.admin-header {
+  width: 100%;
+  max-width: 293px;
+}
+
+/* ---------------------------------------------------------------------------
+   Admin main - two-column layout: sidebar (left) + content (right)
+   Identical structure to .account-main in account.css.
+   --------------------------------------------------------------------------- */
+
+.admin-main {
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  gap: 24px;
+  width: 100%;
+  max-width: 1100px;
+  padding: 40px 16px 60px;
+  box-sizing: border-box;
+}
+
+/* ---------------------------------------------------------------------------
+   Sidebar - same pattern as .account-sidebar
+   --------------------------------------------------------------------------- */
+
+.admin-sidebar {
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+  flex-shrink: 0;
+  width: 180px;
+}
+
+.sidebar-nav {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.sidebar-btn {
+  display: block;
+  width: 100%;
+  padding: 10px 14px;
+  background: transparent;
+  border: none;
+  border-radius: 8px;
+  text-align: left;
+  font-family: Inter, sans-serif;
+  font-size: 14px;
+  font-weight: 500;
+  color: #adc0f8;
+  cursor: pointer;
+  transition:
+    background-color 0.12s ease,
+    color 0.12s ease;
+}
+
+.sidebar-btn:hover {
+  background-color: rgba(70, 118, 251, 0.08);
+  color: #0060ff;
+}
+
+.sidebar-btn--active {
+  background-color: rgba(0, 96, 255, 0.08);
+  color: #0060ff;
+  font-weight: 700;
+}
+
+.sidebar-danger-zone {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.danger-label {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: #adc0f8;
+  padding: 0 2px;
+}
+
+.admin-back-btn {
+  width: 100%;
+  text-align: center;
+  text-decoration: none;
+  box-sizing: border-box;
+}
+
+/* ---------------------------------------------------------------------------
+   Content area
+   --------------------------------------------------------------------------- */
+
+.admin-content {
+  flex: 1;
+  min-width: 0;
+}
+
+.admin-section {
+  background: white;
+  border-radius: 15px;
+  padding: 32px 28px;
+  box-shadow: 0 4px 24px rgba(70, 118, 251, 0.1);
+  box-sizing: border-box;
+}
+
+.admin-section--hidden {
+  display: none;
+}
+
+.section-title {
+  margin: 0 0 24px;
+  font-weight: 700;
+  font-size: 18px;
+  line-height: 1.2;
+  letter-spacing: -0.02em;
+  color: #0b0b0b;
+}
+
+/* ---------------------------------------------------------------------------
+   Statistics grid
+   --------------------------------------------------------------------------- */
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+}
+
+.stat-card {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  background-color: #f2f5ff;
+  border-radius: 12px;
+  padding: 18px 20px;
+}
+
+.stat-card--danger {
+  background-color: rgba(244, 67, 54, 0.08);
+}
+
+.stat-label {
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: #adc0f8;
+}
+
+.stat-card--danger .stat-label {
+  color: #f44336;
+}
+
+.stat-value {
+  font-size: 28px;
+  font-weight: 700;
+  color: #0b0b0b;
+  letter-spacing: -0.02em;
+}
+
+/* ---------------------------------------------------------------------------
+   Users toolbar - search + add user button
+   --------------------------------------------------------------------------- */
+
+.users-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+  margin-bottom: 20px;
+}
+
+.users-toolbar .section-title {
+  margin-bottom: 0;
+}
+
+.users-toolbar-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.user-search-input {
+  font-family: Inter, sans-serif;
+  font-size: 13px;
+  color: #0b0b0b;
+  background-color: #fafafa;
+  border: 2px solid #adc0f8;
+  border-radius: 8px;
+  padding: 8px 12px;
+  outline: none;
+  transition: border-color 0.15s ease;
+  width: 220px;
+  box-sizing: border-box;
+}
+
+.user-search-input:focus {
+  border-color: #4676fb;
+  background-color: white;
+}
+
+.users-add-btn {
+  width: auto;
+  white-space: nowrap;
+}
+
+/* ---------------------------------------------------------------------------
+   Users table
+   --------------------------------------------------------------------------- */
+
+.users-table-wrapper {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.users-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+
+.users-table th,
+.users-table td {
+  text-align: left;
+  padding: 10px 12px;
+  border-bottom: 1px solid #eef1fb;
+  white-space: nowrap;
+}
+
+.users-table th {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: #adc0f8;
+}
+
+.users-table tbody tr:hover {
+  background-color: #f8faff;
+  cursor: pointer;
+}
+
+.users-table td.email-cell {
+  font-weight: 500;
+  word-break: break-all;
+  white-space: normal;
+  max-width: 220px;
+}
+
+/* Role / status badges */
+.badge {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 12px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+
+.badge--admin {
+  background-color: rgba(0, 96, 255, 0.1);
+  color: #0060ff;
+}
+
+.badge--user {
+  background-color: rgba(173, 192, 248, 0.25);
+  color: #6f86c9;
+}
+
+.badge--active {
+  background-color: rgba(76, 175, 80, 0.12);
+  color: #4caf50;
+}
+
+.badge--blocked {
+  background-color: rgba(244, 67, 54, 0.1);
+  color: #f44336;
+}
+
+.users-table-actions {
+  display: flex;
+  gap: 6px;
+}
+
+.table-action-btn {
+  border: none;
+  background: none;
+  cursor: pointer;
+  font-size: 16px;
+  padding: 4px 6px;
+  border-radius: 6px;
+  transition: background-color 0.12s ease;
+  line-height: 1;
+}
+
+.table-action-btn:hover {
+  background-color: rgba(0, 96, 255, 0.08);
+}
+
+/* ---------------------------------------------------------------------------
+   Pagination - shared by users table and per-user image browser
+   --------------------------------------------------------------------------- */
+
+.users-pagination {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 18px;
+  flex-wrap: wrap;
+}
+
+.pagination-btn {
+  border: 2px solid #adc0f8;
+  background: white;
+  color: #0060ff;
+  font-family: Inter, sans-serif;
+  font-size: 13px;
+  font-weight: 600;
+  border-radius: 8px;
+  padding: 6px 12px;
+  cursor: pointer;
+  transition:
+    border-color 0.15s ease,
+    background-color 0.15s ease;
+}
+
+.pagination-btn:hover:not(:disabled) {
+  border-color: #4676fb;
+  background-color: #f2f5ff;
+}
+
+.pagination-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.pagination-btn--active {
+  background-color: #0060ff;
+  color: white;
+  border-color: #0060ff;
+}
+
+.pagination-info {
+  font-size: 13px;
+  color: #6f86c9;
+  padding: 0 6px;
+}
+
+/* ---------------------------------------------------------------------------
+   Wide modal variant - user detail
+   --------------------------------------------------------------------------- */
+
+.modal--wide {
+  max-width: 720px;
+}
+
+.modal-header-row {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+
+.modal-header-row .modal-title {
+  margin: 0;
+}
+
+.modal-close-x {
+  border: none;
+  background: none;
+  font-size: 28px;
+  line-height: 1;
+  color: #adc0f8;
+  cursor: pointer;
+  padding: 0 4px;
+  transition: color 0.12s ease;
+}
+
+.modal-close-x:hover {
+  color: #f44336;
+}
+
+.user-detail-grid {
+  display: flex;
+  gap: 24px;
+  flex-wrap: wrap;
+  margin-bottom: 24px;
+}
+
+.user-detail-grid .info-list {
+  flex: 1 1 260px;
+  min-width: 0;
+}
+
+.user-detail-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  flex: 0 0 180px;
+}
+
+.user-detail-actions .btn {
+  width: 100%;
+  font-size: 11px;
+}
+
+.user-images-title {
+  margin: 0 0 12px;
+  font-size: 14px;
+  font-weight: 700;
+  color: #0b0b0b;
+  letter-spacing: -0.01em;
+}
+
+.user-images-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+  gap: 10px;
+  max-height: 280px;
+  overflow-y: auto;
+  padding-right: 4px;
+}
+
+.user-image-card {
+  position: relative;
+  border-radius: 8px;
+  overflow: hidden;
+  aspect-ratio: 1 / 1;
+  background-color: #f2f5ff;
+}
+
+.user-image-card img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.user-image-delete {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  background: rgba(244, 67, 54, 0.85);
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 12px;
+  padding: 2px 6px;
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity 0.12s ease;
+}
+
+.user-image-card:hover .user-image-delete {
+  opacity: 1;
+}
+
+.user-images-empty {
+  font-size: 13px;
+  color: #adc0f8;
+  padding: 12px 0;
+}
+
+/* ---------------------------------------------------------------------------
+   Add user form extras
+   --------------------------------------------------------------------------- */
+
+.form-group--checkbox {
+  flex-direction: row;
+  align-items: center;
+  gap: 8px;
+}
+
+.checkbox-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 500 !important;
+  font-size: 13px !important;
+  cursor: pointer;
+}
+
+.checkbox-label input[type="checkbox"] {
+  width: 16px;
+  height: 16px;
+  cursor: pointer;
+}
+
+/* ---------------------------------------------------------------------------
+   Responsive - tablet (768px and below)
+   --------------------------------------------------------------------------- */
+
+@media (max-width: 768px) {
+  .admin-main {
+    flex-direction: column;
+    gap: 16px;
+    padding: 24px 16px 48px;
+  }
+
+  .admin-sidebar {
+    width: 100%;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .sidebar-nav {
+    flex-direction: row;
+    gap: 6px;
+  }
+
+  .sidebar-btn {
+    flex: 1;
+    text-align: center;
+  }
+
+  .sidebar-danger-zone {
+    flex-direction: row;
+  }
+
+  .danger-label {
+    display: none;
+  }
+
+  .admin-section {
+    padding: 24px 20px;
+  }
+
+  .stats-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .user-detail-grid {
+    flex-direction: column;
+  }
+
+  .user-detail-actions {
+    flex: 1;
+  }
+}
+
+/* ---------------------------------------------------------------------------
+   Responsive - mobile (480px and below)
+   --------------------------------------------------------------------------- */
+
+@media (max-width: 480px) {
+  .admin-main {
+    padding: 16px 12px 40px;
+    gap: 12px;
+  }
+
+  .sidebar-danger-zone {
+    flex-direction: column;
+  }
+
+  .admin-section {
+    padding: 20px 16px;
+    border-radius: 12px;
+  }
+
+  .stats-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .stat-value {
+    font-size: 24px;
+  }
+
+  .users-toolbar {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .users-toolbar-actions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .user-search-input {
+    width: 100%;
+  }
+
+  .users-add-btn {
+    width: 100%;
+  }
+
+  .modal--wide {
+    max-width: 95%;
+  }
+
+  .user-images-grid {
+    grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+    max-height: 220px;
+  }
+}

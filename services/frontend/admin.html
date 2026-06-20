@@ -1,0 +1,291 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <title>Image Hosting - Admin Panel</title>
+    <link rel="icon" type="image/x-icon" href="base_images/ico/favicon.ico" />
+    <link rel="stylesheet" href="css/auth.css" />
+    <link rel="stylesheet" href="css/admin.css" />
+    <script src="js/modal.js" defer></script>
+    <script src="js/admin.js" defer></script>
+  </head>
+  <body>
+    <div class="page-container">
+      <!-- ==================== HEADER ==================== -->
+      <header class="header-container admin-header">
+        <a href="upload.html" class="header-link">
+          <h1 class="header-title">Image Hosting</h1>
+        </a>
+        <p class="header-subtitle">Admin Panel</p>
+      </header>
+
+      <!-- ==================== ADMIN PAGE ==================== -->
+      <main class="admin-main">
+        <!-- LEFT PANEL: navigation -->
+        <aside class="admin-sidebar">
+          <nav class="sidebar-nav">
+            <button
+              class="sidebar-btn sidebar-btn--active"
+              id="nav-stats"
+              data-target="section-stats"
+            >
+              Statistics
+            </button>
+            <button
+              class="sidebar-btn"
+              id="nav-users"
+              data-target="section-users"
+            >
+              Users
+            </button>
+          </nav>
+
+          <div class="sidebar-danger-zone">
+            <span class="danger-label">Navigation</span>
+            <a href="upload.html" class="btn btn-secondary admin-back-btn"
+              >Back to Gallery</a
+            >
+          </div>
+        </aside>
+
+        <!-- RIGHT PANEL: content sections -->
+        <div class="admin-content">
+          <!-- ---- Statistics ---- -->
+          <section class="admin-section" id="section-stats">
+            <h2 class="section-title">Statistics</h2>
+
+            <div class="stats-grid" id="stats-grid">
+              <!-- Populated by admin.js -->
+              <div class="stat-card">
+                <span class="stat-label">Total Users</span>
+                <span class="stat-value" id="stat-total-users">-</span>
+              </div>
+              <div class="stat-card">
+                <span class="stat-label">Total Images</span>
+                <span class="stat-value" id="stat-total-images">-</span>
+              </div>
+              <div class="stat-card">
+                <span class="stat-label">Storage Used</span>
+                <span class="stat-value" id="stat-total-size">-</span>
+              </div>
+              <div class="stat-card">
+                <span class="stat-label">Admins</span>
+                <span class="stat-value" id="stat-admin-users">-</span>
+              </div>
+              <div class="stat-card stat-card--danger">
+                <span class="stat-label">Blocked Users</span>
+                <span class="stat-value" id="stat-blocked-users">-</span>
+              </div>
+            </div>
+          </section>
+
+          <!-- ---- Users ---- -->
+          <section class="admin-section admin-section--hidden" id="section-users">
+            <div class="users-toolbar">
+              <h2 class="section-title">Users</h2>
+              <div class="users-toolbar-actions">
+                <input
+                  type="search"
+                  id="user-search"
+                  class="user-search-input"
+                  placeholder="Search by email..."
+                />
+                <button class="btn btn-primary users-add-btn" id="open-add-user">
+                  + Add User
+                </button>
+              </div>
+            </div>
+
+            <div class="users-table-wrapper">
+              <table class="users-table" id="users-table">
+                <thead>
+                  <tr>
+                    <th>Email</th>
+                    <th>Role</th>
+                    <th>Status</th>
+                    <th>Images</th>
+                    <th>Last Login</th>
+                    <th>Registered</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="users-table-body">
+                  <!-- Populated by admin.js -->
+                </tbody>
+              </table>
+            </div>
+
+            <div class="users-pagination" id="users-pagination">
+              <!-- Populated by admin.js -->
+            </div>
+          </section>
+        </div>
+        <!-- /.admin-content -->
+      </main>
+    </div>
+    <!-- /.page-container -->
+
+    <!-- ==================== USER DETAIL MODAL ==================== -->
+    <div
+      class="modal-overlay modal-overlay--wide"
+      id="user-detail-overlay"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="ud-title"
+      hidden
+    >
+      <div class="modal modal--wide">
+        <div class="modal-header-row">
+          <h3 class="modal-title" id="ud-title">User Details</h3>
+          <button class="modal-close-x" id="user-detail-close" aria-label="Close">&times;</button>
+        </div>
+
+        <div class="user-detail-grid">
+          <dl class="info-list">
+            <dt>Email</dt>
+            <dd id="ud-email">-</dd>
+
+            <dt>Role</dt>
+            <dd id="ud-role">-</dd>
+
+            <dt>Status</dt>
+            <dd id="ud-status">-</dd>
+
+            <dt>Registered</dt>
+            <dd id="ud-created">-</dd>
+
+            <dt>Last Login</dt>
+            <dd id="ud-last-login">-</dd>
+
+            <dt>Registered IP</dt>
+            <dd id="ud-ip">-</dd>
+
+            <dt>Total Images</dt>
+            <dd id="ud-image-count">-</dd>
+          </dl>
+
+          <div class="user-detail-actions">
+            <button class="btn btn-secondary" id="ud-toggle-admin">
+              Grant Admin
+            </button>
+            <button class="btn btn-secondary" id="ud-toggle-block">
+              Block User
+            </button>
+            <button class="btn btn-secondary" id="ud-clear-lockout">
+              Clear Lockout
+            </button>
+            <button class="btn btn-danger" id="ud-delete-user">
+              Delete User
+            </button>
+          </div>
+        </div>
+
+        <h4 class="user-images-title">Images</h4>
+        <div class="user-images-grid" id="user-images-grid">
+          <!-- Populated by admin.js -->
+        </div>
+        <div class="users-pagination" id="user-images-pagination">
+          <!-- Populated by admin.js -->
+        </div>
+      </div>
+    </div>
+
+    <!-- ==================== ADD USER MODAL ==================== -->
+    <div
+      class="modal-overlay"
+      id="add-user-overlay"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="au-title"
+      hidden
+    >
+      <div class="modal">
+        <h3 class="modal-title" id="au-title">Add User</h3>
+
+        <form class="auth-form" id="add-user-form" novalidate>
+          <div class="form-group">
+            <label for="au-email">Email</label>
+            <input
+              type="email"
+              id="au-email"
+              name="email"
+              placeholder="user@example.com"
+              autocomplete="off"
+              required
+            />
+            <span class="field-error" id="au-email-error"></span>
+          </div>
+
+          <div class="form-group">
+            <label for="au-password">Password</label>
+            <input
+              type="password"
+              id="au-password"
+              name="password"
+              placeholder="At least 8 characters"
+              autocomplete="new-password"
+              required
+              minlength="8"
+            />
+            <span class="field-error" id="au-password-error"></span>
+          </div>
+
+          <div class="form-group form-group--checkbox">
+            <label class="checkbox-label">
+              <input type="checkbox" id="au-is-admin" name="is_admin" />
+              Grant admin privileges
+            </label>
+          </div>
+
+          <div class="modal-actions">
+            <button type="button" class="btn btn-secondary" id="add-user-cancel">
+              Cancel
+            </button>
+            <button type="submit" class="btn btn-primary" id="add-user-submit">
+              Create User
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- ==================== CONFIRM ACTION MODAL (generic) ==================== -->
+    <div
+      class="modal-overlay"
+      id="confirm-action-overlay"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="ca-title"
+      hidden
+    >
+      <div class="modal">
+        <h3 class="modal-title" id="ca-title">Confirm Action</h3>
+        <p class="modal-body" id="ca-body">Are you sure?</p>
+        <div class="modal-actions">
+          <button class="btn btn-secondary" id="ca-cancel">Cancel</button>
+          <button class="btn btn-danger" id="ca-confirm">Confirm</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ==================== INFO / ERROR MODAL (generic) ==================== -->
+    <div
+      class="modal-overlay"
+      id="info-overlay"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="info-title"
+      hidden
+    >
+      <div class="modal">
+        <h3 class="modal-title" id="info-title">Notice</h3>
+        <p class="modal-body" id="info-body"></p>
+        <div class="modal-actions">
+          <button class="btn btn-primary" id="info-ok">OK</button>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>
