@@ -58,6 +58,10 @@ body {
   cursor: pointer;
 }
 
+.header-link {
+  text-decoration: none;
+}
+
 .header-subtitle {
   margin: 0;
   width: 293px;

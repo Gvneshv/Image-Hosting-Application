@@ -73,6 +73,7 @@ button {
   line-height: 14px;
   letter-spacing: -0.02em;
   color: #0b0b0b;
+  cursor: pointer;
 }
 
 .header-subtitle {
