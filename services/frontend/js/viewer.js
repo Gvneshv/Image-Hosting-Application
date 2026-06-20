@@ -47,6 +47,27 @@
     return response;
   };
 
+  /**
+   * Reveal the admin panel icon for admin users only.
+   *
+   * is_admin is not present in the JWT payload (only the user_id is encoded there), so this must be confirmed by the server.
+   * The icon stays `hidden` (set in viewer.html) until this confirms is_admin: true.
+   * Mirrors the identical helper in upload.js.
+   */
+  const revealAdminIconIfAdmin = async () => {
+    try {
+      const res = await authFetch(`${location.origin}/auth/me`);
+      if (!res.ok) return;
+      const me = await res.json();
+      if (me.is_admin) {
+        document.getElementById("admin-icon-link")?.removeAttribute("hidden");
+      }
+    } catch {
+      // Network failure - admin icon simply stays hidden, no user-facing impact.
+    }
+  };
+  revealAdminIconIfAdmin();
+
   /** CSS selector map — centralises all querySelector strings. */
   const SEL = {
     fileNameEl: "#infoFilename",

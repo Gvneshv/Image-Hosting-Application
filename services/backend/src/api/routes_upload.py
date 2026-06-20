@@ -77,21 +77,23 @@ PerPageNumber = Annotated[int, Query(ge=1, le=100)]
 # Helper
 # ---------------------------------------------------------------------------
 
-def _scoped_user_id(user: User) -> int | None:
+def _scoped_user_id(user: User) -> int:
     """
-    Return ``None`` for admins (no ownership filter) or the user's ID for regular users.
- 
-    Admins can access all images; regular users are scoped to their own.
-    Centralising this logic here keeps every route one clean line instead of
-    repeating the same ``if user.is_admin`` check everywhere.
- 
+    Return the current user's ID - always scopes to the caller's own images.
+
+    This module (routes_upload.py) is the personal-gallery surface used by every account, including admins: upload.html, viewer.html, and their underlying endpoints.
+    Admins do NOT get cross-account visibility here - that capability lives exclusively in routes_admin.py, where image and user queries deliberately pass user_id=None to remove the ownership filter.
+    Keeping that bypass out of this module means an admin's own gallery behaves identically to anyone else's: it shows only what they uploaded.
+
+    Centralising this here keeps every route in this file one clean line instead of repeating ``current_user.id`` everywhere, and gives a single place to revisit if personal-gallery scoping rules ever change.
+
     Args:
         user: The currently authenticated User ORM instance.
- 
+
     Returns:
-        int | None: ``None`` if the user is an admin, otherwise their ``id``.
+        int: The user's own ID - always, regardless of admin status.
     """
-    return None if user.is_admin else user.id
+    return user.id
 
 
 # ---------------------------------------------------------------------------
