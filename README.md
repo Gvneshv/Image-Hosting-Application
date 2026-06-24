@@ -22,7 +22,7 @@ A self-hosted, full-featured image hosting web application built with **FastAPI*
 
 ## Overview
 
-This application provides a complete self-hosted image hosting solution with user accounts. Users register with an email and password, log in to receive a JWT, and can upload, manage, and share their own images. All images are user-scoped - regular users can only see and manage their own; admin users can access everything. Images are stored on disk and tracked in a PostgreSQL database. The frontend is a responsive, single-page-style interface with tab switching, sorting, pagination, a lightbox viewer, and full keyboard navigation - all without page reloads. The entire stack runs in Docker containers with Nginx as a reverse proxy, PgBouncer for connection pooling, automated database backups, and structured logging throughout.
+This application provides a complete self-hosted image hosting solution with user accounts. Users register with an email and password, log in to receive a JWT, and can upload, manage, and share their own images. All images are user-scoped - regular users can only see and manage their own; admin users get access to a dedicated admin panel for site-wide moderation. Images are stored on disk and tracked in a PostgreSQL database. The frontend is a responsive, single-page-style interface with tab switching, sorting, pagination, a lightbox viewer, and full keyboard navigation - all without page reloads. Login abuse is mitigated by a rolling lockout: five consecutive failed attempts within 30 minutes lock the account for 30 minutes. The entire stack runs in Docker containers with Nginx as a reverse proxy, PgBouncer for connection pooling, automated database backups, and structured logging throughout.
 
 ---
 
@@ -30,20 +30,21 @@ This application provides a complete self-hosted image hosting solution with use
 
 ### Authentication & Accounts
 
-![Register demo](https://github.com/Gvneshv/Image-Hosting-Application/releases/download/v2.0.0/registration.gif)
-![Login demo](https://github.com/Gvneshv/Image-Hosting-Application/releases/download/v2.0.0/login.gif)
+![Register demo](https://github.com/Gvneshv/Image-Hosting-Application/releases/download/v3.0.0/registration.gif)
+![Login demo](https://github.com/Gvneshv/Image-Hosting-Application/releases/download/v3.0.0/login.gif)
 
 - Register with an email and password; passwords are hashed with Argon2 and never stored in plain text
 - Log in to receive a signed JWT; all protected API calls require a valid `Authorization: Bearer` header
 - Account page shows email and registration date
 - Change password at any time - requires re-verification of the current password
 - Delete account - permanently removes the account and all associated images
-- Admin flag (`is_admin`) - admins can view and delete any user's images; regular users are strictly scoped to their own
+- Admin flag (`is_admin`) - admins get access to the admin panel and can view or delete any user's images; regular users are strictly scoped to their own
+- **Login lockout** - five consecutive failed attempts within 30 minutes lock the account for 30 minutes; the UI displays the reason and unlock time
 
 ### Upload
 
-![Upload demo](https://github.com/Gvneshv/Image-Hosting-Application/releases/download/v2.0.0/image_upload.gif)
-![Drag and drop demo](https://github.com/Gvneshv/Image-Hosting-Application/releases/download/v2.0.0/dragging.gif)
+![Upload demo](https://github.com/Gvneshv/Image-Hosting-Application/releases/download/v3.0.0/image_upload.gif)
+![Drag and drop demo](https://github.com/Gvneshv/Image-Hosting-Application/releases/download/v3.0.0/dragging.gif)
 
 - Upload images via browser file picker, drag-and-drop, or REST API
 - Per-IP rate limiting to prevent abuse (10 uploads per minute)
@@ -54,9 +55,9 @@ This application provides a complete self-hosted image hosting solution with use
 
 ### Image Library
 
-![Sorting demo](https://github.com/Gvneshv/Image-Hosting-Application/releases/download/v2.0.0/sort.gif)
-![Pagination demo](https://github.com/Gvneshv/Image-Hosting-Application/releases/download/v2.0.0/pagination_copy.gif)
-![Delete from gallery demo](https://github.com/Gvneshv/Image-Hosting-Application/releases/download/v2.0.0/gallery_copy_delete.gif)
+![Sorting demo](https://github.com/Gvneshv/Image-Hosting-Application/releases/download/v3.0.0/sort.gif)
+![Pagination demo](https://github.com/Gvneshv/Image-Hosting-Application/releases/download/v3.0.0/pagination_copy.gif)
+![Delete from gallery demo](https://github.com/Gvneshv/Image-Hosting-Application/releases/download/v3.0.0/gallery_copy_delete.gif)
 
 - Toggle between the upload form and image library without a page reload
 - Sort images by upload time, file size, or filename in ascending or descending order
@@ -67,8 +68,8 @@ This application provides a complete self-hosted image hosting solution with use
 
 ### Image Viewer
 
-![Lightbox and fullscreen demo](https://github.com/Gvneshv/Image-Hosting-Application/releases/download/v2.0.0/viewer_lightbox_fs_mode.gif)
-![Viewer actions demo](https://github.com/Gvneshv/Image-Hosting-Application/releases/download/v2.0.0/viewer_copy_download_delete.gif)
+![Lightbox and fullscreen demo](https://github.com/Gvneshv/Image-Hosting-Application/releases/download/v3.0.0/viewer_lightbox_fs_mode.gif)
+![Viewer actions demo](https://github.com/Gvneshv/Image-Hosting-Application/releases/download/v3.0.0/viewer_copy_download_delete.gif)
 
 - Individual image pages display full metadata: filename, original name, unique name, size, type, and upload date
 - Buttons to download the image, copy its URL, or delete it
@@ -76,6 +77,20 @@ This application provides a complete self-hosted image hosting solution with use
 - Double-click resets zoom and position
 - Navigate between images using on-screen arrow buttons, thumbnail previews of the previous/next image, or keyboard shortcuts (`←` / `→` to navigate, `Esc` to close)
 - Close the overlay by clicking the darkened area outside the image
+
+### Admin Panel
+
+![Block and clear lockout demo](https://github.com/Gvneshv/Image-Hosting-Application/releases/download/v3.0.0/admin_panel_block_and_lockout.gif)
+![Delete user demo](https://github.com/Gvneshv/Image-Hosting-Application/releases/download/v3.0.0/admin_panel_delete_user.gif)
+![Add user and grant admin demo](https://github.com/Gvneshv/Image-Hosting-Application/releases/download/v3.0.0/admin_panel_add_user.gif)
+
+- Dedicated admin dashboard at `/admin.html`, accessible only to users with `is_admin = True`
+- Admin icon revealed in the header of the upload and viewer pages after login (`GET /auth/me` returns `is_admin`)
+- **User management** - paginated user table showing email, registration date, last login, registered IP, image count, and blocked / locked-out status badges
+- Per-user actions: block / unblock account, clear login lockout, delete user and all their images
+- **Image management** - site-wide image table with thumbnail preview, uploader email, size, upload date, and per-row delete
+- **Site statistics** - total users, total images, total storage used, new users in the last 7 days, uploads in the last 7 days
+- The `/admin.html` page is served as a static file by Nginx; the `/admin/` proxy path is blocked at the Nginx layer so the backend admin API is never accidentally exposed through an unintended route
 
 ### Infrastructure & Reliability
 
@@ -128,13 +143,14 @@ Project/
 │   │   ├── backup/                     # Backup files written here (gitignored)
 │   │   ├── src/
 │   │   │   ├── api/
+│   │   │   │   ├── routes_admin.py     # Admin endpoints: user/image CRUD, block, lockout, stats
 │   │   │   │   ├── routes_auth.py      # Auth endpoints: register, login, me, change-password, delete account
 │   │   │   │   └── routes_upload.py    # Image endpoints: upload, list, delete, metadata, viewer, health
 │   │   │   ├── db/
 │   │   │   │   ├── cleanup_scheduler.py    # Orphaned file & record cleanup
-│   │   │   │   ├── crud.py                 # Database CRUD operations
+│   │   │   │   ├── crud.py                 # Database CRUD operations (incl. lockout helpers)
 │   │   │   │   ├── database.py             # DB engine & session setup
-│   │   │   │   └── models.py               # SQLAlchemy ORM models (User, Image)
+│   │   │   │   └── models.py               # SQLAlchemy ORM models (User, Image, LoginAttempts)
 │   │   │   ├── handlers/
 │   │   │   │   └── upload.py               # Upload validation & storage logic
 │   │   │   ├── interfaces/
@@ -169,6 +185,7 @@ Project/
 │   ├── frontend/
 │   │   ├── base_images/                    # Static SVG illustrations & icons
 │   │   ├── css/
+│   │   │   ├── admin.css                   # Admin panel layout and component styles
 │   │   │   ├── auth.css                    # Shared styles for login/register pages
 │   │   │   ├── account.css                 # Account page layout (sidebar + content)
 │   │   │   ├── index.css                   # Landing page styles
@@ -176,14 +193,17 @@ Project/
 │   │   │   └── viewer.css                  # Image viewer & lightbox styles
 │   │   ├── js/
 │   │   │   ├── account.js                  # Account page: info display, password change, logout, delete account
-│   │   │   ├── index.js                    # Landing page logic
+│   │   │   ├── admin.js                    # Admin panel: users, images, stats, moderation actions
+│   │   │   ├── index.js                    # Landing page logic (incl. lockout modal)
 │   │   │   ├── modal.js                    # Custom confirmation/alert dialogs
 │   │   │   ├── tabs.js                     # Tab switching without reload; hash-based deep-link support
 │   │   │   ├── upload.js                   # Upload form, drag-and-drop, gallery, account icon
 │   │   │   └── viewer.js                   # Image detail page, lightbox, fullscreen, keyboard nav
 │   │   ├── templates/
 │   │   │   └── viewer.html                 # Jinja2 individual image page
+│   │   ├── 404.html                        # Custom not-found page served by Nginx
 │   │   ├── account.html                    # Account management page
+│   │   ├── admin.html                      # Admin panel (admin-only)
 │   │   ├── index.html                      # Landing / login / register page
 │   │   └── upload.html                     # Upload + library page
 │   ├── nginx/
@@ -317,15 +337,19 @@ Click the account icon in the top-right corner to reach the account page. From t
 - Permanently delete your account and all your images
 
 ### Admin Access
- 
-The `is_admin` flag is not settable through the UI - it is granted manually. To promote a user to admin while the stack is running:
- 
+
+The first admin account is bootstrapped automatically via the `FIRST_ADMIN_EMAIL` environment variable. The account that registers with that email address receives `is_admin = True` at registration time - no manual database work needed. See [Environment Variables](#environment-variables) for details.
+
+Once logged in as an admin, a shield icon appears in the header. Clicking it opens the admin panel at `/admin.html`, where you can manage users, images, and view site statistics.
+
+If you need to grant admin access to an additional account after the first deployment, use the shell:
+
 ```bash
 make shell
 ```
- 
+
 Then inside the container:
- 
+
 ```python
 from db.database import SessionLocal
 from db.models import User
@@ -335,8 +359,6 @@ user.is_admin = True
 db.commit()
 db.close()
 ```
- 
-Admins can view and delete any user's images regardless of ownership.
 
 ---
 
@@ -369,7 +391,19 @@ Interactive Swagger documentation is available at **`http://localhost/docs`** wh
 | `GET` | `/file_info/{filename}` | Metadata for a single image |
 | `GET` | `/all_images` | Full image list for the viewer slideshow |
 
-### Upload Constraints
+#### Admin only (Bearer token + `is_admin = True` required)
+
+| Method | Endpoint | Description |
+|---|---|---|
+| `GET` | `/admin/users` | Paginated list of all users with aggregate counts |
+| `GET` | `/admin/users/{user_id}` | Single user detail |
+| `DELETE` | `/admin/users/{user_id}` | Delete a user and all their images |
+| `POST` | `/admin/users/{user_id}/block` | Permanently block a user account |
+| `POST` | `/admin/users/{user_id}/unblock` | Unblock a user account |
+| `POST` | `/admin/users/{user_id}/clear-lockout` | Clear login lockout for a user |
+| `GET` | `/admin/images` | Paginated site-wide image list |
+| `DELETE` | `/admin/images/{filename}` | Delete any image regardless of owner |
+| `GET` | `/admin/stats` | Site statistics (users, images, storage, recent activity) |
  
 - **Allowed extensions:** `.jpg`, `.jpeg`, `.png`, `.gif`
 - **Allowed MIME types:** `image/jpeg`, `image/png`, `image/gif`
@@ -428,8 +462,15 @@ All configuration lives in `services/backend/.env`. This file is never committed
 | `SECRET_KEY` | Secret used to sign JWTs - use a long random string | `openssl rand -hex 32` |
 | `ALGORITHM` | JWT signing algorithm | `HS256` |
 | `ACCESS_TOKEN_EXPIRE_MINUTES` | JWT lifetime in minutes | `60` |
+| `FIRST_ADMIN_EMAIL` | Email that receives `is_admin = True` automatically on registration | `admin@example.com` |
 | `BACKEND_WORKERS` | Number of Uvicorn worker processes | `1` |
 | `WEB_SERVER_START_PORT` | Uvicorn listening port | `8000` |
+
+### A note on `FIRST_ADMIN_EMAIL`
+
+Set this to the email address you will register with on first startup. That account will receive `is_admin = True` automatically - no shell access or manual SQL needed. If that account is later deleted and re-registered with the same email, admin status is restored automatically.
+
+This is intentional by design: on a fresh deployment the database is empty, so there is no other way to bootstrap an admin without container shell access. Once the admin account exists, additional admins can be granted access through the admin panel or via the shell snippet in [Admin Access](#admin-access).
 
 ### A note on `BACKEND_WORKERS`
  
