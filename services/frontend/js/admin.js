@@ -361,9 +361,7 @@
 
       const statusBadge = user.is_blocked
         ? `<span class="badge badge--blocked">Blocked</span>`
-        : user.is_locked_out
-          ? `<span class="badge badge--locked">Locked</span>`
-          : `<span class="badge badge--active">Active</span>`;
+        : `<span class="badge badge--active">Active</span>`;
 
       tr.innerHTML = `
         <td class="email-cell">${escapeHtml(user.email)}</td>
@@ -407,7 +405,7 @@
    * ---------------------------------------------------------------------- */
   let currentDetailUser = null; // cached user dict for the open modal
   let currentImagesPage = 1;
-  const IMAGES_PER_PAGE = 12;
+  const IMAGES_PER_PAGE = 10;
 
   /**
    * Open the user detail modal and load both the user info and their images.
@@ -452,9 +450,7 @@
       : `<span class="badge badge--user">User</span>`;
     udStatus.innerHTML = user.is_blocked
       ? `<span class="badge badge--blocked">Blocked</span>`
-      : user.is_locked_out
-        ? `<span class="badge badge--locked">Locked</span>`
-        : `<span class="badge badge--active">Active</span>`;
+      : `<span class="badge badge--active">Active</span>`;
     udCreated.textContent = formatDate(user.created_at);
     udLastLogin.textContent = formatDate(user.last_login);
     udIp.textContent = user.registered_ip || "-";
@@ -462,10 +458,6 @@
 
     udToggleAdmin.textContent = user.is_admin ? "Revoke Admin" : "Grant Admin";
     udToggleBlock.textContent = user.is_blocked ? "Unblock User" : "Block User";
-    udClearLockout.disabled = !user.is_locked_out;
-    udClearLockout.textContent = user.is_locked_out
-      ? "Clear Lockout"
-      : "Not Locked Out";
   };
 
   userDetailClose.addEventListener("click", () => hideModal(userDetailOverlay));

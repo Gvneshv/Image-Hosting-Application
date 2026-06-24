@@ -164,7 +164,7 @@ class LoginAttempt(Base):
         id (int): Auto-incrementing primary key.
         email (str): The email used in the attempt. Indexed for fast per-email queries.
         ip_address (str | None): Client IP at the time of the attempt.
-        attempted_at (datetime): UTC timestamp of the attempt.
+        attempted_at (datetime): UTC timestamp of the attempt, stored as TIMESTAMP WITH TIME ZONE (+00 offset visible when reading the table directly in psql).
         is_resolved (bool): True once an admin has cleared this entry, or once the lockout window has naturally expired and the cleanup scheduler has marked/pruned it.
     """
 
@@ -173,7 +173,7 @@ class LoginAttempt(Base):
     id = Column(Integer, primary_key=True, index=True)
     email = Column(String, index=True, nullable=False)
     ip_address = Column(String, nullable=True)
-    attempted_at = Column(DateTime, server_default=func.now(), nullable=False)
+    attempted_at = Column(DateTime(timezone=True), server_default=func.now(), nullable=False)
 
     # Flipped to True by the admin panel (unlock) or by the cleanup scheduler.
     is_resolved = Column(Boolean, default=False, nullable=False)

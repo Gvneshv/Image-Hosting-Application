@@ -343,7 +343,7 @@ def record_failed_attempt(db: Session, email: str, ip_address: str | None) -> No
     attempt = LoginAttempt(
         email=email,
         ip_address=ip_address,
-        attempted_at=datetime.now(timezone.utc),
+        attempted_at=datetime.now(timezone.utc).replace(microsecond=0),
     )
     db.add(attempt)
     db.commit()

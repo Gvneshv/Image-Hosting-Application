@@ -517,7 +517,7 @@ def get_user_images(
     db: DbSession,
     _admin: AdminUser,
     page: PageNumber = 1,
-    per_page: PerPageNumber = 12,
+    per_page: PerPageNumber = 10,
     sort_by: Annotated[str, Query()] = "upload_time",
     sort_order: Annotated[str, Query()] = "desc",
 ) -> dict:
