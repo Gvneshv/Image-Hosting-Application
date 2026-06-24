@@ -88,6 +88,29 @@ PageNumber = Annotated[int, Query(ge=1)]
 PerPageNumber = Annotated[int, Query(ge=1, le=100)]
 
 
+def _is_locked_out(db: Session, email: str) -> bool:
+    """
+    Check whether an email is currently under an automatic login lockout.
+
+    Thin wrapper around ``crud.is_locked_out`` that supplies the same config thresholds ``routes_auth.login()`` uses,
+    so the admin panel's "Locked" indicator always matches what would actually happen if that user tried to log in right now.
+
+    Args:
+        db: Active database session.
+        email: Email address to check.
+
+    Returns:
+        bool: True if the account is currently locked out.
+    """
+    return crud.is_locked_out(
+        db,
+        email=email,
+        window_minutes=config.LOCKOUT_WINDOW_MINUTES,
+        max_attempts=config.MAX_LOGIN_ATTEMPTS,
+        lockout_minutes=config.LOCKOUT_DURATION_MINUTES,
+    )
+
+
 # ---------------------------------------------------------------------------
 # Stats
 # ---------------------------------------------------------------------------
@@ -153,6 +176,7 @@ def list_users(
     for user in users:
         row = user.to_dict()
         row["image_count"] = crud.count_images(db, user_id=user.id)
+        row["is_locked_out"] = _is_locked_out(db, email=user.email)
         user_rows.append(row)
     
     return {
@@ -246,6 +270,7 @@ def get_user(user_id: int, db: DbSession, _admin: AdminUser) -> dict:
     
     row = user.to_dict()
     row["image_count"] = crud.count_images(db, user_id=user_id)
+    row["is_locked_out"] = _is_locked_out(db, email=user.email)
     return row
 
 

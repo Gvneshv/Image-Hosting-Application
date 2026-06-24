@@ -50,6 +50,11 @@
   const wrongCredsOk = document.getElementById("wrong-credentials-ok");
   const serverErrOverlay = document.getElementById("server-error-overlay");
   const serverErrOk = document.getElementById("server-error-ok");
+  const accountLockedOverlay = document.getElementById(
+    "account-locked-overlay",
+  );
+  const accountLockedBody = document.getElementById("al-body");
+  const accountLockedOk = document.getElementById("account-locked-ok");
 
   /* -------------------------------------------------------------------------
    *  Modal helpers
@@ -146,6 +151,21 @@
         return;
       }
 
+      if (response.status === 429) {
+        // Locked out after too many failed attempts. Use the backend's own detail message
+        // so the displayed wait time always matches config.LOCKOUT_DURATION_MINUTES, even if that value changes.
+        let message = "Too many failed login attempts. Please try again later.";
+        try {
+          const errData = await response.json();
+          if (errData.detail) message = errData.detail;
+        } catch {
+          // Body wasn't JSON or was empty - fall back to the default message above.
+        }
+        accountLockedBody.textContent = message;
+        showModal(accountLockedOverlay);
+        return;
+      }
+
       if (!response.ok) {
         // Any other non-2xx (e.g. 500, 503) is a generic server error
         showModal(serverErrOverlay);
@@ -210,6 +230,16 @@
     if (e.target === serverErrOverlay) hideModal(serverErrOverlay);
   });
 
+  // Account locked - OK button
+  accountLockedOk.addEventListener("click", () =>
+    hideModal(accountLockedOverlay),
+  );
+
+  // Account locked - click outside
+  accountLockedOverlay.addEventListener("click", (e) => {
+    if (e.target === accountLockedOverlay) hideModal(accountLockedOverlay);
+  });
+
   // ESC key closes whichever modal is currently open
   document.addEventListener("keydown", (e) => {
     if (e.key !== "Escape") return;
@@ -219,5 +249,6 @@
       passwordInput.focus();
     }
     if (!serverErrOverlay.hidden) hideModal(serverErrOverlay);
+    if (!accountLockedOverlay.hidden) hideModal(accountLockedOverlay);
   });
 })();

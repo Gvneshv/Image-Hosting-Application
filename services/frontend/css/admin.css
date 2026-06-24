@@ -296,6 +296,11 @@
   color: #f44336;
 }
 
+.badge--locked {
+  background-color: rgba(255, 152, 0, 0.12);
+  color: #e68a00;
+}
+
 .users-table-actions {
   display: flex;
   gap: 6px;
@@ -431,6 +436,16 @@
 .user-detail-actions .btn {
   width: 100%;
   font-size: 11px;
+}
+
+.user-detail-actions .btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.user-detail-actions .btn:disabled:hover {
+  transform: none;
+  box-shadow: none;
 }
 
 .user-images-title {

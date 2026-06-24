@@ -361,7 +361,9 @@
 
       const statusBadge = user.is_blocked
         ? `<span class="badge badge--blocked">Blocked</span>`
-        : `<span class="badge badge--active">Active</span>`;
+        : user.is_locked_out
+          ? `<span class="badge badge--locked">Locked</span>`
+          : `<span class="badge badge--active">Active</span>`;
 
       tr.innerHTML = `
         <td class="email-cell">${escapeHtml(user.email)}</td>
@@ -450,7 +452,9 @@
       : `<span class="badge badge--user">User</span>`;
     udStatus.innerHTML = user.is_blocked
       ? `<span class="badge badge--blocked">Blocked</span>`
-      : `<span class="badge badge--active">Active</span>`;
+      : user.is_locked_out
+        ? `<span class="badge badge--locked">Locked</span>`
+        : `<span class="badge badge--active">Active</span>`;
     udCreated.textContent = formatDate(user.created_at);
     udLastLogin.textContent = formatDate(user.last_login);
     udIp.textContent = user.registered_ip || "-";
@@ -458,6 +462,10 @@
 
     udToggleAdmin.textContent = user.is_admin ? "Revoke Admin" : "Grant Admin";
     udToggleBlock.textContent = user.is_blocked ? "Unblock User" : "Block User";
+    udClearLockout.disabled = !user.is_locked_out;
+    udClearLockout.textContent = user.is_locked_out
+      ? "Clear Lockout"
+      : "Not Locked Out";
   };
 
   userDetailClose.addEventListener("click", () => hideModal(userDetailOverlay));

@@ -96,6 +96,30 @@
     </div>
 
     <!--
+    Account locked modal.
+    Shown when the backend returns 429 after too many failed login attempts.
+    The body text is filled in by index.js from the response's `detail` field, so the exact wait time / unlock instructions stay in sync with whatever the backend (config.LOCKOUT_DURATION_MINUTES) actually says.
+-->
+    <div
+      class="modal-overlay"
+      id="account-locked-overlay"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="al-title"
+      hidden
+    >
+      <div class="modal">
+        <h3 class="modal-title" id="al-title">Account Temporarily Locked</h3>
+        <p class="modal-body" id="al-body">
+          Too many failed login attempts. Please try again later.
+        </p>
+        <div class="modal-actions">
+          <button class="btn btn-primary" id="account-locked-ok">OK</button>
+        </div>
+      </div>
+    </div>
+
+    <!--
     Generic server error modal.
     Shown when the backend returns an unexpected 5xx response.
 -->
