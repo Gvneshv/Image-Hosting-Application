@@ -6,8 +6,17 @@
     <meta http-equiv="X-UA-Compatible" content="ie=edge" />
     <title>Image Hosting - Sign In</title>
     <link rel="icon" type="image/x-icon" href="base_images/ico/favicon.ico" />
-    <link rel="stylesheet" href="css/auth.css" />
+    <script>
+    /* Apply saved theme before first CSS paint to prevent flash of wrong theme. */
+    (function () {
+      var t = localStorage.getItem("theme");
+      if (t) document.documentElement.setAttribute("data-theme", t);
+    })();
+  </script>
+  <link rel="stylesheet" href="css/theme.css" />
+  <link rel="stylesheet" href="css/auth.css" />
     <script src="js/index.js" defer></script>
+  <script src="js/theme.js" defer></script>
   </head>
   <body>
     <div class="page-container">
@@ -16,7 +25,7 @@
         <!--
             Clicking the title reloads the login page.
             index.js redirects already-logged-in users to upload.html before this page renders, so this link is only ever reached by
-            unauthenticated visitors — for them, "home" is here.
+            unauthenticated visitors - for them, "home" is here.
         -->
         <a href="index.html" class="header-link">
           <h1 class="header-title">Image Hosting</h1>
@@ -141,5 +150,14 @@
         </div>
       </div>
     </div>
+
+    <!-- Theme toggle - fixed top-left; uses .theme-toggle--fixed from auth.css -->
+    <button
+      class="theme-toggle theme-toggle--fixed"
+      id="theme-toggle"
+      aria-label="Switch theme"
+      title="Switch theme"
+      type="button"
+    ></button>
   </body>
 </html>

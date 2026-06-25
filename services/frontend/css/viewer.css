@@ -1,7 +1,7 @@
 body {
   margin: 0;
   font-family: Inter, sans-serif;
-  background-color: #f2f5ff;
+  background-color: var(--color-bg);
   padding-top: 120px;
 }
 
@@ -15,7 +15,7 @@ body {
   top: 0;
   left: 0;
   right: 0;
-  background-color: #f2f5ff;
+  background-color: var(--color-bg);
   z-index: 100;
   padding: 15px 0;
 }
@@ -53,7 +53,7 @@ body {
   font-size: 16px;
   line-height: 14px;
   letter-spacing: -0.02em;
-  color: #0b0b0b;
+  color: var(--color-text);
   text-align: right;
   cursor: pointer;
 }
@@ -70,10 +70,19 @@ body {
   font-size: 14px;
   line-height: 150%;
   letter-spacing: -0.04em;
-  color: #0b0b0b;
+  color: var(--color-text);
   text-align: right;
   right: -1%;
   position: relative;
+}
+
+/* Header left slot — theme toggle for viewer page */
+.header-left-group {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  flex-shrink: 0;
+  min-width: 40px;
 }
 
 /* Account icon - top-right corner, links to account.html */
@@ -86,7 +95,7 @@ body {
   width: 40px;
   height: 40px;
   border-radius: 50%;
-  background-color: #0060ff;
+  background-color: var(--color-accent);
   color: #ffffff;
   display: flex;
   align-items: center;
@@ -101,7 +110,7 @@ body {
 }
 
 .account-icon:hover {
-  background-color: #0052e0;
+  background-color: var(--color-accent-hover);
   transform: scale(1.08);
 }
 
@@ -130,9 +139,9 @@ body {
   width: 40px;
   height: 40px;
   border-radius: 50%;
-  background-color: #fafafa;
-  color: #0060ff;
-  border: 2px solid #0060ff;
+  background-color: var(--color-surface-input);
+  color: var(--color-accent);
+  border: 2px solid var(--color-accent);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -144,7 +153,7 @@ body {
 }
  
 .admin-icon:hover {
-  background-color: #0060ff;
+  background-color: var(--color-accent);
   color: #ffffff;
   transform: scale(1.08);
 }
@@ -159,8 +168,8 @@ body {
   width: auto;
   height: 35px;
   border: none;
-  background-color: darkgoldenrod;
-  color: black;
+  background-color: var(--color-surface-alt);
+  color: var(--color-text);
   border-radius: 5px;
   position: absolute;
   left: 2%;
@@ -214,8 +223,8 @@ main {
   font-size: xx-large;
   margin: 0 0 20px 0;
   text-align: center;
-  color: darkgoldenrod;
-  text-shadow: -1px 1px 0 black;
+  color: var(--color-viewer-gold);
+  text-shadow: -1px 1px 0 rgba(0,0,0,0.5);
 }
 
 .info-card {
@@ -225,7 +234,7 @@ main {
 
 .info-row {
   padding: 10px 0;
-  border-bottom: 1px solid #e0e0e0;
+  border-bottom: 1px solid var(--color-border);
 }
 
 .info-row:last-child {
@@ -257,12 +266,12 @@ main {
 .action-button {
   border-radius: 20px;
   font-weight: lighter;
-  color: darkgoldenrod;
+  color: var(--color-viewer-btn-fg);
   border: none;
   cursor: pointer;
   height: 50px;
   letter-spacing: 7px;
-  background-color: black;
+  background-color: var(--color-viewer-btn-bg);
   transition: transform 0.2s;
 }
 
@@ -310,7 +319,7 @@ main {
 .viewer-neighbor {
   /*
      * Fixed positioning anchors the neighbors to the viewport rather than to .viewer-content, whose height varies with the main image's aspect ratio. 
-     * Using position:absolute with top:% caused the neighbors to appear at different vertical positions depending on whether the main image was portrait or landscape.
+     * Using position:absolute with top:% caused the neighbors to appear at different vertical positions depending on whether the main image was portrait landscape.
      * Fixed + bottom keeps them at a consistent position regardless of image dimensions.
      */
   position: fixed;
@@ -354,7 +363,7 @@ main {
 }
 
 #image-viewer .close-btn:hover {
-  color: #ff4444;
+  color: var(--color-danger);
   transform: scale(1.2);
 }
 
@@ -849,12 +858,12 @@ main {
 
 /* Modal container */
 .modal-container {
-  background: white;
+  background: var(--color-surface);
   border-radius: 15px;
   padding: 30px;
   max-width: 450px;
   width: 90%;
-  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 10px 40px var(--color-shadow-modal);
   transform: scale(0.9);
   transition: transform 0.3s ease;
 }
@@ -877,22 +886,22 @@ main {
 }
 
 .modal-icon.warning {
-  color: #ff9800;
+  color: var(--color-warning);
 }
 .modal-icon.success {
-  color: #4caf50;
+  color: var(--color-success);
 }
 .modal-icon.error {
-  color: #f44336;
+  color: var(--color-danger);
 }
 .modal-icon.info {
-  color: #2196f3;
+  color: var(--color-accent);
 }
 
 .modal-title {
   font-size: 24px;
   font-weight: 700;
-  color: #0b0b0b;
+  color: var(--color-text);
   margin: 0;
 }
 
@@ -900,7 +909,7 @@ main {
 .modal-content {
   font-size: 16px;
   line-height: 1.5;
-  color: #555;
+  color: var(--color-text-secondary);
   margin-bottom: 25px;
 }
 
@@ -934,30 +943,30 @@ main {
 }
 
 .modal-button.primary {
-  background-color: #0060ff;
+  background-color: var(--color-accent);
   color: white;
 }
 
 .modal-button.primary:hover {
-  background-color: #0052e0;
+  background-color: var(--color-accent-hover);
 }
 
 .modal-button.danger {
-  background-color: #f44336;
+  background-color: var(--color-danger);
   color: white;
 }
 
 .modal-button.danger:hover {
-  background-color: #d32f2f;
+  background-color: var(--color-danger-hover);
 }
 
 .modal-button.secondary {
-  background-color: #e0e0e0;
-  color: #333;
+  background-color: var(--color-border);
+  color: var(--color-text);
 }
 
 .modal-button.secondary:hover {
-  background-color: #d0d0d0;
+  background-color: #b8b8b8;
 }
 
 /* Responsive */

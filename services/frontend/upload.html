@@ -13,10 +13,19 @@
     -->
     <title>My Gallery</title>
     <link rel="icon" type="image/x-icon" href="base_images/ico/favicon.ico" />
-    <link rel="stylesheet" href="css/upload.css" />
+    <script>
+    /* Apply saved theme before first CSS paint to prevent flash of wrong theme. */
+    (function () {
+      var t = localStorage.getItem("theme");
+      if (t) document.documentElement.setAttribute("data-theme", t);
+    })();
+  </script>
+  <link rel="stylesheet" href="css/theme.css" />
+  <link rel="stylesheet" href="css/upload.css" />
     <script src="js/modal.js" defer></script>
     <script src="js/upload.js" defer></script>
     <script src="js/tabs.js" defer></script>
+  <script src="js/theme.js" defer></script>
   </head>
   <body>
     <section class="page-container">
@@ -25,6 +34,18 @@
         Clicking the title switches to the Images tab so the user lands directly on their gallery.
         The data-tab attribute is read by tabs.js, which already handles all tab switching via that same mechanism.
     -->
+        <!-- Left slot: theme toggle. Mirrors header-actions-group width so the title stays centred. -->
+        <div class="header-left-group">
+          <!-- Theme toggle - switches dark/light mode; icon is set by theme.js -->
+          <button
+            class="theme-toggle"
+            id="theme-toggle"
+            aria-label="Switch theme"
+            title="Switch theme"
+            type="button"
+          ></button>
+        </div>
+
         <div class="header-title-group">
           <a
             class="header-link header-title-link"

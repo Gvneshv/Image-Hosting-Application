@@ -6,8 +6,17 @@
     <meta http-equiv="X-UA-Compatible" content="ie=edge" />
     <title>Image Hosting - Create Account</title>
     <link rel="icon" type="image/x-icon" href="base_images/ico/favicon.ico" />
-    <link rel="stylesheet" href="css/auth.css" />
+    <script>
+    /* Apply saved theme before first CSS paint to prevent flash of wrong theme. */
+    (function () {
+      var t = localStorage.getItem("theme");
+      if (t) document.documentElement.setAttribute("data-theme", t);
+    })();
+  </script>
+  <link rel="stylesheet" href="css/theme.css" />
+  <link rel="stylesheet" href="css/auth.css" />
     <script src="js/register.js" defer></script>
+  <script src="js/theme.js" defer></script>
   </head>
   <body>
     <div class="page-container">
@@ -148,5 +157,14 @@
         </div>
       </div>
     </div>
+
+    <!-- Theme toggle - fixed top-left; uses .theme-toggle--fixed from auth.css -->
+    <button
+      class="theme-toggle theme-toggle--fixed"
+      id="theme-toggle"
+      aria-label="Switch theme"
+      title="Switch theme"
+      type="button"
+    ></button>
   </body>
 </html>
