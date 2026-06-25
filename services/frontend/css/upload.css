@@ -2,6 +2,8 @@ body {
   margin: 0;
   font-family: Inter, sans-serif;
   background-color: var(--color-bg);
+  /* Base text colour  ensures all un-styled text respects the active theme token. */
+  color: var(--color-text);
 }
 
 button {
@@ -104,18 +106,15 @@ button {
   color: #ffffff;
 }
 
-/* Header left slot — theme toggle lives here on upload/viewer pages.
-   Mirrors header-actions-group in width so the title stays visually centred between the two outer flex items.
+/* Header left slot  theme toggle lives here on upload/viewer pages.
+   Same min-width as header-actions-group (2 × 40px icons + 10px gap = 90px) so flex space-between keeps the title visually centred between both sides.
    */
 .header-left-group {
   display: flex;
   flex-direction: row;
   align-items: center;
   flex-shrink: 0;
-  /* Match the min-width of header-actions-group so flex space-between keeps the title centred.
-     Value matches: account-icon (40px) + gap (10px) + possible admin-icon (40px) — use min-width so it shrinks when only the toggle is present but never pushes the title off-centre.
-     */
-  min-width: 40px;
+  min-width: 90px;
 }
 
 .header-actions-group {
@@ -127,7 +126,7 @@ button {
 }
  
 /* Admin icon - hidden by default via the `hidden` attribute in HTML.
-   upload.js removes `hidden` only after GET /auth/me confirms is_admin.*/
+   upload.js removes `hidden` only after GET /auth/me confirms is_admin. */
 .admin-icon-link {
   text-decoration: none;
   flex-shrink: 0;
@@ -798,16 +797,15 @@ input[type="file"] {
     left: 10px;
   }
 
-  /* Header left slot — theme toggle lives here on upload/viewer pages.
-     Mirrors header-actions-group in width so the title stays visually centred between the two outer flex items.                                           */
+  /* Header left slot  theme toggle lives here on upload/viewer pages.
+   Same min-width as header-actions-group (2 × 40px icons + 10px gap = 90px) so flex space-between keeps the title visually centred between both sides.
+   */
 .header-left-group {
   display: flex;
   flex-direction: row;
   align-items: center;
   flex-shrink: 0;
-  /* Match the min-width of header-actions-group so flex space-between keeps the title centred.
-     Value matches: account-icon (40px) + gap (10px) + possible admin-icon (40px) — use min-width so it shrinks when only the toggle is present but never pushes the title off-centre.              */
-  min-width: 40px;
+  min-width: 90px;
 }
 
 .header-actions-group {

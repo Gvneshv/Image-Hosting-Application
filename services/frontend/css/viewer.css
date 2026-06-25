@@ -2,6 +2,7 @@ body {
   margin: 0;
   font-family: Inter, sans-serif;
   background-color: var(--color-bg);
+  color: var(--color-text);
   padding-top: 120px;
 }
 
@@ -76,13 +77,14 @@ body {
   position: relative;
 }
 
-/* Header left slot — theme toggle for viewer page */
+/* Header left slot — theme toggle for viewer page.
+   min-width matches header-actions-group so the title stays centred. */
 .header-left-group {
   display: flex;
   flex-direction: row;
   align-items: center;
   flex-shrink: 0;
-  min-width: 40px;
+  min-width: 90px;
 }
 
 /* Account icon - top-right corner, links to account.html */
@@ -319,7 +321,7 @@ main {
 .viewer-neighbor {
   /*
      * Fixed positioning anchors the neighbors to the viewport rather than to .viewer-content, whose height varies with the main image's aspect ratio. 
-     * Using position:absolute with top:% caused the neighbors to appear at different vertical positions depending on whether the main image was portrait landscape.
+     * Using position:absolute with top:% caused the neighbors to appear at different vertical positions depending on whether the main image was portrait or landscape.
      * Fixed + bottom keeps them at a consistent position regardless of image dimensions.
      */
   position: fixed;

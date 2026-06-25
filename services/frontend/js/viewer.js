@@ -80,7 +80,6 @@
     copyBtn: "#copyUrlBtn",
     downloadBtn: "#downloadBtn",
     deleteBtn: "#deleteBtn",
-    back: ".back-to-gallery",
     viewer: "#image-viewer",
     viewerImg: "#viewer-image",
     viewerContent: ".viewer-content", // wrapper around main image + neighbors
@@ -112,7 +111,6 @@
   const copyBtn = $(SEL.copyBtn);
   const downloadBtn = $(SEL.downloadBtn);
   const deleteBtn = $(SEL.deleteBtn);
-  const back = $(SEL.back);
 
   // Slideshow state
   let currentIndex = -1;
@@ -165,10 +163,6 @@
     // -----------------------------------------------------------------------
     // Action buttons
     // -----------------------------------------------------------------------
-
-    back.addEventListener("click", () => {
-      window.location.href = "/upload.html#images";
-    });
 
     copyBtn.addEventListener("click", async () => {
       try {

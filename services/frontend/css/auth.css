@@ -21,6 +21,8 @@ body {
   margin: 0;
   font-family: Inter, sans-serif;
   background-color: var(--color-bg);
+  /* Base text colour  ensures all un-styled text respects the active theme token. */
+  color: var(--color-text);
 }
 
 button {
@@ -370,9 +372,13 @@ button {
   width: 36px;
   height: 36px;
   border-radius: 50%;
-  background: transparent;
-  border: 2px solid var(--color-accent-border);
-  color: var(--color-text-muted);
+  /*
+   * Use a tinted background rather than transparent so the button is legible on both the white auth-card area and the #f2f5ff page bg.
+   * In dark mode the surface-alt token gives the same effect on dark bg.
+   */
+  background: var(--color-surface-alt);
+  border: 2px solid var(--color-accent);
+  color: var(--color-accent);
   cursor: pointer;
   flex-shrink: 0;
   transition:
@@ -383,9 +389,9 @@ button {
 }
 
 .theme-toggle:hover {
-  background-color: var(--color-accent-light);
+  background-color: var(--color-accent);
   border-color: var(--color-accent);
-  color: var(--color-accent);
+  color: #ffffff;
   transform: scale(1.08);
 }
 
