@@ -87,6 +87,39 @@ body {
   min-width: 90px;
 }
 
+/*
+ * Theme toggle button - strips all browser-default button chrome (border, background, outline) and renders as a 40×40 circular icon button that
+ * matches the account/admin icon dimensions.
+ * The SVG icon inside is injected by theme.js at runtime.
+ */
+.theme-toggle {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: 2px solid var(--color-border);
+  background-color: var(--color-surface);
+  color: var(--color-text-secondary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  padding: 0;
+  transition:
+    background-color 0.2s,
+    border-color 0.2s,
+    color 0.2s,
+    transform 0.2s;
+  box-sizing: border-box;
+  flex-shrink: 0;
+}
+
+.theme-toggle:hover {
+  background-color: var(--color-accent-light);
+  border-color: var(--color-accent);
+  color: var(--color-accent);
+  transform: scale(1.08);
+}
+
 /* Account icon - top-right corner, links to account.html */
 .account-icon-link {
   text-decoration: none;

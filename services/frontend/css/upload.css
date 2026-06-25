@@ -118,7 +118,7 @@ button {
 }
 
 /*
- * Theme toggle button  strips all browser-default button chrome (border, background, outline) and renders as a 40×40 circular icon button that
+ * Theme toggle button - strips all browser-default button chrome (border, background, outline) and renders as a 40×40 circular icon button that
  * matches the account/admin icon dimensions.
  * The SVG icon inside is injected by theme.js at runtime.
  */
