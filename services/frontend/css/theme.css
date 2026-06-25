@@ -1,0 +1,193 @@
+/* =============================================================================
+   The design token layer for the Image Hosting Application.
+   All colour decisions live here. No rule in this file should reference any HTML class or element; it only defines custom properties on :root / [data-theme].
+
+   USAGE
+   -----
+   Every other CSS file must import this file (via <link> in <head>) BEFORE its own rules, then reference colours exclusively through var(--token-name).
+
+   THEME SWITCHING
+   ---------------
+   theme.js sets data-theme="dark" | "light" on <html> based on localStorage.
+   A bare :root block provides the light palette as the default.
+   The @media block applies dark values when the OS preference is dark AND the user has not pinned a theme manually (i.e. no data-theme attribute at all).
+   The [data-theme="dark"] block is the explicit override and always wins.
+
+   TOKEN NAMING
+   ------------
+   --color-bg              Page / body background
+   --color-surface         Card, modal, input background (one level above bg)
+   --color-surface-alt     Slightly tinted surface (stat cards, table stripes)
+   --color-surface-input   Input field background
+   --color-border          Default border / divider colour
+   --color-border-focus    Input focus ring
+   --color-text            Primary body text
+   --color-text-secondary  Secondary / muted text (descriptions, subtitles)
+   --color-hint            Placeholder text, label hints (#adc0f8 family)
+   --color-accent          Brand blue - primary buttons, active states
+   --color-accent-hover    Darker blue for hover states
+   --color-accent-light    Low-opacity blue tint (card backgrounds, hover fills)
+   --color-accent-mid      Mid-blue used in pagination, badge borders
+   --color-danger          Destructive actions (delete, error)
+   --color-danger-hover    Darker red for hover
+   --color-danger-light    Low-opacity red tint (danger stat card, badge bg)
+   --color-success         Success badge / icon colour
+   --color-success-light   Low-opacity green tint (badge bg)
+   --color-warning         Warning badge colour (locked-out state)
+   --color-warning-light   Low-opacity orange tint (badge bg)
+   --color-shadow          Box-shadow colour (rgba, so kept as a full value)
+   --color-modal-overlay   Semi-transparent backdrop for modals
+   --color-viewer-gold     Viewer page accent (darkgoldenrod - intentional style)
+   --color-viewer-btn-bg   Viewer action button background (intentional dark)
+   ============================================================================= */
+
+/* ---------------------------------------------------------------------------
+   Light theme (default)
+   --------------------------------------------------------------------------- */
+
+:root {
+  /* Backgrounds */
+  --color-bg:             #f2f5ff;
+  --color-surface:        #ffffff;
+  --color-surface-alt:    #f2f5ff;
+  --color-surface-input:  #fafafa;
+
+  /* Borders */
+  --color-border:         #e0e0e0;
+  --color-border-focus:   #4676fb;
+  --color-border-card:    #eef1fb;
+
+  /* Text */
+  --color-text:           #0b0b0b;
+  --color-text-secondary: #555555;
+  --color-text-muted:     #6f86c9;
+  --color-hint:           #adc0f8;
+
+  /* Accent (brand blue) */
+  --color-accent:         #0060ff;
+  --color-accent-hover:   #0052e0;
+  --color-accent-light:   rgba(70, 118, 251, 0.08);
+  --color-accent-mid:     rgba(0, 96, 255, 0.08);
+  --color-accent-border:  #adc0f8;
+
+  /* Semantic colours */
+  --color-danger:         #f44336;
+  --color-danger-hover:   #d32f2f;
+  --color-danger-light:   rgba(244, 67, 54, 0.08);
+  --color-success:        #4caf50;
+  --color-success-light:  rgba(76, 175, 80, 0.12);
+  --color-warning:        #e68a00;
+  --color-warning-light:  rgba(255, 152, 0, 0.12);
+
+  /* Shadows & overlays */
+  --color-shadow:         rgba(70, 118, 251, 0.10);
+  --color-shadow-modal:   rgba(0, 0, 0, 0.25);
+  --color-modal-overlay:  rgba(0, 0, 0, 0.55);
+
+  /* Viewer page - intentional dark aesthetic kept in both themes */
+  --color-viewer-gold:    darkgoldenrod;
+  --color-viewer-btn-bg:  #1a1a1a;
+  --color-viewer-btn-fg:  darkgoldenrod;
+
+  /* Theme toggle icon hint (used by theme.js to know current state) */
+  --theme-is-dark: 0;
+}
+
+/* ---------------------------------------------------------------------------
+   Dark theme - explicit pin via data-theme="dark" (set by theme.js)
+   --------------------------------------------------------------------------- */
+
+[data-theme="dark"] {
+  /* Backgrounds */
+  --color-bg:             #0f1117;
+  --color-surface:        #1a1d27;
+  --color-surface-alt:    #20243a;
+  --color-surface-input:  #13161f;
+
+  /* Borders */
+  --color-border:         #2e3354;
+  --color-border-focus:   #4676fb;
+  --color-border-card:    #252943;
+
+  /* Text */
+  --color-text:           #e8ecf5;
+  --color-text-secondary: #9aa3be;
+  --color-text-muted:     #6272a4;
+  --color-hint:           #4a5580;
+
+  /* Accent - same blue, slightly brighter on dark bg */
+  --color-accent:         #4d8cff;
+  --color-accent-hover:   #3a7aff;
+  --color-accent-light:   rgba(77, 140, 255, 0.12);
+  --color-accent-mid:     rgba(77, 140, 255, 0.10);
+  --color-accent-border:  #3a4875;
+
+  /* Semantic colours - slightly desaturated to avoid harshness on dark */
+  --color-danger:         #ef5350;
+  --color-danger-hover:   #c62828;
+  --color-danger-light:   rgba(239, 83, 80, 0.12);
+  --color-success:        #66bb6a;
+  --color-success-light:  rgba(102, 187, 106, 0.12);
+  --color-warning:        #ffa726;
+  --color-warning-light:  rgba(255, 167, 38, 0.12);
+
+  /* Shadows & overlays - deeper on dark bg */
+  --color-shadow:         rgba(0, 0, 0, 0.35);
+  --color-shadow-modal:   rgba(0, 0, 0, 0.60);
+  --color-modal-overlay:  rgba(0, 0, 0, 0.75);
+
+  /* Viewer - gold pops well on dark; keep it */
+  --color-viewer-gold:    #d4a017;
+  --color-viewer-btn-bg:  #0a0a0a;
+  --color-viewer-btn-fg:  #d4a017;
+
+  --theme-is-dark: 1;
+}
+
+/* ---------------------------------------------------------------------------
+   Dark theme - OS-level preference fallback (no manual pin)
+   Applies when the user hasn't toggled anything; respects prefers-color-scheme.
+   The :not([data-theme="light"]) guard ensures a manually-pinned light theme wins over the OS dark preference.
+   --------------------------------------------------------------------------- */
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --color-bg:             #0f1117;
+    --color-surface:        #1a1d27;
+    --color-surface-alt:    #20243a;
+    --color-surface-input:  #13161f;
+
+    --color-border:         #2e3354;
+    --color-border-focus:   #4676fb;
+    --color-border-card:    #252943;
+
+    --color-text:           #e8ecf5;
+    --color-text-secondary: #9aa3be;
+    --color-text-muted:     #6272a4;
+    --color-hint:           #4a5580;
+
+    --color-accent:         #4d8cff;
+    --color-accent-hover:   #3a7aff;
+    --color-accent-light:   rgba(77, 140, 255, 0.12);
+    --color-accent-mid:     rgba(77, 140, 255, 0.10);
+    --color-accent-border:  #3a4875;
+
+    --color-danger:         #ef5350;
+    --color-danger-hover:   #c62828;
+    --color-danger-light:   rgba(239, 83, 80, 0.12);
+    --color-success:        #66bb6a;
+    --color-success-light:  rgba(102, 187, 106, 0.12);
+    --color-warning:        #ffa726;
+    --color-warning-light:  rgba(255, 167, 38, 0.12);
+
+    --color-shadow:         rgba(0, 0, 0, 0.35);
+    --color-shadow-modal:   rgba(0, 0, 0, 0.60);
+    --color-modal-overlay:  rgba(0, 0, 0, 0.75);
+
+    --color-viewer-gold:    #d4a017;
+    --color-viewer-btn-bg:  #0a0a0a;
+    --color-viewer-btn-fg:  #d4a017;
+
+    --theme-is-dark: 1;
+  }
+}
