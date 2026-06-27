@@ -17,30 +17,24 @@
   <link rel="stylesheet" href="css/auth.css" />
     <script src="js/index.js" defer></script>
   <script src="js/theme.js" defer></script>
+  <script src="js/lang.js" defer></script>
   </head>
   <body>
     <div class="page-container">
-      <!-- ==================== HEADER ==================== -->
       <header class="header-container">
-        <!--
-            Clicking the title reloads the login page.
-            index.js redirects already-logged-in users to upload.html before this page renders, so this link is only ever reached by
-            unauthenticated visitors - for them, "home" is here.
-        -->
         <a href="index.html" class="header-link">
           <h1 class="header-title">Image Hosting</h1>
         </a>
-        <p class="header-subtitle">Your personal image gallery.</p>
+        <p class="header-subtitle" data-i18n="account.subtitle">Your personal image gallery.</p>
       </header>
 
-      <!-- ==================== LOGIN FORM ==================== -->
       <main class="auth-container">
         <div class="auth-card">
-          <h2 class="auth-heading">Sign In</h2>
+          <h2 class="auth-heading" data-i18n="index.heading">Sign In</h2>
 
           <form class="auth-form" id="login-form" novalidate>
             <div class="form-group">
-              <label for="email">Email</label>
+              <label for="email" data-i18n="index.label.email">Email</label>
               <input
                 type="email"
                 id="email"
@@ -49,12 +43,11 @@
                 autocomplete="email"
                 required
               />
-              <!-- Inline validation message shown by JS if the field is empty/malformed -->
               <span class="field-error" id="email-error"></span>
             </div>
 
             <div class="form-group">
-              <label for="password">Password</label>
+              <label for="password" data-i18n="index.label.pass">Password</label>
               <input
                 type="password"
                 id="password"
@@ -66,98 +59,62 @@
               <span class="field-error" id="password-error"></span>
             </div>
 
-            <button type="submit" class="btn btn-primary" id="login-btn">
+            <button type="submit" class="btn btn-primary" id="login-btn" data-i18n="index.btn.submit">
               Sign In
             </button>
           </form>
 
           <p class="auth-switch">
-            Don't have an account?
-            <a href="register.html" class="auth-link">Create one</a>
+            <span data-i18n="index.switch">Don't have an account?</span>
+            <a href="register.html" class="auth-link" data-i18n="index.switch.link">Create one</a>
           </p>
         </div>
       </main>
     </div>
-    <!-- /.page-container -->
 
-    <!-- ==================== MODALS ==================== -->
-
-    <!--
-    Wrong credentials modal.
-    Shown by index.js when POST /auth/login returns 401.
-    Closed by clicking the OK button or anywhere on the overlay.
--->
-    <div
-      class="modal-overlay"
-      id="wrong-credentials-overlay"
-      role="dialog"
-      aria-modal="true"
-      aria-labelledby="wc-title"
-      hidden
-    >
+    <!-- Wrong credentials modal -->
+    <div class="modal-overlay" id="wrong-credentials-overlay" role="dialog" aria-modal="true" aria-labelledby="wc-title" hidden>
       <div class="modal">
-        <h3 class="modal-title" id="wc-title">Sign In Failed</h3>
-        <p class="modal-body">Incorrect email or password. Please try again.</p>
+        <h3 class="modal-title" id="wc-title" data-i18n="index.modal.wrong_creds.title">Sign In Failed</h3>
+        <p class="modal-body" data-i18n="index.modal.wrong_creds.body">Incorrect email or password. Please try again.</p>
         <div class="modal-actions">
-          <button class="btn btn-primary" id="wrong-credentials-ok">OK</button>
+          <button class="btn btn-primary" id="wrong-credentials-ok" data-i18n="modal.btn.ok">OK</button>
         </div>
       </div>
     </div>
 
     <!--
-    Account locked modal.
-    Shown when the backend returns 429 after too many failed login attempts.
-    The body text is filled in by index.js from the response's `detail` field, so the exact wait time / unlock instructions stay in sync with whatever the backend (config.LOCKOUT_DURATION_MINUTES) actually says.
--->
-    <div
-      class="modal-overlay"
-      id="account-locked-overlay"
-      role="dialog"
-      aria-modal="true"
-      aria-labelledby="al-title"
-      hidden
-    >
+      Account locked modal.
+      Body text is filled by index.js from the server response's `detail` field, so the wait time always matches the backend config.
+    -->
+    <div class="modal-overlay" id="account-locked-overlay" role="dialog" aria-modal="true" aria-labelledby="al-title" hidden>
       <div class="modal">
-        <h3 class="modal-title" id="al-title">Account Temporarily Locked</h3>
-        <p class="modal-body" id="al-body">
+        <h3 class="modal-title" id="al-title" data-i18n="index.modal.locked.title">Account Temporarily Locked</h3>
+        <p class="modal-body" id="al-body" data-i18n="index.modal.locked.body">
           Too many failed login attempts. Please try again later.
         </p>
         <div class="modal-actions">
-          <button class="btn btn-primary" id="account-locked-ok">OK</button>
+          <button class="btn btn-primary" id="account-locked-ok" data-i18n="modal.btn.ok">OK</button>
         </div>
       </div>
     </div>
 
-    <!--
-    Generic server error modal.
-    Shown when the backend returns an unexpected 5xx response.
--->
-    <div
-      class="modal-overlay"
-      id="server-error-overlay"
-      role="dialog"
-      aria-modal="true"
-      aria-labelledby="se-title"
-      hidden
-    >
+    <!-- Generic server error modal -->
+    <div class="modal-overlay" id="server-error-overlay" role="dialog" aria-modal="true" aria-labelledby="se-title" hidden>
       <div class="modal">
-        <h3 class="modal-title" id="se-title">Something Went Wrong</h3>
-        <p class="modal-body">
+        <h3 class="modal-title" id="se-title" data-i18n="index.modal.server_err.title">Something Went Wrong</h3>
+        <p class="modal-body" data-i18n="index.modal.server_err.body">
           The server returned an unexpected error. Please try again in a moment.
         </p>
         <div class="modal-actions">
-          <button class="btn btn-primary" id="server-error-ok">OK</button>
+          <button class="btn btn-primary" id="server-error-ok" data-i18n="modal.btn.ok">OK</button>
         </div>
       </div>
     </div>
 
-    <!-- Theme toggle - fixed top-left; uses .theme-toggle--fixed from auth.css -->
-    <button
-      class="theme-toggle theme-toggle--fixed"
-      id="theme-toggle"
-      aria-label="Switch theme"
-      title="Switch theme"
-      type="button"
-    ></button>
+    <!-- Theme toggle - fixed top-left -->
+    <button class="theme-toggle theme-toggle--fixed" id="theme-toggle" aria-label="Switch theme" title="Switch theme" type="button"></button>
+    <!-- Language toggle - fixed top-left, beside theme toggle -->
+    <button class="lang-toggle lang-toggle--fixed" id="lang-toggle" aria-label="Switch to Ukrainian" title="Switch to Ukrainian" type="button">UA</button>
   </body>
 </html>

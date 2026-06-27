@@ -18,92 +18,61 @@
     <link rel="stylesheet" href="css/account.css" />
     <script src="js/account.js" defer></script>
   <script src="js/theme.js" defer></script>
+  <script src="js/lang.js" defer></script>
   </head>
   <body>
     <div class="page-container">
-      <!-- ==================== HEADER ==================== -->
       <header class="header-container">
-        <!--
-            Clicking the title returns to the gallery.
-            account.js also redirects here if no token is found.
-        -->
         <a class="header-link" id="back-to-the-gallery-link">
           <h1 class="header-title">Image Hosting</h1>
         </a>
-        <p class="header-subtitle">Your personal image gallery.</p>
+        <p class="header-subtitle" data-i18n="account.subtitle">Your personal image gallery.</p>
       </header>
 
-      <!-- ==================== ACCOUNT PAGE ==================== -->
       <main class="account-main">
         <!-- LEFT PANEL: navigation / actions -->
         <aside class="account-sidebar">
-          <!-- Safe navigation -->
           <nav class="sidebar-nav">
-            <button
-              class="sidebar-btn sidebar-btn--active"
-              id="nav-info"
-              data-target="section-info"
-            >
+            <button class="sidebar-btn sidebar-btn--active" id="nav-info" data-target="section-info" data-i18n="account.nav.info">
               My Info
             </button>
-            <button
-              class="sidebar-btn"
-              id="nav-password"
-              data-target="section-password"
-            >
+            <button class="sidebar-btn" id="nav-password" data-target="section-password" data-i18n="account.nav.password">
               Change Password
             </button>
           </nav>
 
           <!--
-                Danger zone - visually separated to prevent accidental clicks.
-                Logout is moderate (reversible); Delete Account is destructive.
-            -->
+            Danger zone - visually separated to prevent accidental clicks.
+            Logout is moderate (reversible); Delete Account is destructive.
+          -->
           <div class="sidebar-danger-zone">
-            <span class="danger-label">Account Actions</span>
-            <button class="btn btn-secondary" id="logout-btn">Log Out</button>
-            <button class="btn btn-danger" id="delete-account-btn">
-              Delete Account
-            </button>
+            <span class="danger-label" data-i18n="account.danger.label">Account Actions</span>
+            <button class="btn btn-secondary" id="logout-btn" data-i18n="account.btn.logout">Log Out</button>
+            <button class="btn btn-danger" id="delete-account-btn" data-i18n="account.btn.delete">Delete Account</button>
           </div>
         </aside>
 
         <!-- RIGHT PANEL: content sections (only one shown at a time) -->
         <div class="account-content">
-          <!-- ---- My Info ---- -->
+          <!-- My Info -->
           <section class="account-section" id="section-info">
-            <h2 class="section-title">My Info</h2>
-
+            <h2 class="section-title" data-i18n="account.info.title">My Info</h2>
             <dl class="info-list">
-              <dt>Email</dt>
-              <!--
-                        account.js decodes the JWT or calls /auth/me to get
-                        the user's email and fills this in at load time.
-                    -->
+              <dt data-i18n="account.info.email">Email</dt>
+              <!-- account.js fills this from GET /auth/me -->
               <dd id="info-email">-</dd>
-
-              <dt>Member Since</dt>
+              <dt data-i18n="account.info.since">Member Since</dt>
               <dd id="info-created-at">-</dd>
             </dl>
           </section>
 
-          <!-- ---- Change Password ---- -->
-          <section
-            class="account-section account-section--hidden"
-            id="section-password"
-          >
-            <h2 class="section-title">Change Password</h2>
+          <!-- Change Password -->
+          <section class="account-section account-section--hidden" id="section-password">
+            <h2 class="section-title" data-i18n="account.pw.title">Change Password</h2>
 
-            <!--
-                    No "forgot password" link here - the user is already
-                    logged in, so they know their current password.
-                    If a user forgets their password entirely, they must
-                    contact the administrator who can reset it directly
-                    in the database.
-                -->
             <form class="auth-form" id="change-password-form" novalidate>
               <div class="form-group">
-                <label for="current-password">Current Password</label>
+                <label for="current-password" data-i18n="account.pw.label.current">Current Password</label>
                 <input
                   type="password"
                   id="current-password"
@@ -116,7 +85,7 @@
               </div>
 
               <div class="form-group">
-                <label for="new-password">New Password</label>
+                <label for="new-password" data-i18n="account.pw.label.new">New Password</label>
                 <input
                   type="password"
                   id="new-password"
@@ -130,7 +99,7 @@
               </div>
 
               <div class="form-group">
-                <label for="confirm-new-password">Confirm New Password</label>
+                <label for="confirm-new-password" data-i18n="account.pw.label.confirm">Confirm New Password</label>
                 <input
                   type="password"
                   id="confirm-new-password"
@@ -139,157 +108,86 @@
                   autocomplete="new-password"
                   required
                 />
-                <span
-                  class="field-error"
-                  id="confirm-new-password-error"
-                ></span>
+                <span class="field-error" id="confirm-new-password-error"></span>
               </div>
 
-              <button
-                type="submit"
-                class="btn btn-primary"
-                id="change-password-btn"
-              >
+              <button type="submit" class="btn btn-primary" id="change-password-btn" data-i18n="account.pw.btn.submit">
                 Save New Password
               </button>
             </form>
           </section>
         </div>
-        <!-- /.account-content -->
       </main>
     </div>
-    <!-- /.page-container -->
 
-    <!-- ==================== MODALS ==================== -->
-
-    <!--
-    Logout confirmation.
-    Shown when the user clicks "Log Out".
-    Confirms before clearing the token and redirecting to index.html.
--->
-    <div
-      class="modal-overlay"
-      id="logout-overlay"
-      role="dialog"
-      aria-modal="true"
-      aria-labelledby="lo-title"
-      hidden
-    >
+    <!-- Logout confirmation modal -->
+    <div class="modal-overlay" id="logout-overlay" role="dialog" aria-modal="true" aria-labelledby="lo-title" hidden>
       <div class="modal">
-        <h3 class="modal-title" id="lo-title">Log Out?</h3>
-        <p class="modal-body">
+        <h3 class="modal-title" id="lo-title" data-i18n="account.modal.logout.title">Log Out?</h3>
+        <p class="modal-body" data-i18n="account.modal.logout.body">
           You will be signed out and returned to the login page.
         </p>
         <div class="modal-actions">
-          <button class="btn btn-secondary" id="logout-cancel">Cancel</button>
-          <button class="btn btn-primary" id="logout-confirm">Log Out</button>
+          <button class="btn btn-secondary" id="logout-cancel" data-i18n="account.modal.logout.cancel">Cancel</button>
+          <button class="btn btn-primary" id="logout-confirm" data-i18n="account.modal.logout.confirm">Log Out</button>
         </div>
       </div>
     </div>
 
-    <!--
-    Delete account confirmation - step 1.
-    Initial warning before the irreversible action.
--->
-    <div
-      class="modal-overlay"
-      id="delete-account-overlay"
-      role="dialog"
-      aria-modal="true"
-      aria-labelledby="da-title"
-      hidden
-    >
+    <!-- Delete account confirmation modal -->
+    <div class="modal-overlay" id="delete-account-overlay" role="dialog" aria-modal="true" aria-labelledby="da-title" hidden>
       <div class="modal">
-        <h3 class="modal-title modal-title--danger" id="da-title">
-          Delete Account?
-        </h3>
-        <p class="modal-body">
-          This will permanently delete your account and
-          <strong>all your uploaded images</strong>. This action cannot be
-          undone.
+        <h3 class="modal-title modal-title--danger" id="da-title" data-i18n="account.modal.delete.title">Delete Account?</h3>
+        <p class="modal-body" data-i18n="account.modal.delete.body">
+          This will permanently delete your account and <strong>all your uploaded images</strong>. This action cannot be undone.
         </p>
         <div class="modal-actions">
-          <button class="btn btn-secondary" id="delete-account-cancel">
-            Cancel
-          </button>
-          <button class="btn btn-danger" id="delete-account-confirm">
+          <button class="btn btn-secondary" id="delete-account-cancel" data-i18n="account.modal.delete.cancel">Cancel</button>
+          <button class="btn btn-danger" id="delete-account-confirm" data-i18n="account.modal.delete.confirm">
             Yes, Delete My Account
           </button>
         </div>
       </div>
     </div>
 
-    <!--
-    Password changed successfully.
--->
-    <div
-      class="modal-overlay"
-      id="password-success-overlay"
-      role="dialog"
-      aria-modal="true"
-      aria-labelledby="ps-title"
-      hidden
-    >
+    <!-- Password changed successfully modal -->
+    <div class="modal-overlay" id="password-success-overlay" role="dialog" aria-modal="true" aria-labelledby="ps-title" hidden>
       <div class="modal">
-        <h3 class="modal-title" id="ps-title">Password Updated</h3>
-        <p class="modal-body">Your password has been changed successfully.</p>
+        <h3 class="modal-title" id="ps-title" data-i18n="account.modal.pw_success.title">Password Updated</h3>
+        <p class="modal-body" data-i18n="account.modal.pw_success.body">Your password has been changed successfully.</p>
         <div class="modal-actions">
-          <button class="btn btn-primary" id="password-success-ok">OK</button>
+          <button class="btn btn-primary" id="password-success-ok" data-i18n="modal.btn.ok">OK</button>
         </div>
       </div>
     </div>
 
-    <!--
-    Wrong current password (when user tries to change password).
--->
-    <div
-      class="modal-overlay"
-      id="wrong-password-overlay"
-      role="dialog"
-      aria-modal="true"
-      aria-labelledby="wp-title"
-      hidden
-    >
+    <!-- Wrong current password modal -->
+    <div class="modal-overlay" id="wrong-password-overlay" role="dialog" aria-modal="true" aria-labelledby="wp-title" hidden>
       <div class="modal">
-        <h3 class="modal-title" id="wp-title">Incorrect Password</h3>
-        <p class="modal-body">
+        <h3 class="modal-title" id="wp-title" data-i18n="account.modal.wrong_pw.title">Incorrect Password</h3>
+        <p class="modal-body" data-i18n="account.modal.wrong_pw.body">
           The current password you entered is incorrect. Please try again.
         </p>
         <div class="modal-actions">
-          <button class="btn btn-primary" id="wrong-password-ok">OK</button>
+          <button class="btn btn-primary" id="wrong-password-ok" data-i18n="modal.btn.ok">OK</button>
         </div>
       </div>
     </div>
 
-    <!--
-    Generic server error.
--->
-    <div
-      class="modal-overlay"
-      id="server-error-overlay"
-      role="dialog"
-      aria-modal="true"
-      aria-labelledby="se-title"
-      hidden
-    >
+    <!-- Generic server error modal -->
+    <div class="modal-overlay" id="server-error-overlay" role="dialog" aria-modal="true" aria-labelledby="se-title" hidden>
       <div class="modal">
-        <h3 class="modal-title" id="se-title">Something Went Wrong</h3>
-        <p class="modal-body">
+        <h3 class="modal-title" id="se-title" data-i18n="account.modal.server_err.title">Something Went Wrong</h3>
+        <p class="modal-body" data-i18n="account.modal.server_err.body">
           The server returned an unexpected error. Please try again in a moment.
         </p>
         <div class="modal-actions">
-          <button class="btn btn-primary" id="server-error-ok">OK</button>
+          <button class="btn btn-primary" id="server-error-ok" data-i18n="modal.btn.ok">OK</button>
         </div>
       </div>
     </div>
 
-    <!-- Theme toggle - fixed top-left; uses .theme-toggle--fixed from auth.css -->
-    <button
-      class="theme-toggle theme-toggle--fixed"
-      id="theme-toggle"
-      aria-label="Switch theme"
-      title="Switch theme"
-      type="button"
-    ></button>
+    <button class="theme-toggle theme-toggle--fixed" id="theme-toggle" aria-label="Switch theme" title="Switch theme" type="button"></button>
+    <button class="lang-toggle lang-toggle--fixed" id="lang-toggle" aria-label="Switch to Ukrainian" title="Switch to Ukrainian" type="button">UA</button>
   </body>
 </html>

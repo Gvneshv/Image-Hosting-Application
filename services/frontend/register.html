@@ -17,25 +17,24 @@
   <link rel="stylesheet" href="css/auth.css" />
     <script src="js/register.js" defer></script>
   <script src="js/theme.js" defer></script>
+  <script src="js/lang.js" defer></script>
   </head>
   <body>
     <div class="page-container">
-      <!-- ==================== HEADER ==================== -->
       <header class="header-container">
         <a href="index.html" class="header-link">
           <h1 class="header-title">Image Hosting</h1>
         </a>
-        <p class="header-subtitle">Your personal image gallery.</p>
+        <p class="header-subtitle" data-i18n="account.subtitle">Your personal image gallery.</p>
       </header>
 
-      <!-- ==================== REGISTRATION FORM ==================== -->
       <main class="auth-container">
         <div class="auth-card">
-          <h2 class="auth-heading">Create Account</h2>
+          <h2 class="auth-heading" data-i18n="register.heading">Create Account</h2>
 
           <form class="auth-form" id="register-form" novalidate>
             <div class="form-group">
-              <label for="email">Email</label>
+              <label for="email" data-i18n="register.label.email">Email</label>
               <input
                 type="email"
                 id="email"
@@ -48,7 +47,7 @@
             </div>
 
             <div class="form-group">
-              <label for="password">Password</label>
+              <label for="password" data-i18n="register.label.pass">Password</label>
               <input
                 type="password"
                 id="password"
@@ -62,7 +61,7 @@
             </div>
 
             <div class="form-group">
-              <label for="confirm-password">Confirm Password</label>
+              <label for="confirm-password" data-i18n="register.label.confirm">Confirm Password</label>
               <input
                 type="password"
                 id="confirm-password"
@@ -74,97 +73,57 @@
               <span class="field-error" id="confirm-password-error"></span>
             </div>
 
-            <button type="submit" class="btn btn-primary" id="register-btn">
+            <button type="submit" class="btn btn-primary" id="register-btn" data-i18n="register.btn.submit">
               Create Account
             </button>
           </form>
 
           <p class="auth-switch">
-            Already have an account?
-            <a href="index.html" class="auth-link">Sign in</a>
+            <span data-i18n="register.switch">Already have an account?</span>
+            <a href="index.html" class="auth-link" data-i18n="register.switch.link">Sign in</a>
           </p>
         </div>
       </main>
     </div>
-    <!-- /.page-container -->
 
-    <!-- ==================== MODALS ==================== -->
-
-    <!--
-    Email already registered modal.
-    Shown by register.js when POST /auth/register returns 400.
--->
-    <div
-      class="modal-overlay"
-      id="email-taken-overlay"
-      role="dialog"
-      aria-modal="true"
-      aria-labelledby="et-title"
-      hidden
-    >
+    <!-- Email already registered modal -->
+    <div class="modal-overlay" id="email-taken-overlay" role="dialog" aria-modal="true" aria-labelledby="et-title" hidden>
       <div class="modal">
-        <h3 class="modal-title" id="et-title">Email Already in Use</h3>
+        <h3 class="modal-title" id="et-title" data-i18n="register.modal.email_taken.title">Email Already in Use</h3>
         <p class="modal-body">
-          An account with this email address already exists.
-          <a href="index.html" class="auth-link">Sign in instead?</a>
+          <span data-i18n="register.modal.email_taken.body">An account with this email address already exists.</span>
+          <a href="index.html" class="auth-link" data-i18n="register.modal.email_taken.link">Sign in instead?</a>
         </p>
         <div class="modal-actions">
-          <button class="btn btn-primary" id="email-taken-ok">OK</button>
+          <button class="btn btn-primary" id="email-taken-ok" data-i18n="modal.btn.ok">OK</button>
         </div>
       </div>
     </div>
 
-    <!--
-    Registration success modal.
-    Shown briefly after a successful registration before redirecting to login.
--->
-    <div
-      class="modal-overlay"
-      id="register-success-overlay"
-      role="dialog"
-      aria-modal="true"
-      aria-labelledby="rs-title"
-      hidden
-    >
+    <!-- Registration success modal - JS auto-redirects after 2.5s, no close button needed -->
+    <div class="modal-overlay" id="register-success-overlay" role="dialog" aria-modal="true" aria-labelledby="rs-title" hidden>
       <div class="modal">
-        <h3 class="modal-title" id="rs-title">Account Created!</h3>
-        <p class="modal-body">
-          Your account has been created successfully. You will be redirected to
-          the sign-in page now.
+        <h3 class="modal-title" id="rs-title" data-i18n="register.modal.success.title">Account Created!</h3>
+        <p class="modal-body" data-i18n="register.modal.success.body">
+          Your account has been created successfully. You will be redirected to the sign-in page now.
         </p>
-        <!-- No button needed - JS auto-redirects after a short delay -->
       </div>
     </div>
 
-    <!--
-    Generic server error modal.
--->
-    <div
-      class="modal-overlay"
-      id="server-error-overlay"
-      role="dialog"
-      aria-modal="true"
-      aria-labelledby="se-title"
-      hidden
-    >
+    <!-- Generic server error modal -->
+    <div class="modal-overlay" id="server-error-overlay" role="dialog" aria-modal="true" aria-labelledby="se-title" hidden>
       <div class="modal">
-        <h3 class="modal-title" id="se-title">Something Went Wrong</h3>
-        <p class="modal-body">
+        <h3 class="modal-title" id="se-title" data-i18n="register.modal.server_err.title">Something Went Wrong</h3>
+        <p class="modal-body" data-i18n="register.modal.server_err.body">
           The server returned an unexpected error. Please try again in a moment.
         </p>
         <div class="modal-actions">
-          <button class="btn btn-primary" id="server-error-ok">OK</button>
+          <button class="btn btn-primary" id="server-error-ok" data-i18n="modal.btn.ok">OK</button>
         </div>
       </div>
     </div>
 
-    <!-- Theme toggle - fixed top-left; uses .theme-toggle--fixed from auth.css -->
-    <button
-      class="theme-toggle theme-toggle--fixed"
-      id="theme-toggle"
-      aria-label="Switch theme"
-      title="Switch theme"
-      type="button"
-    ></button>
+    <button class="theme-toggle theme-toggle--fixed" id="theme-toggle" aria-label="Switch theme" title="Switch theme" type="button"></button>
+    <button class="lang-toggle lang-toggle--fixed" id="lang-toggle" aria-label="Switch to Ukrainian" title="Switch to Ukrainian" type="button">UA</button>
   </body>
 </html>
