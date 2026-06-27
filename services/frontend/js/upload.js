@@ -3,13 +3,15 @@
  * - Auth guard: redirects unauthenticated visitors to index.html
  * - Account icon: fetches initials from GET /auth/me and populates the account icon
  * - Upload via button or drag-&-drop
- * - List uploaded images
+ * - List uploaded images with pagination and sorting
  * - Delete images
+ *
+ * Depends on lang.js for all user-visible strings via window.t().
+ * Re-renders dynamic controls on "langchange" events dispatched by lang.js.
  */
 (async () => {
   /* --------------------------------------------------------------------
    *  AUTH GUARD
-   *  Runs before any DOM work.  If no token is present the user has no business being here - send them to the login page immediately.
    * ------------------------------------------------------------------ */
   const token = localStorage.getItem("access_token");
   if (!token) {
@@ -17,13 +19,7 @@
   }
 
   /* --------------------------------------------------------------------
-   *  ACCOUNT ICON - populate initials from the JWT email claim.
-   *
-   *  The JWT payload is base64url-encoded JSON.
-   *  We decode it client-side purely for display purposes (the email shown on the icon).
-   *  The server re-validates the token's signature on every API request, so there is no security risk in reading the payload here.
-   *
-   *  Fallback: if the token is malformed or the email is missing, the default SVG person icon defined in upload.html remains visible.
+   *  ACCOUNT ICON - populate initials from the JWT email claim
    * ------------------------------------------------------------------ */
   (() => {
     try {
@@ -33,8 +29,6 @@
       const email = payload?.sub ?? payload?.email ?? "";
       if (!email) return;
 
-      // Use the part before the @ as the display name.
-      // Take up to the first two "words" split on non-alpha chars, then grab the first character of each -> e.g. "john.doe" -> "JD".
       const parts = email
         .split("@")[0]
         .split(/[^a-zA-Z]+/)
@@ -47,48 +41,31 @@
 
       const iconEl = document.getElementById("account-icon");
       if (!iconEl) return;
-
-      iconEl.textContent = initials; // replaces the default SVG
+      iconEl.textContent = initials;
       iconEl.setAttribute("aria-label", email);
     } catch {
       // Malformed token - leave the default SVG in place.
-      // The next API call will get a 401 and authFetch will redirect.
     }
   })();
 
   /* --------------------------------------------------------------------
-   *  ADMIN ICON - reveal the link to admin.html for admin users only.
-   *
-   *  is_admin is NOT present in the JWT payload (the token only carries the user_id in `sub`),
-   *  so it cannot be read client-side from the token the way the initials are above.
-   *  This must come from the server, which is the only authoritative source.
-   *  The icon stays `hidden` (set in upload.html) until this confirms is_admin: true.
-   *
-   *  Runs after authFetch is defined below, so it is invoked at the bottom of this IIFE rather than inline here
-   *  - see the call to revealAdminIconIfAdmin() near the end of the file.
+   *  ADMIN ICON - reveal for admins only (server-authoritative)
    * ------------------------------------------------------------------ */
   const revealAdminIconIfAdmin = async () => {
     try {
       const res = await authFetch(`${location.origin}/auth/me`);
-      if (!res.ok) return; // 401 already redirected via authFetch; anything else, just skip silently
+      if (!res.ok) return;
       const me = await res.json();
       if (me.is_admin) {
         document.getElementById("admin-icon-link")?.removeAttribute("hidden");
       }
     } catch {
-      // Network failure - admin icon simply stays hidden, no user-facing impact.
+      // Network failure - icon stays hidden.
     }
   };
 
   /* --------------------------------------------------------------------
    *  AUTH FETCH HELPER
-   *
-   *  Wraps every API call with the Bearer token header.
-   *  Handles 401 globally: clears storage and redirects to login so the user never sees a broken gallery due to an expired token.
-   *
-   * @param {string} url
-   * @param {RequestInit} [options]
-   * @returns {Promise<Response>}
    * ------------------------------------------------------------------ */
   const authFetch = async (url, options = {}) => {
     const response = await fetch(url, {
@@ -110,17 +87,10 @@
   /* --------------------------------------------------------------------
    *  CONSTANTS
    * ------------------------------------------------------------------ */
-  // OPTION 1: For production with nginx reverse proxy
   const API_UPLOAD_URL = `${location.origin}/upload/`;
   const API_IMAGES_URL = `${location.origin}/upload`;
   const API_DELETE_URL = (fn) =>
     `${location.origin}/upload/${encodeURIComponent(fn)}`;
-
-  // OPTION 2: For development - direct access to FastAPI on port 8000
-  // const API_BASE = `${location.protocol}//${location.hostname}:8000`;
-  // const API_UPLOAD_URL = `${API_BASE}/upload/`;
-  // const API_IMAGES_URL = `${API_BASE}/upload`;
-  // const API_DELETE_URL = (fn) => `${API_BASE}/upload/${encodeURIComponent(fn)}`;
 
   const SEL = {
     uploadBtn: "#browse-button",
@@ -137,10 +107,10 @@
   const $ = (s) => document.querySelector(s);
 
   /**
-   * Display a status message in upload text area.
-   * @param {HTMLElement} el - Element to display a message in.
-   * @param {string} msg - Message to show.
-   * @param {boolean} [isErr=false] - Whether it's an error message.
+   * Display a status message in the upload text area.
+   * @param {HTMLElement} el
+   * @param {string} msg
+   * @param {boolean} [isErr=false]
    */
   const showStatus = (el, msg, isErr = false) => {
     el.classList.toggle("upload-error", isErr);
@@ -149,9 +119,9 @@
   };
 
   /**
-   * Create a paragraph DOM element to show status/info.
-   * @param {string} txt - Text to display.
-   * @param {string} [col='#555'] - Text color.
+   * Create a paragraph element for status/empty-state messages.
+   * @param {string} txt
+   * @param {string} [col='#555']
    * @returns {HTMLParagraphElement}
    */
   const createMsg = (txt, col = "#555") => {
@@ -162,8 +132,12 @@
     return p;
   };
 
+  /* --------------------------------------------------------------------
+   *  UPLOADER
+   * ------------------------------------------------------------------ */
   /**
-   * Initialize upload functionality.
+   * Initialise upload functionality (file input, drag-drop, copy button).
+   * @param {() => void} loadImages - Callback to refresh the image gallery after a successful upload.
    */
   function initUploader(loadImages) {
     const uploadBtn = $(SEL.uploadBtn);
@@ -188,30 +162,24 @@
 
     /**
      * Upload a single file to the server.
-     * @param {File} file - File to upload.
+     * @param {File} file
      */
     const uploadFile = async (file) => {
-      // Client-side validation
       if (file.type && !allowedTypes.includes(file.type)) {
-        showStatus(
-          uploadText,
-          "Upload failed: Only JPG, PNG, and GIF files are allowed.",
-          true,
-        );
+        showStatus(uploadText, window.t("upload.error.type"), true);
         return;
       }
       if (file.size > maxSize) {
         const sizeMB = (file.size / (1024 * 1024)).toFixed(2);
         showStatus(
           uploadText,
-          `File is ${sizeMB}MB. Maximum size is 5MB.`,
+          window.t("upload.error.size_client", { size: sizeMB }),
           true,
         );
         return;
       }
 
-      // Show uploading status
-      showStatus(uploadText, "Uploading...", false);
+      showStatus(uploadText, window.t("upload.status.uploading"), false);
 
       try {
         const form = new FormData();
@@ -222,58 +190,58 @@
           body: form,
         });
 
-        // Handle different HTTP status codes
         if (response.status === 413) {
-          showStatus(
-            uploadText,
-            "Upload failed: File is too large. Maximum size is 5MB.",
-            true,
-          );
+          showStatus(uploadText, window.t("upload.error.size_server"), true);
           return;
         }
 
         if (response.status === 400) {
           try {
             const error = await response.json();
-            showStatus(uploadText, `Upload failed: ${error.detail}`, true);
+            showStatus(
+              uploadText,
+              `${window.t("upload.error.invalid")}: ${error.detail}`,
+              true,
+            );
           } catch {
-            showStatus(uploadText, "Upload failed: Invalid file", true);
+            showStatus(uploadText, window.t("upload.error.invalid"), true);
           }
           return;
         }
 
         if (response.status === 429) {
-          showStatus(
-            uploadText,
-            "Upload failed: Too many uploads. Please wait a minute and try again.",
-            true,
-          );
+          showStatus(uploadText, window.t("upload.error.rate_limit"), true);
           return;
         }
 
         if (!response.ok) {
           showStatus(
             uploadText,
-            `Upload failed: Server error (${response.status})`,
+            window.t("upload.error.server", { status: response.status }),
             true,
           );
           return;
         }
 
-        // Success - parse JSON response
         const result = await response.json();
-        showStatus(uploadText, `File uploaded: ${result.filename}`);
+        showStatus(
+          uploadText,
+          window.t("upload.status.success") + result.filename,
+        );
 
         loadImages();
 
-        // Build full URL for the result
         const imageUrl = result.url.startsWith("http")
           ? result.url
           : `${location.origin}${result.url}`;
         resultInput.value = imageUrl;
       } catch (e) {
         console.error("Upload error:", e);
-        showStatus(uploadText, `Upload failed: ${e.message}`, true);
+        showStatus(
+          uploadText,
+          window.t("upload.error.server", { status: e.message }),
+          true,
+        );
       }
     };
 
@@ -287,10 +255,21 @@
       if (!resultInput.value) return;
       try {
         await copyToClipboard(resultInput.value);
-        copyBtn.textContent = "Copied!";
-        setTimeout(() => (copyBtn.textContent = "COPY"), 1500);
+        copyBtn.textContent = window.t("upload.copy.copied");
+        setTimeout(
+          () => (copyBtn.textContent = window.t("upload.copy.default")),
+          1500,
+        );
       } catch (err) {
-        alert(`Failed to copy: ${err.message}`);
+        alert(window.t("upload.gallery.fail_copy", { error: err.message }));
+      }
+    });
+
+    // Re-sync copy button label on language change in case it's showing "Copied!"
+    window.addEventListener("langchange", () => {
+      // Only reset if not in "Copied" state (i.e. value is truthy from the timeout)
+      if (copyBtn.textContent !== window.t("upload.copy.copied")) {
+        copyBtn.textContent = window.t("upload.copy.default");
       }
     });
 
@@ -315,108 +294,164 @@
     });
   }
 
+  /* --------------------------------------------------------------------
+   *  IMAGES TAB
+   * ------------------------------------------------------------------ */
   /**
-   * Initialize "Images" tab: fetch list and handle deletion.
+   * Initialise the Images tab: per-page/sort controls, image grid, pagination.
+   * Listens for "langchange" to rebuild injected controls with updated strings.
+   * @returns {{ loadImages: () => void }}
    */
   function initImagesTab() {
     const imgSection = $(SEL.imgSection);
     const table = $(SEL.table);
     const imgTabBtn = $(SEL.imgTabBtn);
 
-    if (!imgSection || !table || !imgTabBtn) return;
+    if (!imgSection || !table || !imgTabBtn) return { loadImages: () => {} };
 
     let currentPage = 1;
     let per_page = 6;
     let totalPages = 1;
-    let hasLoadedOnce = false; // Tracks if loaded at least once
+    let hasLoadedOnce = false;
+    let sort_by = "upload_time";
+    let sort_order = "desc";
 
-    // Create per-page dropdown container
-    const perPageControls = document.createElement("div");
-    perPageControls.className = "perpage-controls";
-    perPageControls.innerHTML = `
-            <label>
-                Per page:
-                <select id="perPageSelect">
-                    <option value="3">3</option>
-                    <option value="6" selected>6</option>
-                    <option value="9">9</option>
-                </select>
-            </label>
+    // ---- Build controls ----
 
-            <label>Sort by:
-                <select id="sortField">
-                    <option value="upload_time" selected>Upload Time</option>
-                    <option value="filename">Filename</option>
-                    <option value="size">Size</option>
-                </select>
-            </label>
+    /**
+     * Inject (or re-inject) the per-page / sort controls using current language strings.
+     * Called on first init and again on every "langchange" event.
+     */
+    const buildControls = () => {
+      // Preserve current select values before rebuilding
+      const prevPerPage =
+        table.querySelector("#perPageSelect")?.value ?? String(per_page);
+      const prevSortField = table.querySelector("#sortField")?.value ?? sort_by;
+      const prevSortOrder =
+        table.querySelector("#sortOrder")?.value ?? sort_order;
 
-            <label>Order:
-                <select id="sortOrder">
-                    <option value="asc">Ascending</option>
-                    <option value="desc" selected>Descending</option>
-                </select>
-            </label>
-        `;
-    table.appendChild(perPageControls);
+      table.innerHTML = ""; // clear old controls
 
-    // Create pagination buttons container (separate, below table)
+      const perPageControls = document.createElement("div");
+      perPageControls.className = "perpage-controls";
+      perPageControls.innerHTML = `
+        <label>
+          ${window.t("controls.per_page")}
+          <select id="perPageSelect">
+            <option value="3">3</option>
+            <option value="6">6</option>
+            <option value="9">9</option>
+          </select>
+        </label>
+        <label>${window.t("controls.sort_by")}
+          <select id="sortField">
+            <option value="upload_time">${window.t("controls.sort.time")}</option>
+            <option value="filename">${window.t("controls.sort.name")}</option>
+            <option value="size">${window.t("controls.sort.size")}</option>
+          </select>
+        </label>
+        <label>${window.t("controls.order")}
+          <select id="sortOrder">
+            <option value="asc">${window.t("controls.order.asc")}</option>
+            <option value="desc">${window.t("controls.order.desc")}</option>
+          </select>
+        </label>
+      `;
+      table.appendChild(perPageControls);
+
+      // Restore previous values
+      perPageControls.querySelector("#perPageSelect").value = prevPerPage;
+      perPageControls.querySelector("#sortField").value = prevSortField;
+      perPageControls.querySelector("#sortOrder").value = prevSortOrder;
+
+      // Wire up change handlers
+      perPageControls
+        .querySelector("#perPageSelect")
+        .addEventListener("change", (e) => {
+          per_page = parseInt(e.target.value);
+          currentPage = 1;
+          loadImages();
+        });
+      perPageControls
+        .querySelector("#sortField")
+        .addEventListener("change", (e) => {
+          sort_by = e.target.value;
+          currentPage = 1;
+          loadImages();
+        });
+      perPageControls
+        .querySelector("#sortOrder")
+        .addEventListener("change", (e) => {
+          sort_order = e.target.value;
+          currentPage = 1;
+          loadImages();
+        });
+    };
+
+    buildControls();
+
+    // ---- Build pagination ----
     const paginationContainer = document.createElement("div");
     paginationContainer.className = "pagination-container";
-    paginationContainer.innerHTML = `
-            <button id="prevBtn">Previous</button>
-            <span id="pageInfo"></span>
-            <button id="nextBtn">Next</button>
-        `;
     imgSection.appendChild(paginationContainer);
 
-    // Controls
-    const prevBtn = paginationContainer.querySelector("#prevBtn");
-    const nextBtn = paginationContainer.querySelector("#nextBtn");
-    const pageInfo = paginationContainer.querySelector("#pageInfo");
-
-    // Pagination and sorting
-    const perPageSelect = perPageControls.querySelector("#perPageSelect");
-    const sortField = perPageControls.querySelector("#sortField");
-    const sortOrder = perPageControls.querySelector("#sortOrder");
-
-    // Changeable sorting variables for querying purposes
-    let sort_by = sortField.value;
-    let sort_order = sortOrder.value;
-
     /**
-     * Show empty state (no images uploaded yet)
+     * Re-render the pagination row with translated button labels and current page info.
      */
+    const renderPagination = () => {
+      paginationContainer.innerHTML = `
+        <button id="prevBtn">${window.t("controls.prev")}</button>
+        <span id="pageInfo">${window.t("upload.page_info", { current: currentPage, total: totalPages })}</span>
+        <button id="nextBtn">${window.t("controls.next")}</button>
+      `;
+      const prevBtn = paginationContainer.querySelector("#prevBtn");
+      const nextBtn = paginationContainer.querySelector("#nextBtn");
+
+      prevBtn.disabled = currentPage <= 1;
+      nextBtn.disabled = currentPage >= totalPages;
+
+      prevBtn.addEventListener("click", () => {
+        if (currentPage > 1) {
+          currentPage--;
+          loadImages();
+        }
+      });
+      nextBtn.addEventListener("click", () => {
+        if (currentPage < totalPages) {
+          currentPage++;
+          loadImages();
+        }
+      });
+    };
+
+    // ---- Empty / loaded state helpers ----
+
     const showEmptyState = () => {
-      // Hide all controls
       table.style.display = "none";
       paginationContainer.style.display = "none";
-
-      // Show "no images" message
       imgSection.querySelectorAll(".no-images-msg").forEach((n) => n.remove());
-      imgSection.appendChild(createMsg("No images yet."));
+      imgSection.appendChild(createMsg(window.t("upload.gallery.empty")));
     };
 
-    /*
-     * Show loaded state (images exist)
-     */
     const showLoadedState = () => {
       table.style.display = "";
-      paginationContainer.style.display = "flex"; // or 'block'
+      paginationContainer.style.display = "flex";
     };
 
+    // ---- Delete ----
+
     /**
-     * Delete a specific image by unique_name.
-     * @param {string} filename - Unique name of a file to delete.
-     * @param {HTMLElement} cell - The cell element to remove from DOM
+     * Confirm and delete an image by unique_name, removing its cell from the DOM.
+     * @param {string} filename
+     * @param {HTMLElement} cell
      */
     const deleteImage = async (filename, cell) => {
       const confirmed = await customConfirm(
-        `Are you sure you want to delete this image? This action cannot be undone.`,
-        "Delete Image",
+        window.t("dialog.delete.body"),
+        window.t("dialog.delete.title"),
         {
-          confirmText: "Delete",
-          cancelText: "Cancel",
+          confirmText: window.t("dialog.delete.confirm"),
+          cancelText: window.t("dialog.delete.cancel"),
           icon: "🗑️",
           iconClass: "warning",
         },
@@ -430,22 +465,25 @@
         });
         if (!response.ok) throw new Error("Delete failed");
         cell.remove();
-        if (!table.querySelector(".image-element")) {
-          showEmptyState();
-        }
+        if (!table.querySelector(".image-element")) showEmptyState();
       } catch (e) {
-        await customAlert(`Failed to delete: ${e.message}`, "Error", {
-          icon: "✕",
-          iconClass: "error",
-        });
+        await customAlert(
+          window.t("upload.gallery.fail_delete", { error: e.message }),
+          window.t("dialog.delete_err.title"),
+          {
+            icon: "✕",
+            iconClass: "error",
+          },
+        );
       }
     };
 
+    // ---- Load & render ----
+
     /**
-     * Load and display the list of uploaded images.
+     * Fetch the current page of images from the server and render them.
      */
     const loadImages = async () => {
-      // Clear previous images/messages
       table.querySelectorAll(".image-element").forEach((n) => n.remove());
       imgSection.querySelectorAll(".no-images-msg").forEach((n) => n.remove());
 
@@ -454,15 +492,12 @@
           `${API_IMAGES_URL}?page=${currentPage}&per_page=${per_page}&sort_by=${sort_by}&sort_order=${sort_order}`,
         );
 
-        // Handle 404 - no images exist yet
         if (response.status === 404) {
           showEmptyState();
           hasLoadedOnce = true;
           return;
         }
-
         if (!response.ok) {
-          console.error(`Failed to load images: ${response.status}`);
           showEmptyState();
           return;
         }
@@ -477,40 +512,33 @@
           return;
         }
 
-        // Show control and table
         showLoadedState();
         hasLoadedOnce = true;
 
-        // Render each image
         images.forEach(({ filename, unique_name }) => {
-          // Build image URL - handle both relative and absolute URLs
           const imageUrl = `/images/${unique_name}`;
-
           const cell = document.createElement("div");
           cell.className = "image-element";
           cell.innerHTML = `
-                        <div class="image" data-filename="${filename}" style="background-image: url(${imageUrl});" alt="${filename}">
-                            <button class="new-tab"></button>
-                        </div>
-                        <div class="image-beneath">
-                            <div class="image-buttons-container">
-                                <button class="copy-button copyBtn">COPY</button>
-                                <button class="delete-button">🗑️</button>
-                            </div>
-                        </div>`;
+            <div class="image" data-filename="${filename}" style="background-image: url(${imageUrl});" alt="${filename}">
+              <button class="new-tab"></button>
+            </div>
+            <div class="image-beneath">
+              <div class="image-buttons-container">
+                <button class="copy-button copyBtn">${window.t("upload.gallery.copy")}</button>
+                <button class="delete-button">🗑️</button>
+              </div>
+            </div>`;
 
-          // Delete button
           cell
             .querySelector(".delete-button")
             .addEventListener("click", () => deleteImage(unique_name, cell));
 
-          // Click on the image itself: open viewer in same tab
           const parent = cell.querySelector(".image");
           parent.addEventListener("click", () => {
             window.location.href = `/view/${encodeURIComponent(unique_name)}`;
           });
 
-          // Click on new-tab button: open viewer in a new tab
           const child = parent.querySelector(".new-tab");
           if (child) {
             child.addEventListener("click", (event) => {
@@ -519,68 +547,41 @@
             });
           }
 
-          // Copy button
           const copyBtn = cell.querySelector(".copyBtn");
           copyBtn?.addEventListener("click", async (event) => {
             event.stopPropagation();
             const url = `${location.origin}/images/${encodeURIComponent(unique_name)}`;
             try {
               await copyToClipboard(url);
-              copyBtn.textContent = "COPIED";
-              setTimeout(() => (copyBtn.textContent = "COPY"), 1500);
+              copyBtn.textContent = window.t("upload.gallery.copied");
+              setTimeout(
+                () => (copyBtn.textContent = window.t("upload.gallery.copy")),
+                1500,
+              );
             } catch (err) {
-              alert(`Failed to copy URL: ${err}`);
+              alert(window.t("upload.gallery.fail_copy", { error: err }));
             }
           });
 
           table.appendChild(cell);
         });
 
-        // Update pagination info
-        pageInfo.textContent = `Page ${currentPage} of ${totalPages}`;
-        prevBtn.disabled = currentPage <= 1;
-        nextBtn.disabled = currentPage >= totalPages;
+        renderPagination();
       } catch (e) {
         console.error("Images load error:", e);
         showEmptyState();
       }
     };
 
-    // Dropdown event handlers
-    perPageSelect.addEventListener("change", () => {
-      per_page = parseInt(perPageSelect.value);
-      currentPage = 1;
-      loadImages();
+    // Rebuild controls (translated labels) and refresh pagination text on language change
+    window.addEventListener("langchange", () => {
+      buildControls();
+      if (hasLoadedOnce) renderPagination();
+      // Refresh "No images yet." message if visible
+      const emptyMsg = imgSection.querySelector(".no-images-msg");
+      if (emptyMsg) emptyMsg.textContent = window.t("upload.gallery.empty");
     });
 
-    sortField.addEventListener("change", () => {
-      sort_by = sortField.value;
-      currentPage = 1;
-      loadImages();
-    });
-
-    sortOrder.addEventListener("change", () => {
-      sort_order = sortOrder.value;
-      currentPage = 1;
-      loadImages();
-    });
-
-    // Pagination buttons
-    prevBtn.addEventListener("click", () => {
-      if (currentPage > 1) {
-        currentPage--;
-        loadImages();
-      }
-    });
-
-    nextBtn.addEventListener("click", () => {
-      if (currentPage < totalPages) {
-        currentPage++;
-        loadImages();
-      }
-    });
-
-    // Initial load when tab is clicked
     imgTabBtn.addEventListener("click", () => {
       if (
         !hasLoadedOnce ||
@@ -590,14 +591,14 @@
       }
     });
 
-    // Load immediately if this tab is already active
-    if (imgTabBtn.classList.contains("active")) {
-      loadImages();
-    }
+    if (imgTabBtn.classList.contains("active")) loadImages();
 
     return { loadImages };
   }
 
+  /* --------------------------------------------------------------------
+   *  CLIPBOARD HELPER
+   * ------------------------------------------------------------------ */
   async function copyToClipboard(text) {
     try {
       await navigator.clipboard.writeText(text);
@@ -616,7 +617,7 @@
     }
   }
 
-  // Initialize modules
+  // Init
   const { loadImages } = initImagesTab();
   initUploader(loadImages);
   revealAdminIconIfAdmin();

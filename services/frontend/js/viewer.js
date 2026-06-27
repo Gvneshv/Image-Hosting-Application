@@ -2,73 +2,47 @@
  * Image detail page logic.
  *
  * Responsibilities:
- *  - Auth guard: redirects unauthenticated visitors to /index.html
+ *  - Auth guard
  *  - Fetch image metadata from /file_info/:filename and populate the info panel
  *  - Wire up action buttons: copy URL, download, delete
- *  - Lightbox overlay: open/close, zoom (mouse wheel), pan (drag), double-click reset
- *  - Slideshow navigation: previous / next via arrow buttons, thumbnail previews,
- *    and keyboard shortcuts (← →)
+ *  - Lightbox overlay: open/close, zoom, pan, double-click reset
+ *  - Slideshow navigation: prev/next, thumbnail previews, keyboard shortcuts
  *  - Fullscreen mode toggle
- *  - Close on ESC or by clicking the dark overlay background
+ *
+ * Depends on lang.js for all user-visible strings via window.t().
  */
 (async () => {
-  // -----------------------------------------------------------------------
-  // Auth guard
-  // Runs before any async work. The viewer is a protected page — users who are not logged in should not be able to view images directly.
-  // -----------------------------------------------------------------------
   const token = localStorage.getItem("access_token");
   if (!token) {
     location.replace("/index.html");
-    return; // stop execution; the async IIFE must return explicitly
+    return;
   }
 
-  /**
-   * Fetch wrapper that attaches the Bearer token to every request.
-   * Handles 401 globally — expired token clears storage and redirects to the login page rather than leaving the user on a broken viewer.
-   *
-   * @param {string} url
-   * @param {RequestInit} [options]
-   * @returns {Promise<Response>}
-   */
   const authFetch = async (url, options = {}) => {
     const response = await fetch(url, {
       ...options,
-      headers: {
-        Authorization: `Bearer ${token}`,
-        ...(options.headers ?? {}),
-      },
+      headers: { Authorization: `Bearer ${token}`, ...(options.headers ?? {}) },
     });
-
     if (response.status === 401) {
       localStorage.removeItem("access_token");
       location.replace("/index.html");
     }
-
     return response;
   };
 
-  /**
-   * Reveal the admin panel icon for admin users only.
-   *
-   * is_admin is not present in the JWT payload (only the user_id is encoded there), so this must be confirmed by the server.
-   * The icon stays `hidden` (set in viewer.html) until this confirms is_admin: true.
-   * Mirrors the identical helper in upload.js.
-   */
   const revealAdminIconIfAdmin = async () => {
     try {
       const res = await authFetch(`${location.origin}/auth/me`);
       if (!res.ok) return;
       const me = await res.json();
-      if (me.is_admin) {
+      if (me.is_admin)
         document.getElementById("admin-icon-link")?.removeAttribute("hidden");
-      }
     } catch {
-      // Network failure - admin icon simply stays hidden, no user-facing impact.
+      /* network failure - icon stays hidden */
     }
   };
   revealAdminIconIfAdmin();
 
-  /** CSS selector map — centralises all querySelector strings. */
   const SEL = {
     fileNameEl: "#infoFilename",
     fileNameOr: "#infoOriginalName",
@@ -82,7 +56,7 @@
     deleteBtn: "#deleteBtn",
     viewer: "#image-viewer",
     viewerImg: "#viewer-image",
-    viewerContent: ".viewer-content", // wrapper around main image + neighbors
+    viewerContent: ".viewer-content",
     closeBtn: ".close-btn",
     prevBtn: ".prev-btn",
     nextBtn: ".next-btn",
@@ -91,16 +65,11 @@
     fullscreenBtn: ".fullscreen-btn",
   };
 
-  /** Shorthand for document.querySelector. */
   const $ = (s) => document.querySelector(s);
 
-  // -----------------------------------------------------------------------
-  // Resolve the current filename from the URL path
-  // -----------------------------------------------------------------------
   const urlParts = window.location.pathname.split("/");
   const filename = decodeURIComponent(urlParts[urlParts.length - 1]);
 
-  // Cache DOM references
   const fileNameEl = $(SEL.fileNameEl);
   const fileNameOr = $(SEL.fileNameOr);
   const fileNameUn = $(SEL.fileNameUn);
@@ -112,34 +81,24 @@
   const downloadBtn = $(SEL.downloadBtn);
   const deleteBtn = $(SEL.deleteBtn);
 
-  // Slideshow state
   let currentIndex = -1;
-  let galleryImages = []; // [{ src: string, filename: string }]
+  let galleryImages = [];
 
   try {
-    // -----------------------------------------------------------------------
-    // Fetch metadata for this image
-    // -----------------------------------------------------------------------
     const res = await authFetch(`/file_info/${encodeURIComponent(filename)}`);
     if (!res.ok) throw new Error("File not found");
     const info = await res.json();
 
-    // -----------------------------------------------------------------------
-    // Fetch all gallery images for the slideshow
-    // -----------------------------------------------------------------------
     const allImagesRes = await authFetch("/all_images");
     if (!allImagesRes.ok) throw new Error("Failed to load gallery images");
     const data = await allImagesRes.json();
 
-    // Build absolute URLs so index lookups always match (avoids relative vs absolute mismatch)
     galleryImages = data.images.map((img) => ({
       src: `${location.origin}/images/${encodeURIComponent(img.unique_name)}`,
       filename: img.unique_name,
     }));
 
-    // -----------------------------------------------------------------------
     // Populate info panel
-    // -----------------------------------------------------------------------
     const mBytes = info.size / (1024 * 1024);
     fileNameEl.textContent = info.filename;
     fileNameOr.textContent = info.original_name;
@@ -157,12 +116,9 @@
       timeZoneName: "short",
     }).format(new Date(info.upload_date));
     fileDateEl.textContent = formattedDate;
-
     viewerImage.src = info.url;
 
-    // -----------------------------------------------------------------------
-    // Action buttons
-    // -----------------------------------------------------------------------
+    // ---- Action buttons ----
 
     copyBtn.addEventListener("click", async () => {
       try {
@@ -170,10 +126,25 @@
           ? info.url
           : `${location.origin}${info.url}`;
         await copyToClipboard(fullUrl);
-        copyBtn.textContent = "COPIED";
-        setTimeout(() => (copyBtn.textContent = "COPY URL"), 1500);
+        copyBtn.querySelector("span").textContent =
+          window.t("viewer.copy.copied");
+        setTimeout(
+          () =>
+            (copyBtn.querySelector("span").textContent = window.t(
+              "viewer.copy.default",
+            )),
+          1500,
+        );
       } catch (err) {
-        alert(`Copy failed: ${err}`);
+        alert(window.t("viewer.copy.fail", { error: err }));
+      }
+    });
+
+    // Re-sync copy button on language change
+    window.addEventListener("langchange", () => {
+      const span = copyBtn.querySelector("span");
+      if (span && span.textContent !== window.t("viewer.copy.copied")) {
+        span.textContent = window.t("viewer.copy.default");
       }
     });
 
@@ -188,11 +159,11 @@
 
     deleteBtn.addEventListener("click", async () => {
       const confirmed = await customConfirm(
-        `Are you sure you want to delete "${info.original_name}"? This action cannot be undone.`,
-        "Delete Image",
+        window.t("viewer.delete.body", { name: info.original_name }),
+        window.t("viewer.delete.title"),
         {
-          confirmText: "Delete",
-          cancelText: "Cancel",
+          confirmText: window.t("viewer.delete.confirm"),
+          cancelText: window.t("viewer.delete.cancel"),
           icon: "🗑️",
           iconClass: "warning",
         },
@@ -202,41 +173,45 @@
       try {
         const delRes = await authFetch(
           `/upload/${encodeURIComponent(info.unique_name)}`,
-          {
-            method: "DELETE",
-          },
+          { method: "DELETE" },
         );
         if (!delRes.ok) throw new Error("Delete failed");
 
-        await customAlert("Image deleted successfully!", "Deleted", {
-          icon: "✓",
-          iconClass: "success",
-        });
+        await customAlert(
+          window.t("viewer.delete.success.body"),
+          window.t("viewer.delete.success.title"),
+          {
+            icon: "✓",
+            iconClass: "success",
+          },
+        );
         window.location.href = "/upload.html#images";
       } catch (err) {
-        await customAlert(`Delete failed: ${err.message}`, "Error", {
-          icon: "✕",
-          iconClass: "error",
-        });
+        await customAlert(
+          window.t("viewer.delete.fail.body", { error: err.message }),
+          window.t("viewer.delete.fail.title"),
+          {
+            icon: "✕",
+            iconClass: "error",
+          },
+        );
       }
     });
 
-    // -----------------------------------------------------------------------
-    // Lightbox — open / close
-    // -----------------------------------------------------------------------
+    // ---- Lightbox ----
+
     const viewer = $(SEL.viewer);
     const viewerImg = $(SEL.viewerImg);
     const viewerContent = $(SEL.viewerContent);
     const closeBtn = $(SEL.closeBtn);
 
-    let scale = 1;
-    let translateX = 0,
+    let scale = 1,
+      translateX = 0,
       translateY = 0;
-    let isDragging = false;
-    let startX = 0,
+    let isDragging = false,
+      startX = 0,
       startY = 0;
 
-    /** Open the lightbox showing the given image src. */
     function openViewer(src) {
       currentIndex = galleryImages.findIndex((img) => img.src === src);
       viewerImg.src = src;
@@ -245,53 +220,41 @@
       preloadNeighbors();
     }
 
-    /** Close the lightbox and exit fullscreen if active. */
     function closeViewer() {
       resetTransform();
       viewer.classList.add("hidden");
       if (document.fullscreenElement) {
-        document.exitFullscreen().catch((err) => {
-          console.error("Error exiting fullscreen:", err);
-        });
+        document
+          .exitFullscreen()
+          .catch((err) => console.error("Error exiting fullscreen:", err));
       }
     }
 
-    // Open viewer when clicking the inline preview image
     viewerImage.addEventListener("click", () => openViewer(viewerImage.src));
-
     closeBtn.addEventListener("click", (e) => {
       e.stopPropagation();
       closeViewer();
     });
 
-    // Close on ESC
     window.addEventListener("keydown", (event) => {
-      if (event.key === "Escape" && !viewer.classList.contains("hidden")) {
+      if (event.key === "Escape" && !viewer.classList.contains("hidden"))
         closeViewer();
-      }
     });
 
-    // Close when clicking the dark background (but not the image or controls)
     viewer.addEventListener("click", (e) => {
-      if (e.target === viewer || e.target === viewerContent) {
-        closeViewer();
-      }
+      if (e.target === viewer || e.target === viewerContent) closeViewer();
     });
 
-    // Prevent background page scroll while the overlay is open
     viewer.addEventListener(
       "wheel",
       (event) => {
-        if (!viewer.classList.contains("hidden")) {
-          event.preventDefault();
-        }
+        if (!viewer.classList.contains("hidden")) event.preventDefault();
       },
       { passive: false },
     );
 
-    // -----------------------------------------------------------------------
-    // Zoom & Pan
-    // -----------------------------------------------------------------------
+    // ---- Zoom & Pan ----
+
     function resetTransform() {
       scale = 1;
       translateX = 0;
@@ -303,7 +266,6 @@
       viewerImg.style.transform = `translate(${translateX}px, ${translateY}px) scale(${scale})`;
     }
 
-    // Zoom with mouse wheel
     viewerImg.addEventListener(
       "wheel",
       (event) => {
@@ -316,7 +278,6 @@
       { passive: false },
     );
 
-    // Drag to pan
     viewerImg.addEventListener("mousedown", (event) => {
       if (event.button !== 0) return;
       isDragging = true;
@@ -334,13 +295,10 @@
     window.addEventListener("mouseup", () => {
       isDragging = false;
     });
-
-    // Double-click resets zoom and position
     viewerImg.addEventListener("dblclick", resetTransform);
 
-    // -----------------------------------------------------------------------
-    // Slideshow navigation
-    // -----------------------------------------------------------------------
+    // ---- Slideshow ----
+
     const prevBtn = $(SEL.prevBtn);
     const nextBtn = $(SEL.nextBtn);
 
@@ -364,20 +322,17 @@
       preloadNeighbors();
     }
 
-    // Keyboard navigation — only active when the lightbox is open
     window.addEventListener("keydown", (event) => {
       if (viewer.classList.contains("hidden")) return;
       if (event.key === "ArrowLeft") showPrev();
       if (event.key === "ArrowRight") showNext();
     });
 
-    // -----------------------------------------------------------------------
-    // Neighbor previews (thumbnails shown at bottom-left / bottom-right)
-    // -----------------------------------------------------------------------
+    // ---- Neighbor previews ----
+
     const viewerPrev = $(SEL.viewerPrev);
     const viewerNext = $(SEL.viewerNext);
 
-    /** Preload and display the adjacent images as clickable thumbnails. */
     function preloadNeighbors() {
       viewerPrev.src = "";
       viewerNext.src = "";
@@ -385,14 +340,12 @@
 
       const prevIndex =
         (currentIndex - 1 + galleryImages.length) % galleryImages.length;
-      if (prevIndex !== currentIndex) {
+      if (prevIndex !== currentIndex)
         viewerPrev.src = galleryImages[prevIndex].src;
-      }
 
       const nextIndex = (currentIndex + 1) % galleryImages.length;
-      if (nextIndex !== currentIndex) {
+      if (nextIndex !== currentIndex)
         viewerNext.src = galleryImages[nextIndex].src;
-      }
     }
 
     viewerPrev.addEventListener("click", () => {
@@ -402,23 +355,20 @@
       if (galleryImages.length) showNext();
     });
 
-    // -----------------------------------------------------------------------
-    // Fullscreen
-    // -----------------------------------------------------------------------
+    // ---- Fullscreen ----
+
     const fullscreenBtn = $(SEL.fullscreenBtn);
     fullscreenBtn.addEventListener("click", (e) => {
       e.stopPropagation();
       toggleFullscreen();
     });
 
-    if (!document.fullscreenEnabled) {
-      fullscreenBtn.style.display = "none";
-    }
+    if (!document.fullscreenEnabled) fullscreenBtn.style.display = "none";
 
     function toggleFullscreen() {
       if (!document.fullscreenElement) {
         viewer.requestFullscreen().catch((err) => {
-          alert(`Fullscreen error: ${err.message}`);
+          alert(window.t("viewer.fullscreen.error", { error: err.message }));
         });
       } else {
         document.exitFullscreen();
@@ -430,7 +380,6 @@
         await navigator.clipboard.writeText(text);
         return true;
       } catch {
-        // Fallback for HTTP / older browsers
         const ta = document.createElement("textarea");
         ta.value = text;
         ta.style.cssText = "position:fixed;opacity:0";
