@@ -90,12 +90,27 @@
       }
 
       if (response.status === 429) {
+        // The server returns its own lockout message with the exact wait time.
+        // We try to translate it; if it's an unrecognised format, show as-is.
         let message = window.t("index.locked.default");
         try {
           const errData = await response.json();
-          if (errData.detail) message = errData.detail;
+          if (errData.detail) {
+            // Pattern: "Too many failed login attempts. Try again in N minutes, or contact..."
+            // Replace the whole thing with our translatable version if it matches.
+            const minutesMatch = errData.detail.match(
+              /Try again in (\d+) minutes?/i,
+            );
+            if (minutesMatch) {
+              message = window.t("index.locked.timed", {
+                minutes: minutesMatch[1],
+              });
+            } else {
+              message = errData.detail;
+            }
+          }
         } catch {
-          /* empty or non-JSON body */
+          /* non-JSON body — use default */
         }
         accountLockedBody.textContent = message;
         showModal(accountLockedOverlay);

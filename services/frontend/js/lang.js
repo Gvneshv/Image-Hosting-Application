@@ -156,6 +156,9 @@ const STRINGS = {
     "index.error.pass_req": "Password is required.",
     "index.locked.default":
       "Too many failed login attempts. Please try again later.",
+    // {minutes} = lockout duration from server response
+    "index.locked.timed":
+      "Too many failed login attempts. Try again in {minutes} minutes, or contact an administrator to unlock your account.",
 
     // ---- index.html modals ----
     "index.modal.wrong_creds.title": "Sign In Failed",
@@ -452,6 +455,8 @@ const STRINGS = {
     "index.error.pass_req": "Потрібний пароль.",
     "index.locked.default":
       "Забагато невдалих спроб увійти. Будь ласка, спробуйте пізніше.",
+    "index.locked.timed":
+      "Забагато невдалих спроб входу. Спробуйте ще раз через {minutes} хвилин або зверніться до адміністратора, щоб розблокувати ваш обліковий запис.",
     "index.modal.wrong_creds.title": "Не вдалося увійти",
     "index.modal.wrong_creds.body":
       "Неправильна електронна адреса або пароль. Будь ласка, спробуйте ще раз.",
