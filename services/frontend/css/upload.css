@@ -42,33 +42,30 @@ button {
   gap: 2px;
   flex: 1;
   min-width: 0;
+  position: relative;
+  right: 10px;
 }
 
 .header-title {
   margin-top: 0;
   margin-bottom: 0;
-  width: 111px;
-  height: 14px;
   font-weight: 700;
   font-size: 16px;
   line-height: 14px;
   letter-spacing: -0.02em;
   color: var(--color-text);
-  text-align: right;
+  text-align: center;
 }
 
 .header-subtitle {
   margin: 0;
-  width: 293px;
-  height: 21px;
+  max-width: 440px;
   font-weight: 300;
   font-size: 14px;
   line-height: 150%;
   letter-spacing: -0.04em;
   color: var(--color-text);
-  text-align: right;
-  right: -1%;
-  position: relative;
+  text-align: center;
 }
 
 /* Account icon - top-right corner, links to account.html */
@@ -113,12 +110,13 @@ button {
   display: flex;
   flex-direction: row;
   align-items: center;
+  gap: 8px;
   flex-shrink: 0;
   min-width: 90px;
 }
 
 /*
- * Theme toggle button - strips all browser-default button chrome (border, background, outline) and renders as a 40×40 circular icon button that
+ * Theme toggle button — strips all browser-default button chrome (border, background, outline) and renders as a 40×40 circular icon button that
  * matches the account/admin icon dimensions.
  * The SVG icon inside is injected by theme.js at runtime.
  */
@@ -151,7 +149,7 @@ button {
 }
 
 /*
- * Language toggle button - same circular dimensions as .theme-toggle but displays a two-letter text label ("EN" / "UA") set by lang.js.
+ * Language toggle button — same circular dimensions as .theme-toggle but displays a two-letter text label ("EN" / "UA") set by lang.js.
  */
 .lang-toggle {
   width: 40px;
@@ -230,23 +228,30 @@ button {
 }
 
 /* Tabs */
+/*
+ * Toggle tabs bar — centred horizontally.
+ * Width is auto so that longer translated labels (e.g. Ukrainian) don't wrap.
+ * white-space: nowrap on each tab prevents the label itself from breaking.
+ */
 .toggle-tabs {
   position: absolute;
-  display: inline;
+  display: flex;
+  gap: 24px;
   transform: translate(-50%);
   left: 50%;
   top: 117px;
-  width: 160px;
   height: 24px;
   font-weight: 700;
   font-size: 20px;
   line-height: 100%;
+  white-space: nowrap;
 }
 
 .toggle-tab {
   font-size: 20px;
   font-weight: 700;
   cursor: pointer;
+  white-space: nowrap;
 }
 
 .toggle-tab.active {
@@ -421,6 +426,8 @@ input[type="file"] {
   border: 2px solid var(--color-border-focus);
   background-color: var(--color-surface-input);
   border-radius: 12px;
+  /* Prevent child overflow when the button label is longer in another language */
+  overflow: hidden;
 }
 
 .url {
@@ -429,7 +436,9 @@ input[type="file"] {
   font-size: 16px;
   line-height: 20px;
   color: var(--color-text-muted);
-  width: 441px;
+  /* Let the input take all remaining space; the button determines its own width */
+  flex: 1;
+  min-width: 0;
   height: 20px;
   letter-spacing: 0.02em;
   border: none;
@@ -440,12 +449,16 @@ input[type="file"] {
 
 .url-copy-button {
   position: relative;
-  width: 59px;
+  /* min-width instead of fixed width so longer translated labels fit */
+  min-width: 59px;
   height: 30px;
   border: none;
   left: 8px;
   border-radius: 8px;
   background-color: var(--color-accent);
+  flex-shrink: 0;
+  white-space: nowrap;
+  padding: 0 10px;
 }
 
 .url-copy-button-text {

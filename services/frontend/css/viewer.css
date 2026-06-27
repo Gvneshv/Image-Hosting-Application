@@ -65,16 +65,16 @@ body {
 
 .header-subtitle {
   margin: 0;
-  width: 293px;
+  max-width: 440px;
   height: 21px;
   font-weight: 300;
   font-size: 14px;
   line-height: 150%;
   letter-spacing: -0.04em;
   color: var(--color-text);
-  text-align: right;
-  right: -1%;
+  text-align: center;
   position: relative;
+  right: -10px;
 }
 
 /* Header left slot - theme toggle for viewer page.
