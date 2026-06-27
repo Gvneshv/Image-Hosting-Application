@@ -18,8 +18,8 @@ def setup_logging() -> None:
     """Configure the root logger for the entire application.
 
     Sets up two handlers:
-    - **StreamHandler** (console) — INFO and above.
-    - **FileHandler**  (``logs/app.log``) — INFO and above.
+    - **StreamHandler** (console) - INFO and above.
+    - **FileHandler**  (``logs/app.log``) - INFO and above.
 
     Should be called once, at application startup, before any other module
     creates a logger.

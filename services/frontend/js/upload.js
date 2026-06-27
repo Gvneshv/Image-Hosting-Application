@@ -1,27 +1,37 @@
 /**
- * Image-host frontend logic
- * - Auth guard: redirects unauthenticated visitors to index.html
- * - Account icon: fetches initials from GET /auth/me and populates the account icon
- * - Upload via button or drag-&-drop
- * - List uploaded images with pagination and sorting
- * - Delete images
+ * Image-host frontend logic for upload.html.
  *
- * Depends on lang.js for all user-visible strings via window.t().
- * Re-renders dynamic controls on "langchange" events dispatched by lang.js.
+ * Responsibilities:
+ *  - Auth guard: redirects unauthenticated visitors to index.html
+ *  - Account icon: derives initials from the JWT and populates the icon element
+ *  - Admin icon: revealed only after GET /auth/me confirms is_admin
+ *  - Upload via file-input button or drag-and-drop
+ *  - Gallery: paginated image list with sort/filter controls
+ *  - Delete images from the gallery
+ *
+ * Depends on lang.js (loaded before this script) for all user-visible strings
+ * via window.t(). Re-renders dynamic controls on "langchange" events.
  */
 (async () => {
-  /* --------------------------------------------------------------------
+  /* ------------------------------------------------------------------
    *  AUTH GUARD
    * ------------------------------------------------------------------ */
   const token = localStorage.getItem("access_token");
   if (!token) {
     location.replace("index.html");
+    return; // stop execution; the async IIFE must return explicitly
   }
 
-  /* --------------------------------------------------------------------
+  /* ------------------------------------------------------------------
    *  AUTH FETCH HELPER
-   *  Must be defined first — every other function in this IIFE uses it.
+   *  Defined first - every other function uses it.
    * ------------------------------------------------------------------ */
+  /**
+   * Fetch wrapper that attaches the Bearer token and handles global 401.
+   * @param {string} url
+   * @param {RequestInit} [options]
+   * @returns {Promise<Response>}
+   */
   const authFetch = async (url, options = {}) => {
     const response = await fetch(url, {
       ...options,
@@ -30,17 +40,15 @@
         ...(options.headers ?? {}),
       },
     });
-
     if (response.status === 401) {
       localStorage.removeItem("access_token");
       location.replace("index.html");
     }
-
     return response;
   };
 
-  /* --------------------------------------------------------------------
-   *  ACCOUNT ICON - populate initials from the JWT email claim
+  /* ------------------------------------------------------------------
+   *  ACCOUNT ICON - derive initials from the JWT email claim
    * ------------------------------------------------------------------ */
   (() => {
     try {
@@ -69,9 +77,13 @@
     }
   })();
 
-  /* --------------------------------------------------------------------
-   *  ADMIN ICON - reveal for admins only (server-authoritative)
+  /* ------------------------------------------------------------------
+   *  ADMIN ICON - revealed only after server confirms is_admin
    * ------------------------------------------------------------------ */
+  /**
+   * Call GET /auth/me and remove [hidden] from the admin icon if is_admin.
+   * Never trusts the JWT payload for this - only the server response.
+   */
   const revealAdminIconIfAdmin = async () => {
     try {
       const res = await authFetch(`${location.origin}/auth/me`);
@@ -81,11 +93,11 @@
         document.getElementById("admin-icon-link")?.removeAttribute("hidden");
       }
     } catch {
-      // Network failure - icon stays hidden.
+      // Network failure - icon stays hidden, no user-facing impact.
     }
   };
 
-  /* --------------------------------------------------------------------
+  /* ------------------------------------------------------------------
    *  CONSTANTS
    * ------------------------------------------------------------------ */
   const API_UPLOAD_URL = `${location.origin}/upload/`;
@@ -93,22 +105,15 @@
   const API_DELETE_URL = (fn) =>
     `${location.origin}/upload/${encodeURIComponent(fn)}`;
 
-  const SEL = {
-    uploadBtn: "#browse-button",
-    fileInput: "#fileInput",
-    resultInput: "#resultLink",
-    copyBtn: ".copyBtn",
-    uploadText: ".upload-main-text, .upload-error",
-    uploadArea: "#uploadArea",
-    imgSection: "#images-tab",
-    table: ".hidden-table",
-    imgTabBtn: '.toggle-tab[data-tab="images"]',
-  };
-
+  /** Shorthand querySelector. */
   const $ = (s) => document.querySelector(s);
 
+  /* ------------------------------------------------------------------
+   *  SHARED HELPERS
+   * ------------------------------------------------------------------ */
+
   /**
-   * Display a status message in the upload text area.
+   * Update the upload-pad status text element.
    * @param {HTMLElement} el
    * @param {string} msg
    * @param {boolean} [isErr=false]
@@ -120,57 +125,71 @@
   };
 
   /**
-   * Create a paragraph element for status/empty-state messages.
+   * Create a centred status paragraph (used for empty-gallery state).
    * @param {string} txt
-   * @param {string} [col='#555']
    * @returns {HTMLParagraphElement}
    */
-  const createMsg = (txt, col = "#555") => {
+  const createMsg = (txt) => {
     const p = document.createElement("p");
     p.textContent = txt;
     p.className = "no-images-msg";
-    p.style.cssText = `text-align:center;color:${col}`;
+    p.style.cssText = "text-align:center;color:var(--color-text-secondary)";
     return p;
   };
 
-  /* --------------------------------------------------------------------
-   *  UPLOADER
+  /**
+   * Copy text to clipboard, falling back to execCommand for HTTP/older browsers.
+   * @param {string} text
+   * @returns {Promise<boolean>}
+   */
+  async function copyToClipboard(text) {
+    try {
+      await navigator.clipboard.writeText(text);
+      return true;
+    } catch {
+      const ta = document.createElement("textarea");
+      ta.value = text;
+      ta.style.cssText = "position:fixed;opacity:0";
+      document.body.appendChild(ta);
+      ta.focus();
+      ta.select();
+      const ok = document.execCommand("copy");
+      ta.remove();
+      return ok;
+    }
+  }
+
+  /* ------------------------------------------------------------------
+   *  UPLOAD TAB
    * ------------------------------------------------------------------ */
   /**
-   * Initialise upload functionality (file input, drag-drop, copy button).
-   * @param {() => void} loadImages - Callback to refresh the image gallery after a successful upload.
+   * Wire up the file-input button, drag-and-drop area, and the URL copy button.
+   * @param {() => void} onUploadSuccess - Called after a successful upload to refresh the gallery.
    */
-  function initUploader(loadImages) {
-    const uploadBtn = $(SEL.uploadBtn);
-    const fileInput = $(SEL.fileInput);
-    const resultInput = $(SEL.resultInput);
-    const copyBtn = $(SEL.copyBtn);
-    const uploadText = $(SEL.uploadText);
-    const uploadArea = $(SEL.uploadArea);
+  function initUploader(onUploadSuccess) {
+    const uploadArea = document.getElementById("uploadArea");
+    const fileInput = document.getElementById("fileInput");
+    const resultInput = document.getElementById("resultLink");
+    const copyBtn = document.getElementById("copyBtn");
+    // The pad text el has either class depending on state; query the parent element
+    const uploadText = document.getElementById("upload-main-text");
 
-    if (
-      !uploadBtn ||
-      !fileInput ||
-      !resultInput ||
-      !copyBtn ||
-      !uploadText ||
-      !uploadArea
-    )
+    if (!uploadArea || !fileInput || !resultInput || !copyBtn || !uploadText)
       return;
 
-    const allowedTypes = ["image/jpeg", "image/png", "image/gif"];
-    const maxSize = 5 * 1024 * 1024;
+    const ALLOWED_TYPES = ["image/jpeg", "image/png", "image/gif"];
+    const MAX_SIZE = 5 * 1024 * 1024; // 5 MB
 
     /**
-     * Upload a single file to the server.
+     * Validate and POST a single file to the server.
      * @param {File} file
      */
     const uploadFile = async (file) => {
-      if (file.type && !allowedTypes.includes(file.type)) {
+      if (file.type && !ALLOWED_TYPES.includes(file.type)) {
         showStatus(uploadText, window.t("upload.error.type"), true);
         return;
       }
-      if (file.size > maxSize) {
+      if (file.size > MAX_SIZE) {
         const sizeMB = (file.size / (1024 * 1024)).toFixed(2);
         showStatus(
           uploadText,
@@ -195,13 +214,12 @@
           showStatus(uploadText, window.t("upload.error.size_server"), true);
           return;
         }
-
         if (response.status === 400) {
           try {
-            const error = await response.json();
+            const err = await response.json();
             showStatus(
               uploadText,
-              `${window.t("upload.error.invalid")}: ${error.detail}`,
+              `${window.t("upload.error.invalid")}: ${err.detail}`,
               true,
             );
           } catch {
@@ -209,12 +227,10 @@
           }
           return;
         }
-
         if (response.status === 429) {
           showStatus(uploadText, window.t("upload.error.rate_limit"), true);
           return;
         }
-
         if (!response.ok) {
           showStatus(
             uploadText,
@@ -230,7 +246,7 @@
           window.t("upload.status.success") + result.filename,
         );
 
-        loadImages();
+        onUploadSuccess();
 
         const imageUrl = result.url.startsWith("http")
           ? result.url
@@ -246,12 +262,14 @@
       }
     };
 
+    // File-input button
     fileInput.addEventListener("change", () => {
       const file = fileInput.files[0];
       if (file) uploadFile(file);
       fileInput.value = "";
     });
 
+    // URL copy button
     copyBtn.addEventListener("click", async () => {
       if (!resultInput.value) return;
       try {
@@ -266,18 +284,18 @@
       }
     });
 
-    // Re-sync copy button label on language change in case it's showing "Copied!"
+    // Re-sync copy button label on language change (in case it's mid-"Copied!" timeout)
     window.addEventListener("langchange", () => {
-      // Only reset if not in "Copied" state (i.e. value is truthy from the timeout)
       if (copyBtn.textContent !== window.t("upload.copy.copied")) {
         copyBtn.textContent = window.t("upload.copy.default");
       }
     });
 
-    const prevent = (e) => e.preventDefault();
-    ["dragenter", "dragover", "dragleave", "drop"].forEach((ev) =>
-      uploadArea.addEventListener(ev, prevent, false),
-    );
+    // ---- Drag-and-drop ----
+    // Prevent browser from opening the file on accidental drop anywhere
+    ["dragenter", "dragover", "dragleave", "drop"].forEach((ev) => {
+      uploadArea.addEventListener(ev, (e) => e.preventDefault(), false);
+    });
 
     uploadArea.addEventListener("dragenter", () =>
       uploadArea.classList.add("dragover"),
@@ -290,54 +308,52 @@
     );
     uploadArea.addEventListener("drop", (e) => {
       uploadArea.classList.remove("dragover");
-      const file = e.dataTransfer.files[0];
+      const file = e.dataTransfer?.files[0];
       if (file) uploadFile(file);
     });
   }
 
-  /* --------------------------------------------------------------------
+  /* ------------------------------------------------------------------
    *  IMAGES TAB
    * ------------------------------------------------------------------ */
   /**
    * Initialise the Images tab: per-page/sort controls, image grid, pagination.
-   * Listens for "langchange" to rebuild injected controls with updated strings.
-   * @returns {{ loadImages: () => void }}
+   * @returns {{ loadImages: () => Promise<void> }}
    */
   function initImagesTab() {
-    const imgSection = $(SEL.imgSection);
-    const table = $(SEL.table);
-    const imgTabBtn = $(SEL.imgTabBtn);
+    const imgSection = document.getElementById("images-tab");
+    const table = document.querySelector(".hidden-table");
+    const imgTabBtn = document.querySelector('.toggle-tab[data-tab="images"]');
 
     if (!imgSection || !table || !imgTabBtn) return { loadImages: () => {} };
 
+    // Pagination / sort state
     let currentPage = 1;
     let per_page = 6;
     let totalPages = 1;
-    let hasLoadedOnce = false;
     let sort_by = "upload_time";
     let sort_order = "desc";
+    let hasLoadedOnce = false;
 
-    // ---- Build controls ----
+    // ---- Per-page / sort controls ----
 
     /**
-     * Inject (or re-inject) the per-page / sort controls using current language strings.
-     * Called on first init and again on every "langchange" event.
+     * Inject (or re-inject) the per-page / sort controls with current-language labels.
+     * Preserves the current select values across rebuilds (e.g. on langchange).
      */
     const buildControls = () => {
-      // Preserve current select values before rebuilding
       const prevPerPage =
         table.querySelector("#perPageSelect")?.value ?? String(per_page);
       const prevSortField = table.querySelector("#sortField")?.value ?? sort_by;
       const prevSortOrder =
         table.querySelector("#sortOrder")?.value ?? sort_order;
 
-      table.innerHTML = ""; // clear old controls
+      table.innerHTML = "";
 
-      const perPageControls = document.createElement("div");
-      perPageControls.className = "perpage-controls";
-      perPageControls.innerHTML = `
-        <label>
-          ${window.t("controls.per_page")}
+      const wrap = document.createElement("div");
+      wrap.className = "perpage-controls";
+      wrap.innerHTML = `
+        <label>${window.t("controls.per_page")}
           <select id="perPageSelect">
             <option value="3">3</option>
             <option value="6">6</option>
@@ -358,47 +374,38 @@
           </select>
         </label>
       `;
-      table.appendChild(perPageControls);
+      table.appendChild(wrap);
 
-      // Restore previous values
-      perPageControls.querySelector("#perPageSelect").value = prevPerPage;
-      perPageControls.querySelector("#sortField").value = prevSortField;
-      perPageControls.querySelector("#sortOrder").value = prevSortOrder;
+      wrap.querySelector("#perPageSelect").value = prevPerPage;
+      wrap.querySelector("#sortField").value = prevSortField;
+      wrap.querySelector("#sortOrder").value = prevSortOrder;
 
-      // Wire up change handlers
-      perPageControls
-        .querySelector("#perPageSelect")
-        .addEventListener("change", (e) => {
-          per_page = parseInt(e.target.value);
-          currentPage = 1;
-          loadImages();
-        });
-      perPageControls
-        .querySelector("#sortField")
-        .addEventListener("change", (e) => {
-          sort_by = e.target.value;
-          currentPage = 1;
-          loadImages();
-        });
-      perPageControls
-        .querySelector("#sortOrder")
-        .addEventListener("change", (e) => {
-          sort_order = e.target.value;
-          currentPage = 1;
-          loadImages();
-        });
+      wrap.querySelector("#perPageSelect").addEventListener("change", (e) => {
+        per_page = parseInt(e.target.value);
+        currentPage = 1;
+        loadImages();
+      });
+      wrap.querySelector("#sortField").addEventListener("change", (e) => {
+        sort_by = e.target.value;
+        currentPage = 1;
+        loadImages();
+      });
+      wrap.querySelector("#sortOrder").addEventListener("change", (e) => {
+        sort_order = e.target.value;
+        currentPage = 1;
+        loadImages();
+      });
     };
 
     buildControls();
 
-    // ---- Build pagination ----
+    // ---- Pagination row ----
+
     const paginationContainer = document.createElement("div");
     paginationContainer.className = "pagination-container";
     imgSection.appendChild(paginationContainer);
 
-    /**
-     * Re-render the pagination row with translated button labels and current page info.
-     */
+    /** Re-render pagination buttons and page-info text with current-language labels. */
     const renderPagination = () => {
       paginationContainer.innerHTML = `
         <button id="prevBtn">${window.t("controls.prev")}</button>
@@ -425,7 +432,7 @@
       });
     };
 
-    // ---- Empty / loaded state helpers ----
+    // ---- Empty / loaded state ----
 
     const showEmptyState = () => {
       table.style.display = "none";
@@ -442,11 +449,11 @@
     // ---- Delete ----
 
     /**
-     * Confirm and delete an image by unique_name, removing its cell from the DOM.
-     * @param {string} filename
+     * Confirm and DELETE a single image, then remove its card from the DOM.
+     * @param {string} uniqueName
      * @param {HTMLElement} cell
      */
-    const deleteImage = async (filename, cell) => {
+    const deleteImage = async (uniqueName, cell) => {
       const confirmed = await customConfirm(
         window.t("dialog.delete.body"),
         window.t("dialog.delete.title"),
@@ -457,53 +464,49 @@
           iconClass: "warning",
         },
       );
-
       if (!confirmed) return;
 
       try {
-        const response = await authFetch(API_DELETE_URL(filename), {
+        const res = await authFetch(API_DELETE_URL(uniqueName), {
           method: "DELETE",
         });
-        if (!response.ok) throw new Error("Delete failed");
+        if (!res.ok) throw new Error("Delete failed");
         cell.remove();
         if (!table.querySelector(".image-element")) showEmptyState();
       } catch (e) {
         await customAlert(
           window.t("upload.gallery.fail_delete", { error: e.message }),
           window.t("dialog.delete_err.title"),
-          {
-            icon: "✕",
-            iconClass: "error",
-          },
+          { icon: "✕", iconClass: "error" },
         );
       }
     };
 
-    // ---- Load & render ----
+    // ---- Load & render images ----
 
     /**
-     * Fetch the current page of images from the server and render them.
+     * Fetch the current page of images from the API and render image cards.
      */
     const loadImages = async () => {
       table.querySelectorAll(".image-element").forEach((n) => n.remove());
       imgSection.querySelectorAll(".no-images-msg").forEach((n) => n.remove());
 
       try {
-        const response = await authFetch(
+        const res = await authFetch(
           `${API_IMAGES_URL}?page=${currentPage}&per_page=${per_page}&sort_by=${sort_by}&sort_order=${sort_order}`,
         );
 
-        if (response.status === 404) {
+        if (res.status === 404) {
           showEmptyState();
           hasLoadedOnce = true;
           return;
         }
-        if (!response.ok) {
+        if (!res.ok) {
           showEmptyState();
           return;
         }
 
-        const result = await response.json();
+        const result = await res.json();
         const images = result.images;
         totalPages = result.pages;
 
@@ -535,34 +538,36 @@
             .querySelector(".delete-button")
             .addEventListener("click", () => deleteImage(unique_name, cell));
 
-          const parent = cell.querySelector(".image");
-          parent.addEventListener("click", () => {
+          const imgDiv = cell.querySelector(".image");
+          imgDiv.addEventListener("click", () => {
             window.location.href = `/view/${encodeURIComponent(unique_name)}`;
           });
 
-          const child = parent.querySelector(".new-tab");
-          if (child) {
-            child.addEventListener("click", (event) => {
-              event.stopPropagation();
+          const newTabBtn = imgDiv.querySelector(".new-tab");
+          if (newTabBtn) {
+            newTabBtn.addEventListener("click", (e) => {
+              e.stopPropagation();
               window.open(`/view/${encodeURIComponent(unique_name)}`, "_blank");
             });
           }
 
           const copyBtn = cell.querySelector(".copyBtn");
-          copyBtn?.addEventListener("click", async (event) => {
-            event.stopPropagation();
-            const url = `${location.origin}/images/${encodeURIComponent(unique_name)}`;
-            try {
-              await copyToClipboard(url);
-              copyBtn.textContent = window.t("upload.gallery.copied");
-              setTimeout(
-                () => (copyBtn.textContent = window.t("upload.gallery.copy")),
-                1500,
-              );
-            } catch (err) {
-              alert(window.t("upload.gallery.fail_copy", { error: err }));
-            }
-          });
+          if (copyBtn) {
+            copyBtn.addEventListener("click", async (e) => {
+              e.stopPropagation();
+              const url = `${location.origin}/images/${encodeURIComponent(unique_name)}`;
+              try {
+                await copyToClipboard(url);
+                copyBtn.textContent = window.t("upload.gallery.copied");
+                setTimeout(
+                  () => (copyBtn.textContent = window.t("upload.gallery.copy")),
+                  1500,
+                );
+              } catch (err) {
+                alert(window.t("upload.gallery.fail_copy", { error: err }));
+              }
+            });
+          }
 
           table.appendChild(cell);
         });
@@ -574,15 +579,15 @@
       }
     };
 
-    // Rebuild controls (translated labels) and refresh pagination text on language change
+    // Rebuild controls and pagination text on language change
     window.addEventListener("langchange", () => {
       buildControls();
       if (hasLoadedOnce) renderPagination();
-      // Refresh "No images yet." message if visible
       const emptyMsg = imgSection.querySelector(".no-images-msg");
       if (emptyMsg) emptyMsg.textContent = window.t("upload.gallery.empty");
     });
 
+    // Load images when the Images tab is clicked (lazy - only if not already loaded)
     imgTabBtn.addEventListener("click", () => {
       if (
         !hasLoadedOnce ||
@@ -592,33 +597,15 @@
       }
     });
 
+    // If the Images tab is already active on page load (e.g. via #images hash), load immediately
     if (imgTabBtn.classList.contains("active")) loadImages();
 
     return { loadImages };
   }
 
-  /* --------------------------------------------------------------------
-   *  CLIPBOARD HELPER
+  /* ------------------------------------------------------------------
+   *  INIT
    * ------------------------------------------------------------------ */
-  async function copyToClipboard(text) {
-    try {
-      await navigator.clipboard.writeText(text);
-      return true;
-    } catch {
-      // Fallback for HTTP / older browsers
-      const ta = document.createElement("textarea");
-      ta.value = text;
-      ta.style.cssText = "position:fixed;opacity:0";
-      document.body.appendChild(ta);
-      ta.focus();
-      ta.select();
-      const ok = document.execCommand("copy");
-      ta.remove();
-      return ok;
-    }
-  }
-
-  // Init
   const { loadImages } = initImagesTab();
   initUploader(loadImages);
   revealAdminIconIfAdmin();

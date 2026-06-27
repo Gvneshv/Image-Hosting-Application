@@ -7,7 +7,7 @@ Initialises the FastAPI application with a lifespan context that starts and grac
   - SlowAPI rate-limit exception handler
   - The image upload/management router (``/``, ``/upload``, etc.)
   - The authentication router (``/auth/register``, ``/auth/login``)
-  - The admin router (``/admin/*`` — requires is_admin=True on the caller)
+  - The admin router (``/admin/*`` - requires is_admin=True on the caller)
   - Static mounts for uploaded images and the frontend SPA
 """
 

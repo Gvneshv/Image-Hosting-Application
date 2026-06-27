@@ -116,7 +116,7 @@ button {
 }
 
 /*
- * Theme toggle button — strips all browser-default button chrome (border, background, outline) and renders as a 40×40 circular icon button that
+ * Theme toggle button - strips all browser-default button chrome (border, background, outline) and renders as a 40×40 circular icon button that
  * matches the account/admin icon dimensions.
  * The SVG icon inside is injected by theme.js at runtime.
  */
@@ -149,7 +149,7 @@ button {
 }
 
 /*
- * Language toggle button — same circular dimensions as .theme-toggle but displays a two-letter text label ("EN" / "UA") set by lang.js.
+ * Language toggle button - same circular dimensions as .theme-toggle but displays a two-letter text label ("EN" / "UA") set by lang.js.
  */
 .lang-toggle {
   width: 40px;
@@ -229,7 +229,7 @@ button {
 
 /* Tabs */
 /*
- * Toggle tabs bar — centred horizontally.
+ * Toggle tabs bar - centred horizontally.
  * Width is auto so that longer translated labels (e.g. Ukrainian) don't wrap.
  * white-space: nowrap on each tab prevents the label itself from breaking.
  */

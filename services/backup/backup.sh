@@ -7,7 +7,7 @@ set -e
 # Timestamp used to make each backup filename unique
 TIMESTAMP=$(date +%Y%m%d_%H%M%S)
 
-# Backup directory — must match the volume mount in docker-compose.yml:
+# Backup directory - must match the volume mount in docker-compose.yml:
 #   ./services/backend/backup:/backup
 BACKUP_DIR="/backup"
 mkdir -p "$BACKUP_DIR"

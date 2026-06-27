@@ -71,7 +71,7 @@ def cleanup_orphan_files() -> None:
 
         db.commit()
         logger.info(
-            f"Scheduled cleanup complete — "
+            f"Scheduled cleanup complete - "
             f"disk orphans removed: {len(orphans_on_disk)}, "
             f"DB orphans removed: {len(orphans_in_db)}."
         )

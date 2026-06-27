@@ -1,6 +1,6 @@
 FROM edoburu/pgbouncer:v1.24.1-p0
 
-# envsubst comes from gettext — install it
+# envsubst comes from gettext - install it
 USER root
 RUN apk add --no-cache gettext
 

@@ -110,7 +110,7 @@
             }
           }
         } catch {
-          /* non-JSON body — use default */
+          /* non-JSON body - use default */
         }
         accountLockedBody.textContent = message;
         showModal(accountLockedOverlay);

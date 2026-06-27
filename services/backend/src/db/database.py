@@ -4,9 +4,9 @@ Database engine and session configuration.
 Creates the SQLAlchemy engine using the ``DATABASE_URL`` environment variable
 and exports:
 
-- ``engine``      — the configured connection pool
-- ``SessionLocal`` — a session factory for creating DB sessions
-- ``Base``        — the declarative base class that all ORM models inherit from
+- ``engine``      - the configured connection pool
+- ``SessionLocal`` - a session factory for creating DB sessions
+- ``Base``        - the declarative base class that all ORM models inherit from
 """
 
 import os

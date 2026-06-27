@@ -1,5 +1,5 @@
 # ---------------------------------------------------------------------------
-# Makefile — convenience commands for the Image Hosting project
+# Makefile - convenience commands for the Image Hosting project
 #
 # All targets are designed to be run from the project root.
 # Alembic targets (revision / upgrade / downgrade) exec into the running
