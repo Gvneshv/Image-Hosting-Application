@@ -140,6 +140,60 @@
   };
 
   /* ---- Admin guard ---- */
+  /**
+   * Translate known server-generated message strings to the active language.
+   *
+   * The backend returns English detail strings that cannot be translated server-side without coupling the API to the frontend's locale.
+   * We pattern-match them here so the admin panel shows them in the correct language.
+   * Any unrecognised string is returned as-is (safe fallback).
+   *
+   * @param {string} msg - Raw message from the server's JSON response.
+   * @returns {string}
+   */
+  const translateServerMessage = (msg) => {
+    if (!msg) return msg;
+    // Self-action guard errors
+    if (msg.includes("cannot block their own account"))
+      return window.t("admin.js.server.cannot_block_self");
+    if (msg.includes("cannot revoke their own admin"))
+      return window.t("admin.js.server.cannot_revoke_self");
+    if (msg.includes("cannot delete their own account"))
+      return window.t("admin.js.server.cannot_delete_self");
+    // Dynamic success messages - extract values and reformat
+    // "Lockout cleared. N attempt record(s) resolved for 'email'."
+    const lockoutMatch = msg.match(
+      /Lockout cleared\. (\d+) attempt record\(s\) resolved for '(.+)'\./,
+    );
+    if (lockoutMatch) {
+      return window.t("admin.js.server.lockout_cleared", {
+        count: lockoutMatch[1],
+        email: lockoutMatch[2],
+      });
+    }
+    // "User 'email' and N image(s) have been permanently deleted."
+    const deleteUserMatch = msg.match(
+      /User '(.+)' and (\d+) image\(s\) have been permanently deleted\./,
+    );
+    if (deleteUserMatch) {
+      return window.t("admin.js.server.user_deleted", {
+        email: deleteUserMatch[1],
+        count: deleteUserMatch[2],
+      });
+    }
+    // "Image 'filename' has been permanently deleted."
+    const deleteImageMatch = msg.match(
+      /Image '(.+)' has been permanently deleted\./,
+    );
+    if (deleteImageMatch) {
+      return window.t("admin.js.server.image_deleted", {
+        filename: deleteImageMatch[1],
+      });
+    }
+    // "Too many failed login attempts. Try again in N minutes..."  (account locked body on index.html)
+    // Not handled here - that message is filled by index.js directly into the DOM.
+    return msg;
+  };
+
   const verifyAdmin = async () => {
     try {
       const res = await authFetch(API_ME);
@@ -325,7 +379,9 @@
 
       const statusBadge = user.is_blocked
         ? `<span class="badge badge--blocked">${window.t("admin.js.badge.blocked")}</span>`
-        : `<span class="badge badge--active">${window.t("admin.js.badge.active")}</span>`;
+        : user.is_locked_out
+          ? `<span class="badge badge--locked">${window.t("admin.js.badge.locked")}</span>`
+          : `<span class="badge badge--active">${window.t("admin.js.badge.active")}</span>`;
 
       tr.innerHTML = `
         <td class="email-cell">${escapeHtml(user.email)}</td>
@@ -401,7 +457,9 @@
       : `<span class="badge badge--user">${window.t("admin.js.badge.user")}</span>`;
     udStatus.innerHTML = user.is_blocked
       ? `<span class="badge badge--blocked">${window.t("admin.js.badge.blocked")}</span>`
-      : `<span class="badge badge--active">${window.t("admin.js.badge.active")}</span>`;
+      : user.is_locked_out
+        ? `<span class="badge badge--locked">${window.t("admin.js.badge.locked")}</span>`
+        : `<span class="badge badge--active">${window.t("admin.js.badge.active")}</span>`;
     udCreated.textContent = formatDate(user.created_at);
     udLastLogin.textContent = formatDate(user.last_login);
     udIp.textContent = user.registered_ip || "-";
@@ -476,7 +534,7 @@
         .addEventListener("click", async (e) => {
           e.stopPropagation();
           const ok = await showConfirm(
-            `Delete image "${img.original_name}"? This cannot be undone.`,
+            window.t("viewer.delete.body", { name: img.original_name }),
             window.t("viewer.delete.title"),
           );
           if (!ok) return;
@@ -534,7 +592,8 @@
       const data = await res.json();
       if (!res.ok) {
         showInfo(
-          data.detail || window.t("admin.js.error.admin_status"),
+          translateServerMessage(data.detail) ||
+            window.t("admin.js.error.admin_status"),
           window.t("admin.js.error.title"),
         );
         return;
@@ -575,7 +634,8 @@
       const data = await res.json();
       if (!res.ok) {
         showInfo(
-          data.detail || window.t("admin.js.error.block_status"),
+          translateServerMessage(data.detail) ||
+            window.t("admin.js.error.block_status"),
           window.t("admin.js.error.title"),
         );
         return;
@@ -605,7 +665,10 @@
         );
         return;
       }
-      showInfo(data.message, window.t("admin.js.lockout_cleared.title"));
+      showInfo(
+        translateServerMessage(data.message),
+        window.t("admin.js.lockout_cleared.title"),
+      );
     } catch {
       showInfo(
         window.t("admin.js.error.clear_lockout"),
@@ -632,13 +695,17 @@
       const data = await res.json();
       if (!res.ok) {
         showInfo(
-          data.detail || window.t("admin.js.error.delete_user"),
+          translateServerMessage(data.detail) ||
+            window.t("admin.js.error.delete_user"),
           window.t("admin.js.error.title"),
         );
         return;
       }
       hideModal(userDetailOverlay);
-      showInfo(data.message, window.t("admin.js.confirm.delete_user.title"));
+      showInfo(
+        translateServerMessage(data.message),
+        window.t("admin.js.confirm.delete_user.title"),
+      );
       loadUsers(usersPage);
       loadStats();
     } catch {
@@ -701,7 +768,8 @@
 
       if (res.status === 400) {
         auEmailError.textContent =
-          data.detail || window.t("admin.js.error.email_taken");
+          translateServerMessage(data.detail) ||
+          window.t("admin.js.error.email_taken");
         auEmail.classList.add("input-error");
         return;
       }
