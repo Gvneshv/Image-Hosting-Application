@@ -505,7 +505,7 @@ input[type="file"] {
   position: absolute;
   padding: 40px;
   top: 130px;
-  left: 50%;
+  left: 51%;
   transform: translate(-50%);
   font-size: 18px;
   color: var(--color-text-secondary);
