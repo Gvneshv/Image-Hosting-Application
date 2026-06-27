@@ -19,6 +19,27 @@
   }
 
   /* --------------------------------------------------------------------
+   *  AUTH FETCH HELPER
+   *  Must be defined first — every other function in this IIFE uses it.
+   * ------------------------------------------------------------------ */
+  const authFetch = async (url, options = {}) => {
+    const response = await fetch(url, {
+      ...options,
+      headers: {
+        Authorization: `Bearer ${token}`,
+        ...(options.headers ?? {}),
+      },
+    });
+
+    if (response.status === 401) {
+      localStorage.removeItem("access_token");
+      location.replace("index.html");
+    }
+
+    return response;
+  };
+
+  /* --------------------------------------------------------------------
    *  ACCOUNT ICON - populate initials from the JWT email claim
    * ------------------------------------------------------------------ */
   (() => {
@@ -62,26 +83,6 @@
     } catch {
       // Network failure - icon stays hidden.
     }
-  };
-
-  /* --------------------------------------------------------------------
-   *  AUTH FETCH HELPER
-   * ------------------------------------------------------------------ */
-  const authFetch = async (url, options = {}) => {
-    const response = await fetch(url, {
-      ...options,
-      headers: {
-        Authorization: `Bearer ${token}`,
-        ...(options.headers ?? {}),
-      },
-    });
-
-    if (response.status === 401) {
-      localStorage.removeItem("access_token");
-      location.replace("index.html");
-    }
-
-    return response;
   };
 
   /* --------------------------------------------------------------------

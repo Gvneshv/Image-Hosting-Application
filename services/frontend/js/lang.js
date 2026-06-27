@@ -261,6 +261,7 @@ const STRINGS = {
     "admin.stats.admins": "Admins",
     "admin.stats.blocked": "Blocked Users",
     "admin.users.title": "Users",
+    "admin.users.add": "Add User",
     "admin.users.col.email": "Email",
     "admin.users.col.role": "Role",
     "admin.users.col.status": "Status",
@@ -277,6 +278,8 @@ const STRINGS = {
     "admin.detail.ip": "Registered IP",
     "admin.detail.images": "Total Images",
     "admin.detail.images_title": "Images",
+    "admin.detail.btn.clear_lockout": "Clear Lockout",
+    "admin.detail.btn.delete_user": "Delete User",
     "admin.add_user.title": "Add User",
     "admin.add_user.email": "Email",
     "admin.add_user.password": "Password",
@@ -328,6 +331,23 @@ const STRINGS = {
     "admin.js.user_created": 'User "{email}" created successfully.',
     "admin.js.user_created.title": "User Created",
     "admin.js.lockout_cleared.title": "Lockout Cleared",
+
+    // ---- Server-generated messages (pattern-matched by translateServerMessage in admin.js) ----
+    "admin.js.server.cannot_block_self":
+      "Administrators cannot block their own account.",
+    "admin.js.server.cannot_revoke_self":
+      "Administrators cannot revoke their own admin privileges.",
+    "admin.js.server.cannot_delete_self":
+      "Administrators cannot delete their own account via the admin panel. Use the account settings page instead.",
+    // {count} = number of attempt records, {email} = user email
+    "admin.js.server.lockout_cleared":
+      "Lockout cleared. {count} attempt record(s) resolved for '{email}'.",
+    // {email} = deleted user email, {count} = number of images removed
+    "admin.js.server.user_deleted":
+      "User '{email}' and {count} image(s) have been permanently deleted.",
+    // {filename} = unique image name
+    "admin.js.server.image_deleted":
+      "Image '{filename}' has been permanently deleted.",
   },
 
   uk: {
@@ -345,7 +365,7 @@ const STRINGS = {
     "upload.tab.images": "Зображення",
     "upload.pad.main": "Виберіть файл або перетягніть його сюди",
     "upload.pad.sub":
-      "Підтримуються лише формати .jpg, .jpeg, .png, та gif.\nМаксимальний розмір файлу – 5MB",
+      "Лише формати .jpg, .jpeg, .png, та gif.\nМаксимальний розмір файлу – 5MB",
     "upload.browse": "Огляд файлів",
     "upload.url.title": "Виберіть файл",
     "upload.url.copy": "Копіювати",
@@ -524,6 +544,7 @@ const STRINGS = {
     "admin.stats.admins": "Адміністратори",
     "admin.stats.blocked": "Заблоковані користувачі",
     "admin.users.title": "Користувачі",
+    "admin.users.add": "Додати користувача",
     "admin.users.col.email": "Електронна адреса",
     "admin.users.col.role": "Роль",
     "admin.users.col.status": "Статус",
@@ -540,6 +561,8 @@ const STRINGS = {
     "admin.detail.ip": "IP-адреса реєстрації",
     "admin.detail.images": "Всього зображень",
     "admin.detail.images_title": "Зображення",
+    "admin.detail.btn.clear_lockout": "Зняти обмеження",
+    "admin.detail.btn.delete_user": "Видалити користувача",
     "admin.add_user.title": "Додати користувача",
     "admin.add_user.email": "Електронна адреса",
     "admin.add_user.password": "Пароль",
@@ -574,7 +597,7 @@ const STRINGS = {
     "admin.js.confirm.unblock": 'Розблокувати "{email}"?',
     "admin.js.confirm.unblock.title": "Розблокувати користувача",
     "admin.js.confirm.delete_user":
-      'Видалити "{email}" та всі {count} зображень(-я) до нього назавжди? Цю дію неможливо скасувати.',
+      'Видалити "{email}" та всі {count} зображень(-я) до нього назавжди? Цю дію неможливо буде скасувати.',
     "admin.js.confirm.delete_user.title": "Видалити користувача",
     "admin.js.notice.title": "Повідомлення",
     "admin.js.error.title": "Помилка",
@@ -586,13 +609,24 @@ const STRINGS = {
     "admin.js.error.create_user": "Не вдалося створити користувача.",
     "admin.js.error.email_taken": "Ця електронна адреса вже використовується.",
     "admin.js.error.email_req": "Потрібна електронна адреса.",
-    "admin.js.error.pass_min":
-      "Пароль повинен містити не менше 8 символів.",
+    "admin.js.error.pass_min": "Пароль повинен містити не менше 8 символів.",
     "admin.js.error.network": "Помилка мережі.",
-    "admin.js.user_created":
-      'Користувача "{email}" створено.',
+    "admin.js.user_created": 'Користувача "{email}" створено.',
     "admin.js.user_created.title": "Користувача створено",
     "admin.js.lockout_cleared.title": "Обмеження знято",
+
+    "admin.js.server.cannot_block_self":
+      "Адміністратори не можуть блокувати власні облікові записи.",
+    "admin.js.server.cannot_revoke_self":
+      "Адміністратори не можуть скасовувати права адміністратора власному обліковому запису.",
+    "admin.js.server.cannot_delete_self":
+      "Адміністратори не можуть видалити свій обліковий запис через панель адміністратора. Натомість скористайтеся сторінкою налаштувань облікового запису.",
+    "admin.js.server.lockout_cleared":
+      "Обмеження знято. {count} запис(ів) обмежень розв’язано для '{email}'.",
+    "admin.js.server.user_deleted":
+      "Користувача '{email}' та {count} зображень було видалено назавжди.",
+    "admin.js.server.image_deleted":
+      "TRANSLATE_ME: Image '{filename}' has been permanently deleted.",
   },
 };
 
